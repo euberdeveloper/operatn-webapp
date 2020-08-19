@@ -46,6 +46,10 @@ const routes = [
 				component: () => import(/* webpackChunkName: "presenze" */ '@/views/sportello/Presenze.vue')
 			},
 			{
+				path: '/bollette',
+				component: () => import(/* webpackChunkName: "presenze" */ '@/views/sportello/Bollette.vue')
+			},
+			{
 				path: '/pulizie',
 				component: () => import(/* webpackChunkName: "pulizie" */ '@/views/controllo/Pulizie.vue')
 			},

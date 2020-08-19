@@ -95,6 +95,11 @@ export default {
             text: "Presenze",
             path: "/presenze"
           },
+          {
+            icon: "mdi-email-multiple",
+            text: "Bollette",
+            path: "/bollette"
+          },
         ]);
       if (k == 2 || k == 3)
         items = items.concat([
