@@ -19,7 +19,6 @@ const getDefaultState = () => {
       stanza: "",
       contratto: "",
       annoContratto: `${(new Date()).getFullYear()}/${(new Date()).getFullYear() + 1}`,
-      importi: "",
       contabilizzato: false,
       cod_tipoutente: "",
       id_tipo_stanza: "",
@@ -32,7 +31,6 @@ const getDefaultState = () => {
       fabbricato: "",
       stanza: "",
       contratto: "",
-      importi: "",
       contabilizzato: true,
       id_tipo_stanza: "",
       id_utilizzo_stanza: -1,
@@ -40,6 +38,10 @@ const getDefaultState = () => {
     proroga: null,
     tab: 0,
     dialogContratto: false,
+    importi: {
+      totale_canone: null,
+      totale_consumi: null,
+    },
   }
 }
 
@@ -88,6 +90,12 @@ export default {
     },
     setSuccess(state, val) {
       state.alertSucc = val
+    },
+    setImportoCanone(state, val){
+      state.importi.totale_canone = val;
+    },
+    setImportoConsumi(state, val){
+      state.importi.totale_consumi = val;
     }
   },
   actions: {
@@ -182,7 +190,9 @@ export default {
           data_fine: obj.fine,
           anno_accademico: obj.annoContratto,
           id_tipo_rata: obj.id_tipo_rata,
-          id_utilizzo_stanza: obj.id_utilizzo_stanza == -1 ? obj.stanza.id_tipo_stanza : obj.id_utilizzo_stanza
+          id_utilizzo_stanza: obj.id_utilizzo_stanza == -1 ? obj.stanza.id_tipo_stanza : obj.id_utilizzo_stanza,
+          totale_canone: state.importi.totale_canone,
+          totale_consumi: state.importi.totale_consumi
         })
         .then(
           () => {

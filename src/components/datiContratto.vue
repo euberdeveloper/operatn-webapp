@@ -409,14 +409,14 @@ div
                       readonly,
                       dense,
                       label="Totale Canone",
-                      v-model="totaleCanone"
+                      v-model="totale_canone"
                     )
                   v-col.py-0(cols="12", sm="4")
                     v-text-field(
                       readonly,
                       dense,
                       label="Totale Consumi",
-                      v-model="totaleConsumi"
+                      v-model="totale_consumi"
                     )
                   v-col.py-0(cols="12", sm="4")
                     v-text-field(
@@ -538,28 +538,48 @@ export default {
         return tipi.indexOf(v) == i;
       });
     },
-    totaleCanone() {
-      this.updateT;
-      if (!this.v.tariffa) return "";
-      return (
-        this.v.tariffa.prezzo_canone *
-        moment(this.v.fine).diff(moment(this.v.inizio), "months", true)
-      );
+    totale_canone: {
+      set(val) {
+        this.$store.commit('inserimentoContratto/setImportoCanone', val);
+      },
+      get() {
+        if (!this.v.tariffa) return "";
+        var a = moment(this.v.fine),
+        b = moment(this.v.inizio);
+        var months = a.diff(b, 'months');
+        b.add(months, 'months');
+        var days = a.diff(b, 'days');
+      
+        return (
+          (this.v.tariffa.prezzo_canone * months) + ((this.v.tariffa.prezzo_canone/30) * days)
+        )
+      }
     },
-    totaleConsumi() {
-      this.updateT;
-      if (!this.v.tariffa) return "";
-      return (
-        this.v.tariffa.prezzo_consumi *
-        moment(this.v.fine).diff(moment(this.v.inizio), "months", true)
-      );
+    totale_consumi: {
+      set(val) {
+        this.$store.commit('inserimentoContratto/setImportoConsumi', val);
+      },
+      get() {
+        if (!this.v.tariffa) return "";
+        var a = moment(this.v.fine),
+        b = moment(this.v.inizio);
+        var months = a.diff(b, 'months');
+        b.add(months, 'months');
+        var days = a.diff(b, 'days');
+      
+        return (
+          (this.v.tariffa.prezzo_consumi * months) + ((this.v.tariffa.prezzo_consumi/30) * days)
+        )
+      }
     },
     totale() {
       this.updateT;
       if (!this.v.tariffa) return "";
+      this.$store.commit('inserimentoContratto/setImportoConsumi', this.totale_consumi);
+      this.$store.commit('inserimentoContratto/setImportoCanone', this.totale_canone);
       return (
-        Number.parseFloat(this.totaleCanone) +
-        Number.parseFloat(this.totaleConsumi)
+        Number.parseFloat(this.totale_canone) +
+        Number.parseFloat(this.totale_consumi)
       );
     },
   },
@@ -667,6 +687,6 @@ export default {
           }
         );
     },
-  },
+  }
 };
 </script>
