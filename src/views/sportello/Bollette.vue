@@ -227,6 +227,10 @@ export default {
     clearCampi() {
       this.submitted = false;
       this.error = false;
+      let setAll = (obj)=> Object.keys(obj).forEach(k => {
+        Object.keys(obj[k]).forEach(i => obj[k][i] = null);
+      });
+      setAll(this.campi, null);
     },
   },
   mounted() {
