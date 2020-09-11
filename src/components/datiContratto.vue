@@ -430,7 +430,7 @@ div
                       readonly,
                       dense,
                       label="Cauzione",
-                      v-model="v.tipoContratto.cauzione"
+                      v-model="cauzione"
                     )
                   //- v-col.py-0(cols="12", sm="4")
                   //-   input-date-picker(
@@ -441,17 +441,36 @@ div
                   //- v-col.py-0(cols="12", sm="4")
                   //-   v-text-field(readonly, dense, label="Penale")
                   v-col.py-0(cols="12", md="6")
-                    v-text-field(
-                      readonly,
+                    v-autocomplete(
+                      cache-items,
+                      flat,
+                      hide-details,
                       dense,
-                      label="Totale Altre Bollette"
+                      label="Pagante Cauzione",
+                      solo-inverted,
+                      :items="paganti",
+                      item-text="descrizione",
+                      item-value="id"
+                      v-model="pagante_cauzione",
+                      return-object,
+                      prepend-icon="mdi-file-document-edit",
+                      clearable
                     )
                   v-col.py-0(cols="12", md="6")
-                    v-text-field(
-                      readonly,
+                    v-autocomplete(
+                      cache-items,
+                      flat,
+                      hide-details,
                       dense,
-                      label="Importo a carico del Quietanzante",
-                      v-model="v.tipoContratto.pagante_cauzione"
+                      label="Quietanzante",
+                      solo-inverted,
+                      :items="paganti",
+                      item-text="descrizione",
+                      item-value="id"
+                      v-model="quiet",
+                      return-object,
+                      prepend-icon="mdi-file-document-edit",
+                      clearable
                     )
       v-tab-item.pa-2
         v-card-text ?
@@ -467,6 +486,7 @@ div
 <script>
 import Vue from "vue";
 import moment from "moment";
+import { mapState } from "vuex";
 export default {
   props: ["value", "fabbricati", "type", "tipi-contratti", "tipi-utente", "tipi-rate"],
   data() {
@@ -500,6 +520,7 @@ export default {
     };
   },
   computed: {
+     ...mapState("inserimentoContratto", ["paganti"]),
     deleteBtnText() {
       if (this.$props.type == "modifica") return "Elimina contratto";
       else return "Annulla inserimento";
@@ -555,6 +576,22 @@ export default {
         )
       }
     },
+    pagante_cauzione: {
+      set(val) {
+        this.$store.commit('inserimentoContratto/setPagante', val);
+      },
+      get() {
+        return this.$store.state.inserimentoContratto.importi.pagante
+      }
+    },
+    quiet: {
+      set(val) {
+        this.$store.commit('inserimentoContratto/setQuiet', val);
+      },
+      get() {
+        return this.$store.state.inserimentoContratto.importi.quiet
+      }
+    },
     totale_consumi: {
       set(val) {
         this.$store.commit('inserimentoContratto/setImportoConsumi', val);
@@ -582,6 +619,9 @@ export default {
         Number.parseFloat(this.totale_consumi)
       );
     },
+    cauzione() {
+      return (this.v.tariffa == undefined) ? 0 : this.v.tariffa.cauzione.rows[0].prezzo;
+    }
   },
   watch: {
     "v.fabbricato": {
@@ -677,7 +717,7 @@ export default {
               return;
             }
             this.noTariffaValid = false;
-            let tariffa = res.data[0];
+            let tariffa = res.data.rows[0];
             this.v.tariffa = tariffa;
             this.$emit("input", this.v);
             this.updateT++;
@@ -687,6 +727,9 @@ export default {
           }
         );
     },
+  },
+  mounted() {
+    this.$store.dispatch("inserimentoContratto/loadPaganti")
   }
 };
 </script>

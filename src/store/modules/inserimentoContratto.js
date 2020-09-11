@@ -41,7 +41,10 @@ const getDefaultState = () => {
     importi: {
       totale_canone: null,
       totale_consumi: null,
+      quiet: null,
+      pagante: null,
     },
+    paganti: [],
   }
 }
 
@@ -91,14 +94,37 @@ export default {
     setSuccess(state, val) {
       state.alertSucc = val
     },
-    setImportoCanone(state, val){
+    setImportoCanone(state, val) {
       state.importi.totale_canone = val;
     },
-    setImportoConsumi(state, val){
+    setImportoConsumi(state, val) {
       state.importi.totale_consumi = val;
-    }
+    },
+    setPaganti(state, val) {
+      state.paganti = val;
+    },
+    setPagante(state, val) {
+      state.importi.pagante = val;
+    },
+    setQuiet(state, val) {
+      state.importi.quiet = val;
+    },
   },
   actions: {
+    loadPaganti({ commit }) {
+      Vue.prototype.$api
+        .get("/ragioneria/paganti")
+        .then(
+          res => {
+            console.log(res.data);
+            commit('setPaganti', res.data.rows)
+          },
+          error => {
+            commit('setPaganti', [])
+            console.error(error)
+          }
+        )
+    },
     loadTipiUtente({ commit }) {
       Vue.prototype.$api
         .get("/ragioneria/tipi/utente")
@@ -192,7 +218,9 @@ export default {
           id_tipo_rata: obj.id_tipo_rata,
           id_utilizzo_stanza: obj.id_utilizzo_stanza == -1 ? obj.stanza.id_tipo_stanza : obj.id_utilizzo_stanza,
           totale_canone: state.importi.totale_canone,
-          totale_consumi: state.importi.totale_consumi
+          totale_consumi: state.importi.totale_consumi,
+          pagante_cauzione: state.importi.pagante,
+          quiet: state.importi.quiet,
         })
         .then(
           () => {
