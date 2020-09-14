@@ -365,7 +365,7 @@ div
                       v-model="v.tipoContratto.canone",
                       readonly,
                       dense,
-                      label="Tariffa Canone'"
+                      label="Tariffa Canone"
                     )
                   v-col.py-0(cols="12", md="6")
                     v-text-field(
@@ -381,6 +381,20 @@ div
                       readonly,
                       dense,
                       label="Frequenza Rate"
+                    )
+                  v-col.py-0(cols="12", md="6")
+                    v-text-field(
+                      v-model="(v.tipoContratto.quietanziante == null) ? 'Non specificato' : v.tipoContratto.quietanziante",
+                      readonly,
+                      dense,
+                      label="Quietanziante"
+                    )
+                  v-col.py-0(cols="12", md="6")
+                    v-text-field(
+                      v-model="(v.tipoContratto.pagante_cauzione == null) ? 'Non specificato' : v.tipoContratto.pagante_cauzione",
+                      readonly,
+                      dense,
+                      label="Pagante Cauzione"
                     )
                   v-col.py-0(cols="12", sm="6")
                     v-autocomplete(
@@ -430,7 +444,7 @@ div
                       readonly,
                       dense,
                       label="Cauzione",
-                      v-model="cauzione"
+                      v-model="(isNaN(v.tipoContratto.cauzione)) ? 'Non specificato' : v.tipoContratto.cauzione"
                     )
                   //- v-col.py-0(cols="12", sm="4")
                   //-   input-date-picker(
@@ -440,38 +454,6 @@ div
                   //-   )
                   //- v-col.py-0(cols="12", sm="4")
                   //-   v-text-field(readonly, dense, label="Penale")
-                  v-col.py-0(cols="12", md="6")
-                    v-autocomplete(
-                      cache-items,
-                      flat,
-                      hide-details,
-                      dense,
-                      label="Pagante Cauzione",
-                      solo-inverted,
-                      :items="paganti",
-                      item-text="descrizione",
-                      item-value="id"
-                      v-model="pagante_cauzione",
-                      return-object,
-                      prepend-icon="mdi-file-document-edit",
-                      clearable
-                    )
-                  v-col.py-0(cols="12", md="6")
-                    v-autocomplete(
-                      cache-items,
-                      flat,
-                      hide-details,
-                      dense,
-                      label="Quietanzante",
-                      solo-inverted,
-                      :items="paganti",
-                      item-text="descrizione",
-                      item-value="id"
-                      v-model="quiet",
-                      return-object,
-                      prepend-icon="mdi-file-document-edit",
-                      clearable
-                    )
       v-tab-item.pa-2
         v-card-text ?
       v-tab-item.pa-2
@@ -486,7 +468,6 @@ div
 <script>
 import Vue from "vue";
 import moment from "moment";
-import { mapState } from "vuex";
 export default {
   props: ["value", "fabbricati", "type", "tipi-contratti", "tipi-utente", "tipi-rate"],
   data() {
@@ -520,7 +501,6 @@ export default {
     };
   },
   computed: {
-     ...mapState("inserimentoContratto", ["paganti"]),
     deleteBtnText() {
       if (this.$props.type == "modifica") return "Elimina contratto";
       else return "Annulla inserimento";
@@ -576,22 +556,6 @@ export default {
         )
       }
     },
-    pagante_cauzione: {
-      set(val) {
-        this.$store.commit('inserimentoContratto/setPagante', val);
-      },
-      get() {
-        return this.$store.state.inserimentoContratto.importi.pagante
-      }
-    },
-    quiet: {
-      set(val) {
-        this.$store.commit('inserimentoContratto/setQuiet', val);
-      },
-      get() {
-        return this.$store.state.inserimentoContratto.importi.quiet
-      }
-    },
     totale_consumi: {
       set(val) {
         this.$store.commit('inserimentoContratto/setImportoConsumi', val);
@@ -619,9 +583,6 @@ export default {
         Number.parseFloat(this.totale_consumi)
       );
     },
-    cauzione() {
-      return (this.v.tariffa == undefined) ? 0 : this.v.tariffa.cauzione.rows[0].prezzo;
-    }
   },
   watch: {
     "v.fabbricato": {
@@ -728,8 +689,5 @@ export default {
         );
     },
   },
-  mounted() {
-    this.$store.dispatch("inserimentoContratto/loadPaganti")
-  }
 };
 </script>
