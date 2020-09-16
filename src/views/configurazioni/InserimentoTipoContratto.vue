@@ -31,9 +31,7 @@ v-data-table.elevation-1(:headers='headers', :items='tipi', :items-per-page='50'
                 v-col(cols='6')
                   v-text-field.ml-2(label='Ammontare', placeholder='0', v-model='cauzione', prepend-icon='mdi-currency-eur', :rules='numberRule')
                 v-col(cols='6')
-                  v-radio-group.mt-0(v-model="paganteCauzione", :rules='notNull')
-                    v-radio(label="Beneficiario" value="B")
-                    v-radio(label="Quietanziante" value="Q")
+                  v-autocomplete(label='Pagante Cauzione', :items='quietanzianti', v-model='paganteCauzione', :rules='notNull')
                       
           v-card-actions
             v-spacer
@@ -159,6 +157,7 @@ export default {
     Vue.prototype.$api.get("/ragioneria/tipi/quietanziante").then(
       res => {
         this.quietanzianti_ = res.data;
+        console.log(this.quietanzianti_);
       },
       error => {
         this.quietanzianti_ = [];
