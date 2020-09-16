@@ -382,20 +382,6 @@ div
                       dense,
                       label="Frequenza Rate"
                     )
-                  v-col.py-0(cols="12", md="6")
-                    v-text-field(
-                      v-model="(v.tipoContratto.quietanziante == null) ? 'Non specificato' : v.tipoContratto.quietanziante",
-                      readonly,
-                      dense,
-                      label="Quietanziante"
-                    )
-                  v-col.py-0(cols="12", md="6")
-                    v-text-field(
-                      v-model="(v.tipoContratto.pagante_cauzione == null) ? 'Non specificato' : v.tipoContratto.pagante_cauzione",
-                      readonly,
-                      dense,
-                      label="Pagante Cauzione"
-                    )
                   v-col.py-0(cols="12", sm="6")
                     v-autocomplete(
                       :items="anniAccademici",
@@ -414,7 +400,7 @@ div
             v-expand-transition
               div(v-show="expand_sections[3] === true")
                 v-card-actions
-                  v-btn.mx-4(@click="getTariffa") Ricalcola
+                  v-btn.mx-4(@click="getTariffa") Calcola
                     v-icon mdi-refresh
                   v-alert.ma-2(v-if="noTariffaValid", type="error") Nessuna tariffa disponibile per i dati forniti
                 v-row.mx-1(v-if="v.tipoContratto")
@@ -436,15 +422,29 @@ div
                     v-text-field(
                       readonly,
                       dense,
-                      label="Totale",
-                      v-model="totale"
+                      label="Cauzione",
+                      v-model="(isNaN(v.tipoContratto.cauzione)) ? 'Non specificato' : v.tipoContratto.cauzione"
+                    )
+                  v-col.py-0(cols="12", md="6")
+                    v-text-field(
+                      v-model="(v.tipoContratto.quietanziante == null) ? 'Non specificato' : v.tipoContratto.quietanziante",
+                      readonly,
+                      dense,
+                      label="Quietanziante"
+                    )
+                  v-col.py-0(cols="12", md="6")
+                    v-text-field(
+                      v-model="(v.tipoContratto.pagante_cauzione == null) ? 'Non specificato' : v.tipoContratto.pagante_cauzione",
+                      readonly,
+                      dense,
+                      label="Pagante Cauzione"
                     )
                   v-col.py-0(cols="12", sm="4")
                     v-text-field(
                       readonly,
                       dense,
-                      label="Cauzione",
-                      v-model="(isNaN(v.tipoContratto.cauzione)) ? 'Non specificato' : v.tipoContratto.cauzione"
+                      label="Totale",
+                      v-model="totale"
                     )
                   //- v-col.py-0(cols="12", sm="4")
                   //-   input-date-picker(
@@ -580,7 +580,8 @@ export default {
       this.$store.commit('inserimentoContratto/setImportoCanone', this.totale_canone);
       return (
         Number.parseFloat(this.totale_canone) +
-        Number.parseFloat(this.totale_consumi)
+        Number.parseFloat(this.totale_consumi) +
+        Number.parseFloat(this.v.tipoContratto.cauzione)
       );
     },
   },
@@ -648,6 +649,7 @@ export default {
       // this.expand_sections[i] = !this.expand_sections[i]
       // e' necessario aggiornare tutto l'array per invocare il ricalcolo del virtual-dom
       this.expand_sections = this.expand_sections.map((x, j) => {
+        if(i == 3) this.getTariffa();
         if (i === j) return !x;
         else return x;
       });
