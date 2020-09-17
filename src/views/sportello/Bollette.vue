@@ -3,7 +3,7 @@ v-card
   v-toolbar.primary.elevation-0(dark)
     v-toolbar-title Bollette
   v-card-text(style="padding-bottom: 0px; padding-top: 0px;")
-    v-subheader.pa-0  Ricerca per id contratto/nome, data di inizio o per data di scadenza
+    v-subheader.pa-0 Ricerca per id contratto/nome, data di inizio o per data di scadenza
   v-card-text
     v-radio-group(v-model="radios", :mandatory="true")
       v-radio(value="idcontratto", label="Id contratto")
@@ -22,7 +22,7 @@ v-card
           v-model="campi[0].id_contratto",
           dense,
           required,
-          :rules="[value => !isNaN(value) || 'Inserire il codice identificativo del contratto']"
+          :rules="[(value) => !isNaN(value) || 'Inserire il codice identificativo del contratto']",
           label="Id contratto"
         )
     v-expand-transition
@@ -30,7 +30,7 @@ v-card
         v-row.mx-2.mt-2
           v-col.py-0
             v-card-text(v-if="!error") Seleziona l'intervallo di date
-            v-card-text(v-else, style="color: red") {{error}}
+            v-card-text(v-else, style="color: red") {{ error }}
             v-date-picker.elevation-1(
               v-model="campi[1].dates",
               :landscape="$vuetify.breakpoint.mdAndUp",
@@ -45,7 +45,7 @@ v-card
         v-row.mx-2.mt-2
           v-col.py-0
             v-card-text(v-if="!error") Seleziona l'intervallo di date
-            v-card-text(v-else, style="color: red") {{error}}
+            v-card-text(v-else, style="color: red") {{ error }}
             v-date-picker.elevation-1(
               v-model="campi[2].dates",
               :landscape="$vuetify.breakpoint.mdAndUp",
@@ -85,7 +85,7 @@ v-card
             v-select(
               :items="tipiContratti",
               item-text="desc_sigla",
-              item-value="id"
+              item-value="id",
               label="Tipo di contratto",
               v-model="campi[3].tipo_contratto"
             )
@@ -94,7 +94,7 @@ v-card
               :items="tipiUtente",
               label="Tipo di utente",
               item-text="descrizione",
-              item-value="id"
+              item-value="id",
               v-model="campi[3].tipo_utente"
             )
           v-col.py-0
@@ -104,14 +104,16 @@ v-card
               v-model="campi[3].anno_contratto"
             )
     v-expand-transition
-      v-data-table#print.elevation-1(
-        v-show="submitted",
-        :headers="headers",
-        dense=""
-      )
-        template(v-slot:item.controls="props")
-          v-btn.mx-2(small="", color="primary", @click="dettaglio(props.item)")
-            v-icon(dark="") mdi-card-account-mail
+      v-content.pa-0(v-show="submitted")
+        v-row.ml-0.mt-2
+          v-col.pa-0
+            v-card-title.pa-0 Risultati della ricerca
+        v-divider.mb-3
+        v-data-table#print.elevation-1(
+          :headers="headers",
+          dense="",
+          :items="risultati"
+        )
     v-card-text 
       v-btn(color="primary", @click="submitCampi") Continua
       v-btn(text, @click="clearCampi") Pulisci campi
@@ -174,16 +176,19 @@ export default {
       let h = [
         "nome",
         "cognome",
-        "sesso",
-        "descrizione_fabbricato",
-        "inizio contratto",
-        "fine contratto",
-        "check in",
-        "check out",
+        "data_inizio",
+        "data_fine",
+        "contabilizzato",
+        "data_firma_contratto",
+        "num_bolletta",
+        "scadenza",
+        "prezzo",
+        "competenza_da",
+        "competenza_a",
+        "tipo",
       ].map((x) => {
         return { text: x, value: x };
       });
-      h.push({ text: "", value: "controls", sortable: false });
       return h;
     },
     anniAccademici() {
@@ -198,7 +203,6 @@ export default {
       this.expand.forEach((value, i) => {
         if (value) {
           let params = new URLSearchParams(this.campi[i]);
-          console.log(this.tipiUtente)
           switch (i) {
             case 1:
             case 2:
@@ -211,11 +215,15 @@ export default {
             default:
               break;
           }
+          this.clearCampi();
           Vue.prototype.$api
             .get(`/ragioneria/bollette/${i}?${params.toString()}`)
             .then(
-              () => {
+              (res) => {
+                this.risultati = JSON.stringify(res.data);
+                this.risultati = JSON.parse(this.risultati);
                 this.submitted = true;
+                console.log(res.data);
               },
               (error) => {
                 console.log(error);
@@ -227,9 +235,10 @@ export default {
     clearCampi() {
       this.submitted = false;
       this.error = false;
-      let setAll = (obj)=> Object.keys(obj).forEach(k => {
-        Object.keys(obj[k]).forEach(i => obj[k][i] = null);
-      });
+      let setAll = (obj) =>
+        Object.keys(obj).forEach((k) => {
+          Object.keys(obj[k]).forEach((i) => (obj[k][i] = null));
+        });
       setAll(this.campi, null);
     },
   },
