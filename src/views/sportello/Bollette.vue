@@ -3,120 +3,119 @@ v-card
   v-toolbar.primary.elevation-0(dark)
     v-toolbar-title Bollette
   v-card-text(style="padding-bottom: 0px; padding-top: 0px;")
-    v-subheader.pa-0 Ricerca per id contratto/nome, data di inizio o per data di scadenza
+    v-subheader.pa-0 Per mostrare tutte le bollette presenti nel sistema lasciare in bianco tutti i campi
+
+  v-expand-transition
+    v-content.pa-0(v-if="form")
+      v-row.mx-2.mt-2
+        v-col.py-0
+          v-text-field(
+            v-model="campi.id_contratto",
+            dense,
+            required,
+            :rules="[(value) => !isNaN(value) || 'Inserire il codice identificativo del contratto']",
+            label="Id contratto"
+          )
+        v-col.py-0
+          v-text-field(
+            v-model="campi.num_bolletta",
+            dense,
+            required,
+            :rules="[(value) => !isNaN(value) || 'Inserire il codice identificativo della bolletta']",
+            label="Numero di bolletta"
+          )
+      v-row.mx-2.mt-2
+        v-col.py-0
+          user-select(
+            return-object,
+            hide-no-data,
+            dense,
+            prepend-icon="mdi-account",
+            v-model="campi.persona"
+          )
+        v-col.py-0
+          v-text-field(
+            v-model="campi.id_persona",
+            dense,
+            required,
+            :rules="[(value) => !isNaN(value) || 'Inserire il codice identificativo della persona', (value) => value != 'Inserire il codice identificativo della persona']",
+            label="Id persona"
+          )
+      v-row.mx-2.mt-2
+        v-col.py-0
+          v-card-text Seleziona l'intervallo di date in cui il contratto è iniziato
+          v-date-picker.elevation-1(
+            v-model="campi.dates_start",
+            :landscape="$vuetify.breakpoint.mdAndUp",
+            range="",
+            show-current="",
+            first-day-of-week="1",
+            locale="it-it",
+            hint="MM/DD/YYYY format"
+          )
+        v-col.py-0
+          v-card-text Seleziona l'intervallo di date in cui il contratto è finito
+          v-date-picker.elevation-1(
+            v-model="campi.dates_end",
+            :landscape="$vuetify.breakpoint.mdAndUp",
+            range="",
+            show-current="",
+            first-day-of-week="1",
+            locale="it-it",
+            hint="MM/DD/YYYY format"
+          )
+        v-col.py-0
+          v-card-text Seleziona l'intervallo di date in cui il contratto è stato registrato
+          v-date-picker.elevation-1(
+            v-model="campi.reg_dates",
+            :landscape="$vuetify.breakpoint.mdAndUp",
+            range="",
+            show-current="",
+            first-day-of-week="1",
+            locale="it-it",
+            hint="MM/DD/YYYY format"
+          )
+      v-row.mx-2.mt-2
+        v-col.py-0
+          v-select(
+            :items="tipiContratti",
+            item-text="desc_sigla",
+            item-value="id",
+            label="Tipo di contratto",
+            v-model="campi.tipo_contratto"
+          )
+        v-col.py-0
+          v-select(
+            :items="tipiUtente",
+            label="Tipo di utente",
+            item-text="descrizione",
+            item-value="id",
+            v-model="campi.tipo_utente"
+          )
+        v-col.py-0
+          v-select(
+            :items="anniAccademici",
+            label="Anno contratto",
+            v-model="campi.anno_contratto"
+          )
+  v-expand-transition
+    v-content.pa-0(v-if="submitted")
+      v-divider.mb-2
+      v-row.mt-2
+        v-col
+          v-card-title Risultati della ricerca
+      v-divider.mb-1
+      v-row.mt-2
+        v-col.ma-1
+          v-data-table#print.elevation-1(
+            :headers="headers",
+            dense="",
+            :items="risultati"
+          )
   v-card-text
-    v-radio-group(v-model="radios", :mandatory="true")
-      v-radio(value="idcontratto", label="Id contratto")
-      v-radio(
-        value="datainizio",
-        label="Contratti che iniziano nel periodo (da selezionare)"
-      )
-      v-radio(
-        value="datascadenza",
-        label="Contratti che terminano nel periodo (da selezionare)"
-      )
-      v-radio(value="evoluto", label="Ricerca avanzata") 
-    v-expand-transition
-      v-form.mb-2(v-show="expand[0]")
-        v-text-field(
-          v-model="campi[0].id_contratto",
-          dense,
-          required,
-          :rules="[(value) => !isNaN(value) || 'Inserire il codice identificativo del contratto']",
-          label="Id contratto"
-        )
-    v-expand-transition
-      v-form.mb-2(v-show="expand[1]")
-        v-row.mx-2.mt-2
-          v-col.py-0
-            v-card-text(v-if="!error") Seleziona l'intervallo di date
-            v-card-text(v-else, style="color: red") {{ error }}
-            v-date-picker.elevation-1(
-              v-model="campi[1].dates",
-              :landscape="$vuetify.breakpoint.mdAndUp",
-              range="",
-              show-current="",
-              first-day-of-week="1",
-              locale="it-it",
-              hint="MM/DD/YYYY format"
-            )
-    v-expand-transition
-      v-form.mb-2(v-show="expand[2]")
-        v-row.mx-2.mt-2
-          v-col.py-0
-            v-card-text(v-if="!error") Seleziona l'intervallo di date
-            v-card-text(v-else, style="color: red") {{ error }}
-            v-date-picker.elevation-1(
-              v-model="campi[2].dates",
-              :landscape="$vuetify.breakpoint.mdAndUp",
-              range="",
-              show-current="",
-              first-day-of-week="1",
-              locale="it-it",
-              hint="MM/DD/YYYY format"
-            )
-    v-expand-transition
-      v-form.mb-2(v-show="expand[3]")
-        v-row.mx-2.mt-2
-          v-col.py-0
-            v-card-text Seleziona l'intervallo di date in cui il contratto è stato registrato
-            v-date-picker.elevation-1(
-              v-model="campi[3].reg_dates",
-              :landscape="$vuetify.breakpoint.mdAndUp",
-              range="",
-              show-current="",
-              first-day-of-week="1",
-              locale="it-it",
-              hint="MM/DD/YYYY format"
-            )
-          v-col.py-0
-            v-card-text Seleziona l'intervallo di date in cui il contratto è iniziato
-            v-date-picker.elevation-1(
-              v-model="campi[3].inizio_dates",
-              :landscape="$vuetify.breakpoint.mdAndUp",
-              range="",
-              show-current="",
-              first-day-of-week="1",
-              locale="it-it",
-              hint="MM/DD/YYYY format"
-            )
-        v-row.mx-2.mt-2
-          v-col.py-0
-            v-select(
-              :items="tipiContratti",
-              item-text="desc_sigla",
-              item-value="id",
-              label="Tipo di contratto",
-              v-model="campi[3].tipo_contratto"
-            )
-          v-col.py-0
-            v-select(
-              :items="tipiUtente",
-              label="Tipo di utente",
-              item-text="descrizione",
-              item-value="id",
-              v-model="campi[3].tipo_utente"
-            )
-          v-col.py-0
-            v-select(
-              :items="anniAccademici",
-              label="Anno contratto",
-              v-model="campi[3].anno_contratto"
-            )
-    v-expand-transition
-      v-content.pa-0(v-show="submitted")
-        v-row.ml-0.mt-2
-          v-col.pa-0
-            v-card-title.pa-0 Risultati della ricerca
-        v-divider.mb-3
-        v-data-table#print.elevation-1(
-          :headers="headers",
-          dense="",
-          :items="risultati"
-        )
-    v-card-text 
-      v-btn(color="primary", @click="submitCampi") Continua
-      v-btn(text, @click="clearCampi") Pulisci campi
+    v-btn(color="primary", @click="submitCampi") Continua
+    v-btn(text, @click="clearCampi") Pulisci campi
+    v-btn(text, @click="form = true") Mostra maschera di ricerca
 </template>
 
 <script>
@@ -134,42 +133,21 @@ export default {
       expand: [false, false, false],
       submitted: false,
       dates: null,
-      campi: [
-        { id_contratto: null },
-        { dates: null },
-        { dates: null },
-        {
-          reg_dates: null,
-          inizio_dates: null,
-          tipo_contratto: null,
-          tipo_utente: null,
-          anno_contratto: null,
-        },
-      ],
+      campi: {
+        id_contratto: null,
+        num_bolletta: null,
+        id_persona: null,
+        persona: null,
+        dates_start: null,
+        dates_end: null,
+        reg_dates: null,
+        tipo_contratto: null,
+        tipo_utente: null,
+        anno_contratto: null,
+      },
+      risultati: null,
+      form: true,
     };
-  },
-  watch: {
-    radios() {
-      this.error = false;
-      this.expand = this.expand.map((x) => {
-        x = false;
-        return x;
-      });
-      switch (this.radios) {
-        case "idcontratto":
-          this.expand[0] = true;
-          break;
-        case "datainizio":
-          this.expand[1] = true;
-          break;
-        case "datascadenza":
-          this.expand[2] = true;
-          break;
-        case "evoluto":
-          this.expand[3] = true;
-          break;
-      }
-    },
   },
   computed: {
     headers() {
@@ -200,45 +178,26 @@ export default {
   },
   methods: {
     submitCampi() {
-      this.expand.forEach((value, i) => {
-        if (value) {
-          let params = new URLSearchParams(this.campi[i]);
-          switch (i) {
-            case 1:
-            case 2:
-              if (this.campi[i].dates.length > 1) {
-                this.error = false;
-                break;
-              }
-              this.error = `Il campo deve essere un intervallo di date`;
-              return;
-            default:
-              break;
-          }
-          this.clearCampi();
-          Vue.prototype.$api
-            .get(`/ragioneria/bollette/${i}?${params.toString()}`)
-            .then(
-              (res) => {
-                this.risultati = JSON.stringify(res.data);
-                this.risultati = JSON.parse(this.risultati);
-                this.submitted = true;
-                console.log(res.data);
-              },
-              (error) => {
-                console.log(error);
-              }
-            );
+      let params = new URLSearchParams(this.campi);
+      console.log(params.toString())
+      Vue.prototype.$api.get(`/ragioneria/bollette/?${params.toString()}`).then(
+        (res) => {
+          console.log(res);
+          this.risultati = JSON.stringify(res.data);
+          this.risultati = JSON.parse(this.risultati);
+          this.form = false;
+          this.submitted = true;
+          console.log(res.data);
+        },
+        (error) => {
+          console.log(error);
         }
-      });
+      );
     },
     clearCampi() {
       this.submitted = false;
-      this.error = false;
-      let setAll = (obj) =>
-        Object.keys(obj).forEach((k) => {
-          Object.keys(obj[k]).forEach((i) => (obj[k][i] = null));
-        });
+      this.form = true;
+      let setAll = (obj) => Object.keys(obj).forEach((i) => (obj[i] = null));
       setAll(this.campi, null);
     },
   },
@@ -246,5 +205,13 @@ export default {
     this.$store.dispatch("inserimentoContratto/loadTipiUtente");
     this.$store.dispatch("inserimentoContratto/loadTipiContratti");
   },
+  watch: {
+    "campi.persona": {
+      handler(value) {
+        if(value != undefined)
+        this.campi.id_persona = value.id;
+      }
+    }
+  }
 };
 </script>

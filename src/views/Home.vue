@@ -95,11 +95,6 @@ export default {
             text: "Presenze",
             path: "/presenze"
           },
-          {
-            icon: "mdi-email-multiple",
-            text: "Bollette",
-            path: "/bollette"
-          },
         ]);
       if (k == 2 || k == 3)
         items = items.concat([
@@ -113,6 +108,13 @@ export default {
           { icon: "mdi-account-supervisor-circle", text: "Gestione utenti", path: "/utenti" },
           { icon: "mdi-file-document-edit", text: "Gestione Firma", path: "/firmatario" },
         ]);
+      if(k == 4 || k == 3 || k == 1) {
+        items = items.concat([
+          { divider: true, role:'RAGIONERIA' },
+          { icon: "mdi-file-document-edit", text: "Ricerca contratti", path: "/ricerca-contratti" },
+          { icon: "mdi-email-multiple", text: "Ricerca bollette", path: "/bollette" },
+        ]);
+      }
       if (k == 1 || k == 3)
         items = items.concat([
           { divider: true, role:'CONFIGURAZIONI' },

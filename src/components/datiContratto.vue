@@ -9,9 +9,6 @@ div
         v-icon(dense, left) mdi-plus
         | Altri Dati
       v-tab
-        v-icon(dense, left) mdi-cash-multiple
-        | Bollette
-      v-tab
         v-icon(dense, left) mdi-bike
         | Biciclette
       v-tab-item.pa-2
@@ -398,12 +395,12 @@ div
               @click="expandCollapse(3)"
             ) mdi-chevron-{{ expand_sections[1] ? 'up' : 'down' }}
             v-expand-transition
-              div(v-show="expand_sections[3] === true")
+              div(v-show="expand_sections[3] === true" v-if="v.tipoContratto")
                 v-card-actions
                   v-btn.mx-4(@click="getTariffa") Calcola
                     v-icon mdi-refresh
                   v-alert.ma-2(v-if="noTariffaValid", type="error") Nessuna tariffa disponibile per i dati forniti
-                v-row.mx-1(v-if="v.tipoContratto")
+                v-row.mx-1
                   v-col.py-0(cols="12", sm="4")
                     v-text-field(
                       readonly,
@@ -417,7 +414,8 @@ div
                       dense,
                       label="Totale Consumi",
                       v-model="totale_consumi"
-                    )
+                    )                  
+                v-row.mx-1
                   v-col.py-0(cols="12", sm="4")
                     v-text-field(
                       readonly,
@@ -427,17 +425,18 @@ div
                     )
                   v-col.py-0(cols="12", md="6")
                     v-text-field(
-                      v-model="(v.tipoContratto.quietanziante == null) ? 'Non specificato' : v.tipoContratto.quietanziante",
-                      readonly,
-                      dense,
-                      label="Quietanziante"
-                    )
-                  v-col.py-0(cols="12", md="6")
-                    v-text-field(
                       v-model="(v.tipoContratto.pagante_cauzione == null) ? 'Non specificato' : v.tipoContratto.pagante_cauzione",
                       readonly,
                       dense,
                       label="Pagante Cauzione"
+                    )
+                v-row.mx-1
+                  v-col.py-0(cols="12", md="6")
+                    v-text-field(
+                      v-model="(v.tipoContratto.quietanziante == null) ? 'Non specificato' : v.tipoContratto.quietanziante",
+                      readonly,
+                      dense,
+                      label="Quietanziante"
                     )
                   v-col.py-0(cols="12", sm="4")
                     v-text-field(
@@ -445,6 +444,7 @@ div
                       dense,
                       label="Totale",
                       v-model="totale"
+                      color="blue darken-2"
                     )
                   //- v-col.py-0(cols="12", sm="4")
                   //-   input-date-picker(
