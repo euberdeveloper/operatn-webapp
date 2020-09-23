@@ -6,7 +6,7 @@ v-card
     v-subheader.pa-0 Per mostrare tutte le bollette presenti nel sistema lasciare in bianco tutti i campi
 
   v-expand-transition
-    v-content.pa-0(v-if="form")
+    v-main.pa-0(v-if="form")
       v-row.mx-2.mt-2
         v-col.py-0
           v-text-field(
@@ -98,24 +98,27 @@ v-card
             label="Anno contratto",
             v-model="campi.anno_contratto"
           )
-  v-expand-transition
-    v-content.pa-0(v-if="submitted")
-      v-divider.mb-2
-      v-row.mt-2
-        v-col
-          v-card-title Risultati della ricerca
-      v-divider.mb-1
-      v-row.mt-2
-        v-col.ma-1
-          v-data-table#print.elevation-1(
-            :headers="headers",
-            dense="",
-            :items="risultati"
-          )
   v-card-text
     v-btn(color="primary", @click="submitCampi") Continua
     v-btn(text, @click="clearCampi") Pulisci campi
     v-btn(text, @click="form = true") Mostra maschera di ricerca
+  v-expand-transition
+    v-main.pa-0(v-if="submitted")
+      v-divider.mb-1
+      v-row.mt-2
+        v-col
+          v-card-title Risultati della ricerca
+      v-divider.mb-1
+      v-card.ma-1(v-for="i in risultati")
+        v-card-title(style="text-transform: capitalize;") Intestatario: {{i.nome}} {{i.cognome}} 
+        v-card-subtitle 
+          div Contratto valido da {{i.data_inizio}} a {{i.data_fine}}, {{(i.data_firma_contratto == null) ? 'non firmato' : `firmato in data ${i.data_firma_contratto}`}} 
+          div {{i.tipo}}, {{(i.contabilizzato == true) ? 'contabilizzato' : `non contabilizzato`}}
+        v-data-table#print.elevation-1(
+            :headers="headers",
+            dense="",
+            :items="i.bollette"
+          )
 </template>
 
 <script>
@@ -152,18 +155,11 @@ export default {
   computed: {
     headers() {
       let h = [
-        "nome",
-        "cognome",
-        "data_inizio",
-        "data_fine",
-        "contabilizzato",
-        "data_firma_contratto",
         "num_bolletta",
         "scadenza",
         "prezzo",
         "competenza_da",
         "competenza_a",
-        "tipo",
       ].map((x) => {
         return { text: x, value: x };
       });
@@ -179,7 +175,7 @@ export default {
   methods: {
     submitCampi() {
       let params = new URLSearchParams(this.campi);
-      console.log(params.toString())
+      console.log(params.toString());
       Vue.prototype.$api.get(`/ragioneria/bollette/?${params.toString()}`).then(
         (res) => {
           console.log(res);
@@ -187,7 +183,41 @@ export default {
           this.risultati = JSON.parse(this.risultati);
           this.form = false;
           this.submitted = true;
-          console.log(res.data);
+          let temp = [];
+          this.risultati.forEach((element) => {
+            let c = temp.findIndex(
+              (persona) => persona.id == element.id
+            );
+            if (c === -1) {
+              temp.push({
+                id: element.id,
+                nome: element.nome,
+                cognome: element.cognome,
+                data_inizio: element.data_inizio,
+                data_fine: element.data_fine,
+                contabilizzato: element.contabilizzato,
+                data_firma_contratto: element.data_firma_contratto,
+                tipo: element.tipo,
+                bollette: [{
+                  num_bolletta: element.num_bolletta,
+                  scadenza: element.scadenza,
+                  prezzo: element.prezzo,
+                  competenza_da: element.competenza_da,
+                  competenza_a: element.competenza_a
+                }],
+              });
+            } else {
+              temp[c].bollette.push(
+                {
+                  num_bolletta: element.num_bolletta,
+                  scadenza: element.scadenza,
+                  prezzo: element.prezzo,
+                  competenza_da: element.competenza_da,
+                  competenza_a: element.competenza_a
+                });
+            }
+          });
+          this.risultati = temp;
         },
         (error) => {
           console.log(error);
@@ -208,10 +238,9 @@ export default {
   watch: {
     "campi.persona": {
       handler(value) {
-        if(value != undefined)
-        this.campi.id_persona = value.id;
-      }
-    }
-  }
+        if (value != undefined) this.campi.id_persona = value.id;
+      },
+    },
+  },
 };
 </script>
