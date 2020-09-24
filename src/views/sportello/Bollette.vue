@@ -42,33 +42,30 @@ v-card
             label="Id persona"
           )
       v-row.mx-2.mt-2
-        v-col.py-0
+        v-col.py-0.text-center
           v-card-text Seleziona l'intervallo di date in cui il contratto è iniziato
           v-date-picker.elevation-1(
             v-model="campi.dates_start",
-            :landscape="$vuetify.breakpoint.mdAndUp",
             range="",
             show-current="",
             first-day-of-week="1",
             locale="it-it",
             hint="MM/DD/YYYY format"
           )
-        v-col.py-0
+        v-col.py-0.text-center
           v-card-text Seleziona l'intervallo di date in cui il contratto è finito
           v-date-picker.elevation-1(
             v-model="campi.dates_end",
-            :landscape="$vuetify.breakpoint.mdAndUp",
             range="",
             show-current="",
             first-day-of-week="1",
             locale="it-it",
             hint="MM/DD/YYYY format"
           )
-        v-col.py-0
+        v-col.py-0.text-center
           v-card-text Seleziona l'intervallo di date in cui il contratto è stato registrato
           v-date-picker.elevation-1(
             v-model="campi.reg_dates",
-            :landscape="$vuetify.breakpoint.mdAndUp",
             range="",
             show-current="",
             first-day-of-week="1",
@@ -107,27 +104,33 @@ v-card
       v-divider.mb-1
       v-row.mt-2
         v-col
-          v-card-title Risultati della ricerca
+          v-card-title {{ (ricerca) ? 'Risultati di ricerca' : 'Nessun risultato trovato' }}
+        v-col.mr-2.text-right(v-if="ricerca")
+          a(:href="esportaCSV" download="bollette.csv" style="text-decoration: none;")
+            v-btn(text) Esporta in CSV
+          v-btn(text, @click="esportaPDF") Esporta in PDF
       v-divider.mb-1
       v-card.ma-1(v-for="i in risultati")
-        v-card-title(style="text-transform: capitalize;") Intestatario: {{i.nome}} {{i.cognome}} 
+        v-card-title(style="text-transform: capitalize;") Intestatario: {{ i.nome }} {{ i.cognome }}
         v-card-subtitle 
-          div Contratto valido da {{i.data_inizio}} a {{i.data_fine}}, {{(i.data_firma_contratto == null) ? 'non firmato' : `firmato in data ${i.data_firma_contratto}`}} 
-          div {{i.tipo}}, {{(i.contabilizzato == true) ? 'contabilizzato' : `non contabilizzato`}}
+          div Contratto valido da {{ i.data_inizio }} a {{ i.data_fine }}, {{ i.data_firma_contratto == null ? 'non firmato' : `firmato in data ${i.data_firma_contratto}` }}
+          div {{ i.tipo }}, {{ i.contabilizzato == true ? 'contabilizzato' : `non contabilizzato` }}
           div 
             span.font-weight-bold Cauzione
-            span {{(i.cauzione.data_pagamento == null) ? ' non pagata,' : `pagata in data ${i.cauzione.data_pagamento},`}}
-            span {{` da restituire in data ${i.cauzione.data_restituzione}`}}
+            span {{ i.cauzione.data_pagamento == null ? ' non pagata,' : `pagata in data ${i.cauzione.data_pagamento},` }}
+            span {{ ` da restituire in data ${i.cauzione.data_restituzione}` }}
         v-data-table#print.elevation-1(
-            :headers="headers",
-            dense="",
-            :items="i.bollette"
-          )
+          :headers="headers",
+          dense="",
+          :items="i.bollette"
+        )
 </template>
 
 <script>
 import Vue from "vue";
 import { mapState } from "vuex";
+const pdfMake = require("pdfmake/build/pdfmake.js");
+import XLSX from 'xlsx';
 // import { mapState, mapActions } from 'vuex'
 export default {
   data() {
@@ -154,9 +157,17 @@ export default {
       },
       risultati: null,
       form: true,
+      ricerca: false,
+      risultati_raw: null
     };
   },
   computed: {
+    esportaCSV() {
+      let value = JSON.parse(JSON.stringify(this.risultati_raw));
+      let a = XLSX.utils.json_to_sheet(value);
+      let b = XLSX.utils.sheet_to_csv(a);
+      return `data:application/octet-stream,${b.toString()}`;
+    },
     headers() {
       let h = [
         "num_bolletta",
@@ -182,49 +193,52 @@ export default {
       console.log(params.toString());
       Vue.prototype.$api.get(`/ragioneria/bollette/?${params.toString()}`).then(
         (res) => {
-          console.log(res);
           this.risultati = JSON.stringify(res.data);
           this.risultati = JSON.parse(this.risultati);
           this.form = false;
           this.submitted = true;
           let temp = [];
-          this.risultati.forEach((element) => {
-            let c = temp.findIndex(
-              (persona) => persona.id == element.id
-            );
-            if (c === -1) {
-              temp.push({
-                id: element.id,
-                nome: element.nome,
-                cognome: element.cognome,
-                data_inizio: element.data_inizio,
-                data_fine: element.data_fine,
-                contabilizzato: element.contabilizzato,
-                data_firma_contratto: element.data_firma_contratto,
-                tipo: element.tipo,
-                cauzione: {
-                  data_pagamento: element.data_pagamento,
-                  data_restituzione: element.data_restituzione
-                },
-                bollette: [{
-                  num_bolletta: element.num_bolletta,
-                  scadenza: element.scadenza,
-                  prezzo: element.prezzo,
-                  competenza_da: element.competenza_da,
-                  competenza_a: element.competenza_a
-                }],
-              });
-            } else {
-              temp[c].bollette.push(
-                {
-                  num_bolletta: element.num_bolletta,
-                  scadenza: element.scadenza,
-                  prezzo: element.prezzo,
-                  competenza_da: element.competenza_da,
-                  competenza_a: element.competenza_a
+          if (this.risultati[0] == undefined)
+            this.ricerca = false;
+          else
+            this.risultati.forEach((element) => {
+              let c = temp.findIndex((persona) => persona.id == element.id);
+              if (c === -1) {
+                this.ricerca = true;
+                temp.push({
+                  id: element.id,
+                  nome: element.nome,
+                  cognome: element.cognome,
+                  data_inizio: element.data_inizio,
+                  data_fine: element.data_fine,
+                  contabilizzato: element.contabilizzato,
+                  data_firma_contratto: element.data_firma_contratto,
+                  tipo: element.tipo,
+                  cauzione: {
+                    data_pagamento: element.data_pagamento,
+                    data_restituzione: element.data_restituzione,
+                  },
+                  bollette: [
+                    {
+                      num_bolletta: element.num_bolletta,
+                      scadenza: element.scadenza,
+                      prezzo: element.prezzo,
+                      competenza_da: element.competenza_da,
+                      competenza_a: element.competenza_a,
+                    },
+                  ],
                 });
-            }
-          });
+              } else {
+                temp[c].bollette.push({
+                  num_bolletta: element.num_bolletta,
+                  scadenza: element.scadenza,
+                  prezzo: element.prezzo,
+                  competenza_da: element.competenza_da,
+                  competenza_a: element.competenza_a,
+                });
+              }
+            });
+          this.risultati_raw = JSON.parse(JSON.stringify(this.risultati));
           this.risultati = temp;
         },
         (error) => {
@@ -238,10 +252,58 @@ export default {
       let setAll = (obj) => Object.keys(obj).forEach((i) => (obj[i] = null));
       setAll(this.campi, null);
     },
+    esportaPDF() {
+      let value = JSON.parse(JSON.stringify(this.risultati));
+      let docDefinition = {
+        content: [{
+          text: 'Report Bollette - Portineria Opera Universitaria Trento', fontSize: 25
+        }],
+      };
+      value.map((element, i) => {
+        let v = value[i];
+        v.bollette = element.bollette.map((e) => {
+          return Object.values(e);
+        });
+        let h = this.headers.map((e) => {
+          return e.text;
+        });
+        v.bollette.splice(0, 0, h);
+        v.table = {
+          layout: "lightHorizontalLines", // optional
+          table: {
+            // headers are automatically repeated if the table spans over multiple pages
+            // you can declare how many rows should be treated as headers
+            headerRows: 1,
+
+            body: v.bollette,
+          },
+          defaultStyle: {
+            fontSize: 15,
+            alignment: "center",
+          },
+        };
+        v.header = {
+          text: [
+            {text: `Contratto intestato a: ${ v.nome } ${ v.cognome }\n`, fontSize: 18},
+            {text : `Valido da ${v.data_inizio} a ${v.data_fine}, ${v.data_firma_contratto == null ? "non firmato" : `firmato in data ${v.data_firma_contratto}`}
+            ${v.tipo}, ${v.contabilizzato == true ? "contabilizzato" : `non contabilizzato`}
+            Cauzione ${ v.cauzione.data_pagamento == null ? " non pagata," : `pagata in data ${v.cauzione.data_pagamento},`}${` da restituire in data ${v.cauzione.data_restituzione}`}`}],
+          margin: [0, 10]
+          };
+        docDefinition.content.push(v.header);
+        docDefinition.content.push(v.table);
+        return v;
+      });
+      pdfMake.createPdf(docDefinition).open();
+    }
   },
   mounted() {
     this.$store.dispatch("inserimentoContratto/loadTipiUtente");
     this.$store.dispatch("inserimentoContratto/loadTipiContratti");
+    if (pdfMake.vfs == undefined) {
+      let pdfFonts = require("pdfmake/build/vfs_fonts.js");
+      pdfMake.vfs = pdfFonts.pdfMake.vfs;
+    }
   },
   watch: {
     "campi.persona": {
