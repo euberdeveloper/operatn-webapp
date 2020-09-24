@@ -114,6 +114,10 @@ v-card
         v-card-subtitle 
           div Contratto valido da {{i.data_inizio}} a {{i.data_fine}}, {{(i.data_firma_contratto == null) ? 'non firmato' : `firmato in data ${i.data_firma_contratto}`}} 
           div {{i.tipo}}, {{(i.contabilizzato == true) ? 'contabilizzato' : `non contabilizzato`}}
+          div 
+            span.font-weight-bold Cauzione
+            span {{(i.cauzione.data_pagamento == null) ? ' non pagata,' : `pagata in data ${i.cauzione.data_pagamento},`}}
+            span {{` da restituire in data ${i.cauzione.data_restituzione}`}}
         v-data-table#print.elevation-1(
             :headers="headers",
             dense="",
@@ -198,6 +202,10 @@ export default {
                 contabilizzato: element.contabilizzato,
                 data_firma_contratto: element.data_firma_contratto,
                 tipo: element.tipo,
+                cauzione: {
+                  data_pagamento: element.data_pagamento,
+                  data_restituzione: element.data_restituzione
+                },
                 bollette: [{
                   num_bolletta: element.num_bolletta,
                   scadenza: element.scadenza,
