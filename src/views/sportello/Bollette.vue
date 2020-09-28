@@ -113,12 +113,11 @@ v-card
       v-card.ma-1(v-for="i in risultati")
         v-card-title(style="text-transform: capitalize;") Intestatario: {{ i.nome }} {{ i.cognome }}
         v-card-subtitle 
-          div Contratto valido da {{ i.data_inizio }} a {{ i.data_fine }}, {{ i.data_firma_contratto == null ? 'non firmato' : `firmato in data ${i.data_firma_contratto}` }}
-          div {{ i.tipo }}, {{ i.contabilizzato == true ? 'contabilizzato' : `non contabilizzato` }}
-          div 
-            span.font-weight-bold Cauzione
-            span {{ i.cauzione.data_pagamento == null ? ' non pagata,' : `pagata in data ${i.cauzione.data_pagamento},` }}
-            span {{ ` da restituire in data ${i.cauzione.data_restituzione}` }}
+          div Contratto valido da {{ i.data_inizio }} a {{ i.data_fine }}, {{ i.data_firma_contratto == null ? 'non firmato' : `firmato in data ${i.data_firma_contratto}` }}, {{ i.contabilizzato == true ? 'contabilizzato' : `non contabilizzato` }}
+          //- div 
+          //-   span.font-weight-bold Cauzione
+          //-   span {{ i.cauzione.data_pagamento == null ? ' non pagata,' : `pagata in data ${i.cauzione.data_pagamento},` }}
+          //-   span {{ ` da restituire in data ${i.cauzione.data_restituzione}` }}
         v-data-table#print.elevation-1(
           :headers="headers",
           dense="",
@@ -175,6 +174,7 @@ export default {
         "prezzo",
         "competenza_da",
         "competenza_a",
+        "tipo"
       ].map((x) => {
         return { text: x, value: x };
       });
@@ -213,7 +213,6 @@ export default {
                   data_fine: element.data_fine,
                   contabilizzato: element.contabilizzato,
                   data_firma_contratto: element.data_firma_contratto,
-                  tipo: element.tipo,
                   cauzione: {
                     data_pagamento: element.data_pagamento,
                     data_restituzione: element.data_restituzione,
@@ -225,6 +224,7 @@ export default {
                       prezzo: element.prezzo,
                       competenza_da: element.competenza_da,
                       competenza_a: element.competenza_a,
+                      tipo: element.tipo,
                     },
                   ],
                 });
@@ -235,6 +235,7 @@ export default {
                   prezzo: element.prezzo,
                   competenza_da: element.competenza_da,
                   competenza_a: element.competenza_a,
+                  tipo: element.tipo,
                 });
               }
             });
@@ -286,7 +287,7 @@ export default {
           text: [
             {text: `Contratto intestato a: ${ v.nome } ${ v.cognome }\n`, fontSize: 18},
             {text : `Valido da ${v.data_inizio} a ${v.data_fine}, ${v.data_firma_contratto == null ? "non firmato" : `firmato in data ${v.data_firma_contratto}`}
-            ${v.tipo}, ${v.contabilizzato == true ? "contabilizzato" : `non contabilizzato`}
+            ${v.contabilizzato == true ? "contabilizzato" : `non contabilizzato`}
             Cauzione ${ v.cauzione.data_pagamento == null ? " non pagata," : `pagata in data ${v.cauzione.data_pagamento},`}${` da restituire in data ${v.cauzione.data_restituzione}`}`}],
           margin: [0, 10]
           };

@@ -552,7 +552,7 @@ export default {
         var days = a.diff(b, 'days');
       
         return (
-          (this.v.tariffa.prezzo_canone * months) + ((this.v.tariffa.prezzo_canone/30) * days)
+          Math.round(this.v.tariffa.prezzo_canone * months) + ((this.v.tariffa.prezzo_canone/30) * days)
         )
       }
     },
@@ -569,7 +569,7 @@ export default {
         var days = a.diff(b, 'days');
       
         return (
-          (this.v.tariffa.prezzo_consumi * months) + ((this.v.tariffa.prezzo_consumi/30) * days)
+          Math.round(this.v.tariffa.prezzo_consumi * months) + ((this.v.tariffa.prezzo_consumi/30) * days)
         )
       }
     },
