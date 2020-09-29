@@ -114,10 +114,7 @@ v-card
         v-card-title(style="text-transform: capitalize;") Intestatario: {{ i.nome }} {{ i.cognome }}
         v-card-subtitle 
           div Contratto valido da {{ i.data_inizio }} a {{ i.data_fine }}, {{ i.data_firma_contratto == null ? 'non firmato' : `firmato in data ${i.data_firma_contratto}` }}, {{ i.contabilizzato == true ? 'contabilizzato' : `non contabilizzato` }}
-          //- div 
-          //-   span.font-weight-bold Cauzione
-          //-   span {{ i.cauzione.data_pagamento == null ? ' non pagata,' : `pagata in data ${i.cauzione.data_pagamento},` }}
-          //-   span {{ ` da restituire in data ${i.cauzione.data_restituzione}` }}
+          //- CAUZIONE
         v-data-table#print.elevation-1(
           :headers="headers",
           dense="",
@@ -130,7 +127,13 @@ import Vue from "vue";
 import { mapState } from "vuex";
 const pdfMake = require("pdfmake/build/pdfmake.js");
 import XLSX from 'xlsx';
-// import { mapState, mapActions } from 'vuex'
+/*
+-------------------- CAUZIONE ---------------------
+div 
+  span.font-weight-bold Cauzione
+  span {{ i.cauzione.data_pagamento == null ? ' non pagata,' : `pagata in data ${i.cauzione.data_pagamento},` }}
+  span {{ ` da restituire in data ${i.cauzione.data_restituzione}` }}
+*/
 export default {
   data() {
     return {
@@ -257,7 +260,7 @@ export default {
       let value = JSON.parse(JSON.stringify(this.risultati));
       let docDefinition = {
         content: [{
-          text: 'Report Bollette - Portineria Opera Universitaria Trento', fontSize: 25
+          text: 'Report Bollette - Portineria Opera Universitaria Trento', fontSize: 20, margin: [0, 20],
         }],
       };
       value.map((element, i) => {
@@ -275,7 +278,6 @@ export default {
             // headers are automatically repeated if the table spans over multiple pages
             // you can declare how many rows should be treated as headers
             headerRows: 1,
-
             body: v.bollette,
           },
           defaultStyle: {
@@ -285,11 +287,9 @@ export default {
         };
         v.header = {
           text: [
-            {text: `Contratto intestato a: ${ v.nome } ${ v.cognome }\n`, fontSize: 18},
-            {text : `Valido da ${v.data_inizio} a ${v.data_fine}, ${v.data_firma_contratto == null ? "non firmato" : `firmato in data ${v.data_firma_contratto}`}
-            ${v.contabilizzato == true ? "contabilizzato" : `non contabilizzato`}
-            Cauzione ${ v.cauzione.data_pagamento == null ? " non pagata," : `pagata in data ${v.cauzione.data_pagamento},`}${` da restituire in data ${v.cauzione.data_restituzione}`}`}],
-          margin: [0, 10]
+            {text: `Contratto intestato a: ${ v.nome } ${ v.cognome }\n`, fontSize: 16,},
+            {text: `Valido da ${v.data_inizio} a ${v.data_fine}, ${v.data_firma_contratto == null ? "non firmato" : `firmato in data ${v.data_firma_contratto}`}
+            ${v.contabilizzato == true ? "contabilizzato" : `non contabilizzato`}`,}],
           };
         docDefinition.content.push(v.header);
         docDefinition.content.push(v.table);
@@ -314,4 +314,8 @@ export default {
     },
   },
 };
+/*
+------------- CAUZIONE PDF -------------
+Cauzione ${ v.cauzione.data_pagamento == null ? " non pagata," : `pagata in data ${v.cauzione.data_pagamento},`}${` da restituire in data ${v.cauzione.data_restituzione}`}`}],
+*/
 </script>

@@ -47,7 +47,11 @@ const routes = [
 			},
 			{
 				path: '/bollette',
-				component: () => import(/* webpackChunkName: "presenze" */ '@/views/sportello/Bollette.vue')
+				component: () => import(/* webpackChunkName: "presenze" */ '@/views/ragioneria/Bollette.vue')
+			},
+			{
+				path: '/ricerca-contratti',
+				component: () => import(/* webpackChunkName: "presenze" */ '@/views/ragioneria/Contratti.vue')
 			},
 			{
 				path: '/pulizie',
