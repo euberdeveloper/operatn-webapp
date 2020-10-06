@@ -54,8 +54,8 @@ const routes = [
 				component: () => import(/* webpackChunkName: "presenze" */ '@/views/ragioneria/Contratti.vue')
 			},
 			{
-				path: '/pulizie',
-				component: () => import(/* webpackChunkName: "pulizie" */ '@/views/controllo/Pulizie.vue')
+				path: '/spese-servizi',
+				component: () => import(/* webpackChunkName: "pulizie" */ '@/views/controllo/SpeseServizi.vue')
 			},
 			{
 				path: '/guasti',

@@ -99,7 +99,7 @@ export default {
       if (k == 2 || k == 3)
         items = items.concat([
           { divider: true, role:'CONTROLLO ALLOGGI' },
-          { icon: "mdi-spray-bottle", text: "Pulizie", path: "/pulizie" },
+          { icon: "mdi-spray-bottle", text: "Spese Servizi", path: "/spese-servizi" },
           { icon: "mdi-heart-broken", text: "Guasti", path: "/guasti" },
         ]);
       if (k == 3)
