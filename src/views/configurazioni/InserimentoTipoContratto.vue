@@ -28,9 +28,7 @@ v-data-table.elevation-1(:headers='headers', :items='tipi', :items-per-page='50'
             v-card(outlined)
               v-card-text Cauzione
               v-row
-                v-col(cols='6')
-                  v-text-field.ml-2(label='Ammontare', placeholder='0', v-model='cauzione', prepend-icon='mdi-currency-eur', :rules='numberRule')
-                v-col(cols='6')
+                v-col.mx-4
                   v-autocomplete(label='Pagante Cauzione', :items='quietanzianti', v-model='paganteCauzione', :rules='notNull')
                       
           v-card-actions
@@ -66,7 +64,6 @@ export default {
       quietanzianti_: [],
       quietanziante: "",
       tipi: [],
-      cauzione: 0,
       paganteCauzione: "",
       dialog: false,
       notNull: [v => !!v || "Campo obbligatorio"],
@@ -190,7 +187,6 @@ export default {
           consumo: this.consumo,
           quietanziante: this.quietanziante,
           tipoStudente: this.tipoStudente,
-          cauzione: this.cauzione,
           paganteCauzione: this.paganteCauzione
         })
         .then(
