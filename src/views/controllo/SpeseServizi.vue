@@ -46,7 +46,7 @@ v-card
             v-col.text-right
               v-btn(color="primary", @click="openDialog(i)") Aggiungi Spesa
           v-card-subtitle 
-            div Contratto valido da {{ i.data_inizio }} a {{ i.data_fine }}, {{ i.data_firma_contratto == null ? 'non firmato' : `firmato in data ${i.data_firma_contratto}` }}, {{ i.contabilizzato == true ? 'contabilizzato' : `non contabilizzato` }}
+            div Contratto valido da {{ i.data_inizio }} a {{ i.data_fine }}, {{ i.data_firma_contratto == null ? 'non firmato' : `firmato in data ${i.data_firma_contratto}` }}, {{ i.contabilizzato == null ? `non contabilizzato` : `contabilizzato in data ${i.contabilizzato}`}}
             div Stanza: {{ i.numero_stanza }} - Indirizzo {{ i.indirizzo }}
               //- CAUZIONE
           v-data-table#print.elevation-1(
@@ -217,6 +217,7 @@ export default {
                   });
                 }
               });
+            console.log(temp)
             this.risultati = temp;
           },
           (error) => {

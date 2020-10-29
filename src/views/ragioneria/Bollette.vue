@@ -113,7 +113,7 @@ v-card
       v-card.ma-1(v-for="i in risultati")
         v-card-title(style="text-transform: capitalize;") Intestatario: {{ i.nome }} {{ i.cognome }}
         v-card-subtitle 
-          div Contratto valido da {{ i.data_inizio }} a {{ i.data_fine }}, {{ i.data_firma_contratto == null ? 'non firmato' : `firmato in data ${i.data_firma_contratto}` }}, {{ i.contabilizzato == true ? 'contabilizzato' : `non contabilizzato` }}
+          div Contratto valido da {{ i.data_inizio }} a {{ i.data_fine }}, {{ i.data_firma_contratto == null ? 'non firmato' : `firmato in data ${i.data_firma_contratto}` }}, {{ i.contabilizzato == null ? `non contabilizzato` : `contabilizzato in data ${i.contabilizzato}`}}
           //- CAUZIONE
         v-data-table#print.elevation-1(
           :headers="headers",
@@ -289,7 +289,7 @@ export default {
           text: [
             {text: `Contratto intestato a: ${ v.nome } ${ v.cognome }\n`, fontSize: 16,},
             {text: `Valido da ${v.data_inizio} a ${v.data_fine}, ${v.data_firma_contratto == null ? "non firmato" : `firmato in data ${v.data_firma_contratto}`}
-            ${v.contabilizzato == true ? "contabilizzato" : `non contabilizzato`}`,}],
+            ${ v.contabilizzato == null ? `non contabilizzato` : `contabilizzato in data ${v.contabilizzato}`}`,}],
           };
         docDefinition.content.push(v.header);
         docDefinition.content.push(v.table);
