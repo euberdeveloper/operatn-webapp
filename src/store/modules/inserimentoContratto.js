@@ -262,7 +262,7 @@ export default {
     },
     closeItem({ dispatch }, val) {
       Vue.prototype.$api
-        .post(`/ragioneria/contratto/${val.id}?close=true`)
+        .post(`/ragioneria/contratto/${val.id}?close=true&data=${val.data_firma}`)
         .then(
           () => {
             dispatch('loadContratti')
