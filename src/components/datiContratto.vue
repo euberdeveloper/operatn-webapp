@@ -65,6 +65,7 @@ div
                       :readonly="v.contabilizzato",
                       :start-date="v.inizio",
                       :end-date="v.fine"
+                      :disabled="this.$props.type == 'modifica'"
                     )
                 v-row.mx-1.mt-3.py-0(v-if="!!v.persona")
                   v-col.py-0(cols="12", sm="6")

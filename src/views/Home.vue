@@ -90,12 +90,17 @@ export default {
             text: "Inserimento Contratto",
             path: "/inserisci-contratto"
           },
+          { 
+            icon: "mdi-file-document-edit", 
+            text: "Ricerca contratti", 
+            path: "/ricerca-contratti" },
           {
             icon: "mdi-account-multiple-check",
             text: "Presenze",
             path: "/presenze"
           },
         ]);
+        items.push()
       if (k == 2 || k == 3)
         items = items.concat([
           { divider: true, role:'CONTROLLO ALLOGGI' },

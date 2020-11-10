@@ -5,7 +5,7 @@ v-card
     v-col
       v-select(
         segmented,
-        :items="['Modifica Cancella', 'Chiusura Anticipata', 'Proroga', 'Firma ']",
+        :items="['Modifica / Annulla', 'Chiusura Anticipata', 'Proroga', 'Firma', 'Da Firmare', 'Firmati', 'Contabilizzati']",
         label="Operazione",
         v-model="operazione"
       )
@@ -21,6 +21,10 @@ v-card
           v-icon.mr-2(small="", @click="prorogaItem(item)") mdi-update
         template(v-slot:item.firma="{ item }")
           v-icon.mr-2(small="", @click="signItem(item)") mdi-draw
+        template(v-slot:item.da="{ item }")
+          v-icon.mr-2(small="", @click="dateSign(item)") mdi-draw
+        template(v-slot:item.firmati="{ item }")
+          v-icon.mr-2(small="", @click="cancelSign(item)") mdi-update
   v-dialog(v-model="dialogContratto", persistent, max-width="800px")
     v-card
       v-card-title.headline.font-weight-regular {{ modifica.proroga ? 'Proroga contratto' : 'Modifica Contratto' }}
@@ -42,11 +46,11 @@ v-card
   v-dialog(v-model="dialog", persistent, max-width="500")
     v-card
       v-main.pa-0
-        v-card-title.headline Inserisci data di chiusura anticipata
+        v-card-title.headline Inserisci data {{desc==1 ? 'di chiusura anticipata' : 'di firma'}}
         v-row.mx-3.mt-1
           v-col
-            v-alert(type="error" v-if="dataFirmaOk == 0") La data di chiusura del contratto deve essere compresa tra la data di inizio e la data di fine contratto
-            v-card-text.pl-0 Seleziona la data in cui il contratto è stato chiuso
+            v-alert(type="error" v-if="dataFirmaOk == 0 && desc == 1") La data di chiusura del contratto deve essere compresa tra la data di inizio e la data di fine contratto
+            v-card-text.pl-0 Seleziona la data in cui il contratto {{desc==1 ? 'è stato chiuso' : 'è stato firmato'}}
             input-date-picker(
               v-model="dataFirma",
               dense,
@@ -59,7 +63,7 @@ v-card
               :disabled="dataFirma == null",
               @click="confirmCloseItem()"
             ) invia
-            v-btn.ma-1(@click="() => { dialog = false; }", text) annulla
+            v-btn.ma-1(@click="() => { dialog = 0; }", text) annulla
 </template>
 
 <script>
@@ -74,6 +78,7 @@ export default {
       data: null,
       dataFirma: null,
       dataFirmaOk: -1,
+      desc: 0,
     };
   },
   mounted() {
@@ -81,6 +86,7 @@ export default {
     this.$store.dispatch("inserimentoContratto/loadTipiUtente");
     this.$store.dispatch("inserimentoContratto/loadTipiContratti");
     this.$store.dispatch("inserimentoContratto/loadTipiRate");
+
   },
   computed: {
     ...mapState("inserimentoContratto", [
@@ -150,12 +156,24 @@ export default {
         `Confermi la firma del contratto di ${item.nome} ${item.cognome} che inizia il ${item.data_inizio} per la stanza ${item.numero_stanza} in ${item.descrizione_fabbricato} con contratto ${item.sigla}`
       ) && this.$store.dispatch("inserimentoContratto/signItem", item);
     },
+    dateSign(item) {
+      this.data = item;
+      this.dialog = true;
+      this.desc = 2;
+    },
     closeItem(item) {
       this.data = item;
       this.dialog = true;
+      this.desc = 1;
       // confirm(
       //   `Confermi la chiusura anticipata del contratto di ${item.nome} ${item.cognome} iniziato il il ${item.data_inizio} per la stanza ${item.numero_stanza} in ${item.descrizione_fabbricato} con contratto ${item.sigla}`
       // ) && this.$store.dispatch("inserimentoContratto/closeItem", item);
+    },
+    cancelSign(item) {
+      console.log(item)
+      confirm(
+        `Sei sicuro di voler eliminare la firma dal contratto di ${item.nome} ${item.cognome} per la stanza ${item.numero_stanza} in ${item.descrizione_fabbricato} con contratto ${item.sigla}`
+      ) && this.$store.dispatch("inserimentoContratto/cancelSignContract", item);
     },
     dismissDialog() {
       this.$store.commit("inserimentoContratto/setDialogContratto", false);
@@ -173,7 +191,11 @@ export default {
       ) {
         this.dataFirmaOk = 1;
         this.data.data_firma = JSON.parse(JSON.stringify(this.dataFirma));
-        this.$store.dispatch("inserimentoContratto/closeItem", this.data);
+        if(this.desc == 1) {
+          this.$store.dispatch("inserimentoContratto/closeItem", this.data);
+        } else if(this.desc == 2) {
+          this.$store.dispatch("inserimentoContratto/dateSign", this.data); 
+        }
         this.dialog = false;
         this.data = null;
         this.dataFirma = null;

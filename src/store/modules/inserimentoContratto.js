@@ -248,6 +248,18 @@ export default {
           }
         )
     },
+    cancelSignContract({ dispatch }, val) {
+      Vue.prototype.$api
+        .delete(`/ragioneria/contratto/${val.id}?deletesign=true`)
+        .then(
+          () => {
+            dispatch('loadContratti')
+          },
+          error => {
+            console.error(error)
+          }
+        )
+    },
     signItem({ dispatch }, val) {
       Vue.prototype.$api
         .post(`/ragioneria/contratto/${val.id}?sign=true`)
@@ -272,8 +284,25 @@ export default {
           }
         )
     },
+    dateSign({ dispatch }, val) {
+      Vue.prototype.$api
+        .post(`/ragioneria/contratto/${val.id}?datesign=true&data=${val.data_firma}`)
+        .then(
+          () => {
+            dispatch('loadContratti')
+          },
+          error => {
+            console.error(error)
+          }
+        )
+    },
     deleteContract({ dispatch, commit, state }) {
       dispatch('deleteItem', state.modifica)
+      commit('setDialogContratto', false)
+    },
+    cancelSign({ dispatch, commit, state }) {
+      console.log(state.modifica);
+      dispatch('cancelSignContract', state.modifica)
       commit('setDialogContratto', false)
     },
     loadEditContratto({ commit }, val) {
