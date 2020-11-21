@@ -5,7 +5,7 @@ v-card
     v-col
       v-select(
         segmented,
-        :items="['Modifica / Annulla', 'Chiusura Anticipata', 'Proroga', 'Firma', 'Da Firmare', 'Firmati', 'Contabilizzati']",
+        :items="['Modifica / Annulla', 'Chiusura Anticipata', 'Proroga', 'Da Firmare', 'Firmati', 'Contabilizzati']",
         label="Operazione",
         v-model="operazione"
       )
@@ -19,8 +19,6 @@ v-card
           v-icon.mr-2(small="", @click="closeItem(item)") mdi-cancel
         template(v-slot:item.proroga="{ item }")
           v-icon.mr-2(small="", @click="prorogaItem(item)") mdi-update
-        template(v-slot:item.firma="{ item }")
-          v-icon.mr-2(small="", @click="signItem(item)") mdi-draw
         template(v-slot:item.da="{ item }")
           v-icon.mr-2(small="", @click="dateSign(item)") mdi-draw
         template(v-slot:item.firmati="{ item }")
@@ -150,11 +148,6 @@ export default {
       confirm(
         `Sei sicuro di voler eliminare il contratto di ${item.nome} ${item.cognome} che inizierebbe il ${item.data_inizio} per la stanza ${item.numero_stanza} in ${item.descrizione_fabbricato} con contratto ${item.sigla}`
       ) && this.$store.dispatch("inserimentoContratto/deleteItem", item);
-    },
-    signItem(item) {
-      confirm(
-        `Confermi la firma del contratto di ${item.nome} ${item.cognome} che inizia il ${item.data_inizio} per la stanza ${item.numero_stanza} in ${item.descrizione_fabbricato} con contratto ${item.sigla}`
-      ) && this.$store.dispatch("inserimentoContratto/signItem", item);
     },
     dateSign(item) {
       this.data = item;

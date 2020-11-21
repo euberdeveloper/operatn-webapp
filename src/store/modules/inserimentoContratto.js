@@ -4,7 +4,6 @@ import moment from 'moment'
 const getDefaultState = () => {
   return {
     fabbricati: [],
-
     tipiContratti: [],
     tipiUtente: [],
     tipiRate: [],
