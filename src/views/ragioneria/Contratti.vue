@@ -31,6 +31,7 @@ v-card
       .my-4.mx-6
         v-row
           v-col.p(cols="12")
+            //- fa riferimento al componente in src/components/datiContratto.vue
             dati-contratto(
               v-if="dialogContratto",
               type="modifica",

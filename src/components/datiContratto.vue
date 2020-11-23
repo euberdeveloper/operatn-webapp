@@ -551,9 +551,8 @@ export default {
         var months = a.diff(b, 'months');
         b.add(months, 'months');
         var days = a.diff(b, 'days');
-      
         return (
-          Math.round(this.v.tariffa.prezzo_canone * months) + ((this.v.tariffa.prezzo_canone/30) * days)
+          Math.round((this.v.tariffa.prezzo_canone * months) + ((this.v.tariffa.prezzo_canone/30) * days))
         )
       }
     },
@@ -580,16 +579,17 @@ export default {
       this.$store.commit('inserimentoContratto/setImportoConsumi', this.totale_consumi);
       this.$store.commit('inserimentoContratto/setImportoCanone', this.totale_canone);
       return (
-        Number.parseFloat(this.totale_canone) +
-        Number.parseFloat(this.totale_consumi) +
-        Number.parseFloat(this.v.tipoContratto.cauzione)
+          Number.parseFloat(this.totale_canone) +
+          Number.parseFloat(this.totale_consumi) +
+          Number.parseFloat(this.v.tariffa.cauzione)
       );
     },
   },
   watch: {
     "v.fabbricato": {
       handler(val) {
-        if (val != null)
+        console.log(val.length);
+        if (val != null && val.length !== 0)
           this.updateAlloggi(val)
       },
       deep: true,
