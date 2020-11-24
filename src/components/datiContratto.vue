@@ -578,6 +578,7 @@ export default {
       if (!this.v.tariffa) return "";
       this.$store.commit('inserimentoContratto/setImportoConsumi', this.totale_consumi);
       this.$store.commit('inserimentoContratto/setImportoCanone', this.totale_canone);
+      console.log(this.v.tariffa)
       return (
           Number.parseFloat(this.totale_canone) +
           Number.parseFloat(this.totale_consumi) +

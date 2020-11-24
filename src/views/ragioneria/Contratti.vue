@@ -5,7 +5,7 @@ v-card
     v-col
       v-select(
         segmented,
-        :items="['Modifica / Annulla', 'Chiusura Anticipata', 'Proroga', 'Da Firmare', 'Firmati', 'Contabilizzati']",
+        :items="['Modifica / Annulla', 'Da Firmare', 'Firmati',  'Contabilizzati', 'Chiusura Anticipata', 'Proroga']",
         label="Operazione",
         v-model="operazione"
       )
@@ -180,8 +180,8 @@ export default {
     },
     confirmCloseItem() {
       if (
-        new Date(this.dataFirma) > new Date(this.data.data_inizio) &&
-        new Date(this.dataFirma) < new Date(this.data.data_fine)
+        (new Date(this.dataFirma) > new Date(this.data.data_inizio) &&
+        new Date(this.dataFirma) < new Date(this.data.data_fine)) || this.desc == 2
       ) {
         this.dataFirmaOk = 1;
         this.data.data_firma = JSON.parse(JSON.stringify(this.dataFirma));
