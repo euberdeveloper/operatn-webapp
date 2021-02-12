@@ -6,17 +6,17 @@ v-card
       v-tab
         v-icon(dense, left) mdi-plus
         | Nuovo
-      v-tab
-        v-icon(dense, left) mdi-table-cog
-        | Gestione
+      //- v-tab
+      //-   v-icon(dense, left) mdi-table-cog
+      //-   | Gestione
       v-tab-item
         dati-contratto(
           type='nuovo', v-model='nuovo', :fabbricati='fabbricati', 
           :tipi-contratti='tipiContratti', :tipi-utente='tipiUtente', :tipi-rate='tipiRate')
       v-tab-item
-        v-row.mx-1
-          v-col
-            v-select(segmented, :items="['Modifica Cancella', 'Chiusura Anticipata', 'Proroga', 'Firma ']", label='Operazione', v-model="operazione" )
+        //- v-row.mx-1
+        //-   v-col
+        //-     v-select(segmented, :items="['Modifica Cancella', 'Chiusura Anticipata', 'Proroga', 'Firma ']", label='Operazione', v-model="operazione" )
         v-row 
           v-col
             v-data-table(:items="contratti", :headers="headers_op")
@@ -39,7 +39,7 @@ v-card
                 v-col.py-0(cols='12')
                   dati-contratto(
                   v-if="dialogContratto"
-                  type='modifica', v-model='modifica', :fabbricati='fabbricati', 
+                  type='modifica', v-model='modifica', :fabbricati='fabbricati',
                   :tipi-contratti='tipiContratti', :tipi-utente='tipiUtente', :tipi-rate='tipiRate')
   v-alert.ma-2( type="success" v-if="alertSucc"  ) {{alertSucc}}
 </template>
@@ -51,7 +51,6 @@ export default {
     return {
       modifica_orig: null,
       dropdown_icon: [
-        
         ],
     }
   },

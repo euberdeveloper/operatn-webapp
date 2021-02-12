@@ -9,9 +9,6 @@ div
         v-icon(dense, left) mdi-plus
         | Altri Dati
       v-tab
-        v-icon(dense, left) mdi-cash-multiple
-        | Bollette
-      v-tab
         v-icon(dense, left) mdi-bike
         | Biciclette
       v-tab-item.pa-2
@@ -68,6 +65,7 @@ div
                       :readonly="v.contabilizzato",
                       :start-date="v.inizio",
                       :end-date="v.fine"
+                      :disabled="this.$props.type == 'modifica'"
                     )
                 v-row.mx-1.mt-3.py-0(v-if="!!v.persona")
                   v-col.py-0(cols="12", sm="6")
@@ -365,7 +363,7 @@ div
                       v-model="v.tipoContratto.canone",
                       readonly,
                       dense,
-                      label="Tariffa Canone'"
+                      label="Tariffa Canone"
                     )
                   v-col.py-0(cols="12", md="6")
                     v-text-field(
@@ -398,25 +396,48 @@ div
               @click="expandCollapse(3)"
             ) mdi-chevron-{{ expand_sections[1] ? 'up' : 'down' }}
             v-expand-transition
-              div(v-show="expand_sections[3] === true")
+              div(v-show="expand_sections[3] === true" v-if="v.tipoContratto")
                 v-card-actions
-                  v-btn.mx-4(@click="getTariffa") Ricalcola
+                  v-btn.mx-4(@click="getTariffa") Calcola
                     v-icon mdi-refresh
                   v-alert.ma-2(v-if="noTariffaValid", type="error") Nessuna tariffa disponibile per i dati forniti
-                v-row.mx-1(v-if="v.tipoContratto")
+                v-row.mx-1
                   v-col.py-0(cols="12", sm="4")
                     v-text-field(
                       readonly,
                       dense,
                       label="Totale Canone",
-                      v-model="totaleCanone"
+                      v-model="totale_canone"
                     )
                   v-col.py-0(cols="12", sm="4")
                     v-text-field(
                       readonly,
                       dense,
                       label="Totale Consumi",
-                      v-model="totaleConsumi"
+                      v-model="totale_consumi"
+                    )                  
+                v-row.mx-1
+                  v-col.py-0(cols="12", sm="4")
+                    v-text-field(
+                      readonly,
+                      dense,
+                      label="Cauzione",
+                      v-model="(isNaN(v.tipoContratto.cauzione)) ? 'Non specificato' : v.tipoContratto.cauzione"
+                    )
+                  v-col.py-0(cols="12", md="6")
+                    v-text-field(
+                      v-model="(v.tipoContratto.pagante_cauzione == null) ? 'Non specificato' : v.tipoContratto.pagante_cauzione",
+                      readonly,
+                      dense,
+                      label="Pagante Cauzione"
+                    )
+                v-row.mx-1
+                  v-col.py-0(cols="12", md="6")
+                    v-text-field(
+                      v-model="(v.tipoContratto.quietanziante == null) ? 'Non specificato' : v.tipoContratto.quietanziante",
+                      readonly,
+                      dense,
+                      label="Quietanziante"
                     )
                   v-col.py-0(cols="12", sm="4")
                     v-text-field(
@@ -424,13 +445,7 @@ div
                       dense,
                       label="Totale",
                       v-model="totale"
-                    )
-                  v-col.py-0(cols="12", sm="4")
-                    v-text-field(
-                      readonly,
-                      dense,
-                      label="Cauzione",
-                      v-model="v.tipoContratto.cauzione"
+                      color="blue darken-2"
                     )
                   //- v-col.py-0(cols="12", sm="4")
                   //-   input-date-picker(
@@ -440,19 +455,6 @@ div
                   //-   )
                   //- v-col.py-0(cols="12", sm="4")
                   //-   v-text-field(readonly, dense, label="Penale")
-                  v-col.py-0(cols="12", md="6")
-                    v-text-field(
-                      readonly,
-                      dense,
-                      label="Totale Altre Bollette"
-                    )
-                  v-col.py-0(cols="12", md="6")
-                    v-text-field(
-                      readonly,
-                      dense,
-                      label="Importo a carico del Quietanzante",
-                      v-model="v.tipoContratto.pagante_cauzione"
-                    )
       v-tab-item.pa-2
         v-card-text ?
       v-tab-item.pa-2
@@ -538,35 +540,57 @@ export default {
         return tipi.indexOf(v) == i;
       });
     },
-    totaleCanone() {
-      this.updateT;
-      if (!this.v.tariffa) return "";
-      return (
-        this.v.tariffa.prezzo_canone *
-        moment(this.v.fine).diff(moment(this.v.inizio), "months", true)
-      );
+    totale_canone: {
+      set(val) {
+        this.$store.commit('inserimentoContratto/setImportoCanone', val);
+      },
+      get() {
+        if (!this.v.tariffa) return "";
+        var a = moment(this.v.fine),
+        b = moment(this.v.inizio);
+        var months = a.diff(b, 'months');
+        b.add(months, 'months');
+        var days = a.diff(b, 'days');
+        return (
+          Math.round((this.v.tariffa.prezzo_canone * months) + ((this.v.tariffa.prezzo_canone/30) * days))
+        )
+      }
     },
-    totaleConsumi() {
-      this.updateT;
-      if (!this.v.tariffa) return "";
-      return (
-        this.v.tariffa.prezzo_consumi *
-        moment(this.v.fine).diff(moment(this.v.inizio), "months", true)
-      );
+    totale_consumi: {
+      set(val) {
+        this.$store.commit('inserimentoContratto/setImportoConsumi', val);
+      },
+      get() {
+        if (!this.v.tariffa) return "";
+        var a = moment(this.v.fine),
+        b = moment(this.v.inizio);
+        var months = a.diff(b, 'months');
+        b.add(months, 'months');
+        var days = a.diff(b, 'days');
+      
+        return (
+          Math.round(this.v.tariffa.prezzo_consumi * months) + ((this.v.tariffa.prezzo_consumi/30) * days)
+        )
+      }
     },
     totale() {
       this.updateT;
       if (!this.v.tariffa) return "";
+      this.$store.commit('inserimentoContratto/setImportoConsumi', this.totale_consumi);
+      this.$store.commit('inserimentoContratto/setImportoCanone', this.totale_canone);
+      console.log(this.v.tariffa)
       return (
-        Number.parseFloat(this.totaleCanone) +
-        Number.parseFloat(this.totaleConsumi)
+          Number.parseFloat(this.totale_canone) +
+          Number.parseFloat(this.totale_consumi) +
+          Number.parseFloat(this.v.tariffa.cauzione)
       );
     },
   },
   watch: {
     "v.fabbricato": {
       handler(val) {
-        if (val != null)
+        console.log(val.length);
+        if (val != null && val.length !== 0)
           this.updateAlloggi(val)
       },
       deep: true,
@@ -627,6 +651,7 @@ export default {
       // this.expand_sections[i] = !this.expand_sections[i]
       // e' necessario aggiornare tutto l'array per invocare il ricalcolo del virtual-dom
       this.expand_sections = this.expand_sections.map((x, j) => {
+        if(i == 3) this.getTariffa();
         if (i === j) return !x;
         else return x;
       });
@@ -657,7 +682,7 @@ export default {
               return;
             }
             this.noTariffaValid = false;
-            let tariffa = res.data[0];
+            let tariffa = res.data.rows[0];
             this.v.tariffa = tariffa;
             this.$emit("input", this.v);
             this.updateT++;

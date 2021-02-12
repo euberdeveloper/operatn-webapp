@@ -21,7 +21,7 @@ v-data-table.elevation-2(:loading='loading', :search='search', :headers='headers
                 v-col
                   | Ruolo:
                   v-radio-group(v-model='editedItem.ruolo', :mandatory='true')
-                    v-radio(v-for='n in 4', :key='n', :label='getRole(n-1)', :value='n-1')
+                    v-radio(v-for='n in 5', :key='n', :label='getRole(n-1)', :value='n-1')
           v-card-actions
             v-spacer
             v-btn(color='primary darken-1', text='', @click='close') Annulla
@@ -96,12 +96,14 @@ export default {
       else if (num == 1) return "Sportello";
       else if (num == 2) return "Controllo alloggi";
       else if (num == 3) return "Admin";
+      else if (num == 4) return "Ragioneria";
     },
     getRoleIcon(num) {
       if (num == 0) return "mdi-door-open";
       else if (num == 1) return "mdi-lifebuoy";
       else if (num == 2) return "mdi-tools";
       else if (num == 3) return "mdi-shield";
+      else if (num == 4) return "mdi-office-building";
     },
     initialize() {
       this.$store.dispatch("gestioneUtenti/loadUsers");

@@ -4,7 +4,6 @@ import moment from 'moment'
 const getDefaultState = () => {
   return {
     fabbricati: [],
-
     tipiContratti: [],
     tipiUtente: [],
     tipiRate: [],
@@ -19,7 +18,6 @@ const getDefaultState = () => {
       stanza: "",
       contratto: "",
       annoContratto: `${(new Date()).getFullYear()}/${(new Date()).getFullYear() + 1}`,
-      importi: "",
       contabilizzato: false,
       cod_tipoutente: "",
       id_tipo_stanza: "",
@@ -32,7 +30,6 @@ const getDefaultState = () => {
       fabbricato: "",
       stanza: "",
       contratto: "",
-      importi: "",
       contabilizzato: true,
       id_tipo_stanza: "",
       id_utilizzo_stanza: -1,
@@ -40,6 +37,13 @@ const getDefaultState = () => {
     proroga: null,
     tab: 0,
     dialogContratto: false,
+    importi: {
+      totale_canone: null,
+      totale_consumi: null,
+      quiet: null,
+      pagante: null,
+    },
+    paganti: [],
   }
 }
 
@@ -88,9 +92,38 @@ export default {
     },
     setSuccess(state, val) {
       state.alertSucc = val
-    }
+    },
+    setImportoCanone(state, val) {
+      state.importi.totale_canone = val;
+    },
+    setImportoConsumi(state, val) {
+      state.importi.totale_consumi = val;
+    },
+    setPaganti(state, val) {
+      state.paganti = val;
+    },
+    setPagante(state, val) {
+      state.importi.pagante = val;
+    },
+    setQuiet(state, val) {
+      state.importi.quiet = val;
+    },
   },
   actions: {
+    loadPaganti({ commit }) {
+      Vue.prototype.$api
+        .get("/ragioneria/paganti")
+        .then(
+          res => {
+            console.log(res.data);
+            commit('setPaganti', res.data.rows)
+          },
+          error => {
+            commit('setPaganti', [])
+            console.error(error)
+          }
+        )
+    },
     loadTipiUtente({ commit }) {
       Vue.prototype.$api
         .get("/ragioneria/tipi/utente")
@@ -182,7 +215,11 @@ export default {
           data_fine: obj.fine,
           anno_accademico: obj.annoContratto,
           id_tipo_rata: obj.id_tipo_rata,
-          id_utilizzo_stanza: obj.id_utilizzo_stanza == -1 ? obj.stanza.id_tipo_stanza : obj.id_utilizzo_stanza
+          id_utilizzo_stanza: obj.id_utilizzo_stanza == -1 ? obj.stanza.id_tipo_stanza : obj.id_utilizzo_stanza,
+          totale_canone: state.importi.totale_canone,
+          totale_consumi: state.importi.totale_consumi,
+          pagante_cauzione: state.importi.pagante,
+          quiet: state.importi.quiet,
         })
         .then(
           () => {
@@ -210,6 +247,18 @@ export default {
           }
         )
     },
+    cancelSignContract({ dispatch }, val) {
+      Vue.prototype.$api
+        .delete(`/ragioneria/contratto/${val.id}?deletesign=true`)
+        .then(
+          () => {
+            dispatch('loadContratti')
+          },
+          error => {
+            console.error(error)
+          }
+        )
+    },
     signItem({ dispatch }, val) {
       Vue.prototype.$api
         .post(`/ragioneria/contratto/${val.id}?sign=true`)
@@ -224,7 +273,19 @@ export default {
     },
     closeItem({ dispatch }, val) {
       Vue.prototype.$api
-        .post(`/ragioneria/contratto/${val.id}?close=true`)
+        .post(`/ragioneria/contratto/${val.id}?close=true&data=${val.data_firma}`)
+        .then(
+          () => {
+            dispatch('loadContratti')
+          },
+          error => {
+            console.error(error)
+          }
+        )
+    },
+    dateSign({ dispatch }, val) {
+      Vue.prototype.$api
+        .post(`/ragioneria/contratto/${val.id}?datesign=true&data=${val.data_firma}`)
         .then(
           () => {
             dispatch('loadContratti')
@@ -236,6 +297,11 @@ export default {
     },
     deleteContract({ dispatch, commit, state }) {
       dispatch('deleteItem', state.modifica)
+      commit('setDialogContratto', false)
+    },
+    cancelSign({ dispatch, commit, state }) {
+      console.log(state.modifica);
+      dispatch('cancelSignContract', state.modifica)
       commit('setDialogContratto', false)
     },
     loadEditContratto({ commit }, val) {

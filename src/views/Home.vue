@@ -90,16 +90,21 @@ export default {
             text: "Inserimento Contratto",
             path: "/inserisci-contratto"
           },
+          { 
+            icon: "mdi-file-document-edit", 
+            text: "Ricerca contratti", 
+            path: "/ricerca-contratti" },
           {
             icon: "mdi-account-multiple-check",
             text: "Presenze",
             path: "/presenze"
           },
         ]);
+        items.push()
       if (k == 2 || k == 3)
         items = items.concat([
           { divider: true, role:'CONTROLLO ALLOGGI' },
-          { icon: "mdi-spray-bottle", text: "Pulizie", path: "/pulizie" },
+          { icon: "mdi-spray-bottle", text: "Spese Servizi", path: "/spese-servizi" },
           { icon: "mdi-heart-broken", text: "Guasti", path: "/guasti" },
         ]);
       if (k == 3)
@@ -108,6 +113,13 @@ export default {
           { icon: "mdi-account-supervisor-circle", text: "Gestione utenti", path: "/utenti" },
           { icon: "mdi-file-document-edit", text: "Gestione Firma", path: "/firmatario" },
         ]);
+      if(k == 4 || k == 3 || k == 1) {
+        items = items.concat([
+          { divider: true, role:'RAGIONERIA' },
+          { icon: "mdi-file-document-edit", text: "Ricerca contratti", path: "/ricerca-contratti" },
+          { icon: "mdi-email-multiple", text: "Ricerca bollette", path: "/bollette" },
+        ]);
+      }
       if (k == 1 || k == 3)
         items = items.concat([
           { divider: true, role:'CONFIGURAZIONI' },
