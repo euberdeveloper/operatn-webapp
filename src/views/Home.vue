@@ -13,7 +13,7 @@ v-app#inspire
   v-app-bar(:clipped-left='$vuetify.breakpoint.lgAndUp', app, color='primary', dark)
     v-app-bar-nav-icon(@click.stop='drawer = !drawer')
     v-toolbar-title.ml-0.pl-4(style='width: 300px')
-      span.hidden-sm-and-down Portineria Opera Univeristaria
+      span.hidden-sm-and-down CA Portineria Opera Univeristaria
     v-spacer
     v-tooltip(bottom)
       template(v-slot:activator='{ on }')
