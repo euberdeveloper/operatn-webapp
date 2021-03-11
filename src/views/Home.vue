@@ -1,36 +1,47 @@
-<template lang="pug">
-v-app#inspire
-  v-navigation-drawer(v-model='drawer', :clipped='$vuetify.breakpoint.lgAndUp', app)
-    v-list(shaped)
-      v-list-item-group(v-model='tab')
-        v-list-item(v-for='(item, i) in items', :key='i', @click='updateSelected(i)', :disabled='item.divider')
-          v-subheader(v-if='item.divider') {{item.role}}
-          v-divider(v-if='item.divider')
-          v-list-item-icon.mr-3(v-if='!item.divider')
-            v-icon(dense, v-text='item.icon')
-          v-list-item-content(v-if='!item.divider')
-            v-list-item-title(v-text='item.text')
-  v-app-bar(:clipped-left='$vuetify.breakpoint.lgAndUp', app, color='primary', dark)
-    v-app-bar-nav-icon(@click.stop='drawer = !drawer')
-    v-toolbar-title.ml-0.pl-4(style='width: 300px')
-      span.hidden-sm-and-down CA Portineria Opera Univeristaria
-    v-spacer
-    v-tooltip(bottom)
-      template(v-slot:activator='{ on }')
-        v-btn(v-on='on', icon, @click='changeTheme')
-          v-icon mdi-theme-light-dark
-      span Cambia tema
-    v-tooltip(bottom)
-      template(v-slot:activator='{ on }')
-        v-btn(v-on='on', icon, @click='logout')
-          v-icon mdi-logout
-      span Logout
-    v-btn(icon, large, @click='logo_click')
-      v-avatar(style='background-color:white;', size='32px', item)
-        v-img(:src="require('@/assets/logo_opera.png')", alt='Logo')
-  v-main.ma-3
-    transition(name='slide-fade')
-      router-view(:key='$route.path')
+<template>
+<v-app id="inspire">
+    <v-navigation-drawer v-model="drawer" :clipped="$vuetify.breakpoint.lgAndUp" app="app">
+        <v-list shaped="shaped">
+            <v-list-item-group v-model="tab">
+                <v-list-item v-for="(item, i) in items" :key="i" @click="updateSelected(i)" :disabled="item.divider">
+                    <v-subheader v-if="item.divider">{{item.role}}</v-subheader>
+                    <v-divider v-if="item.divider"></v-divider>
+                    <v-list-item-icon class="mr-3" v-if="!item.divider">
+                        <v-icon dense="dense" v-text="item.icon"></v-icon>
+                    </v-list-item-icon>
+                    <v-list-item-content v-if="!item.divider">
+                        <v-list-item-title v-text="item.text"></v-list-item-title>
+                    </v-list-item-content>
+                </v-list-item>
+            </v-list-item-group>
+        </v-list>
+    </v-navigation-drawer>
+    <v-app-bar :clipped-left="$vuetify.breakpoint.lgAndUp" app="app" color="primary" dark="dark">
+        <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+        <v-toolbar-title class="ml-0 pl-4" style="width: 300px"><span class="hidden-sm-and-down">CA Portineria Opera Univeristaria</span></v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-tooltip bottom="bottom"><template v-slot:activator="{ on }">
+                <v-btn v-on="on" icon="icon" @click="changeTheme">
+                    <v-icon>mdi-theme-light-dark</v-icon>
+                </v-btn>
+            </template><span>Cambia tema</span></v-tooltip>
+        <v-tooltip bottom="bottom"><template v-slot:activator="{ on }">
+                <v-btn v-on="on" icon="icon" @click="logout">
+                    <v-icon>mdi-logout</v-icon>
+                </v-btn>
+            </template><span>Logout</span></v-tooltip>
+        <v-btn icon="icon" large="large" @click="logo_click">
+            <v-avatar style="background-color:white;" size="32px" item="item">
+                <v-img :src="require('@/assets/logo_opera.png')" alt="Logo"></v-img>
+            </v-avatar>
+        </v-btn>
+    </v-app-bar>
+    <v-main class="ma-3">
+        <transition name="slide-fade">
+            <router-view :key="$route.path"></router-view>
+        </transition>
+    </v-main>
+</v-app>
 
 </template>
 

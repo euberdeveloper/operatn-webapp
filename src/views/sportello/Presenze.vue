@@ -1,21 +1,22 @@
-<template lang="pug">
-v-card
-  v-card-title.headline.font-weight-regular.primary.white--text Presenze
-  v-card-text
-    v-subheader.pa-0 Da definire
-
+<template>
+  <v-card>
+    <v-card-title class="headline font-weight-regular primary white--text">Presenze</v-card-title>
+    <v-card-text>
+      <v-subheader class="pa-0">Da definire</v-subheader>
+    </v-card-text>
+  </v-card>
 </template>
 
 <script>
-	// import { mapState, mapActions } from 'vuex'
-  // export default {
+// import { mapState, mapActions } from 'vuex'
+// export default {
 
-  //   computed: {
-	// 		...mapState('alloggi',[]),
-	// 	},
-		
-	// 	methods: {
-	// 		...mapActions('alloggi', []),
-	// 	},
-	// }
+//   computed: {
+// 		...mapState('alloggi',[]),
+// 	},
+
+// 	methods: {
+// 		...mapActions('alloggi', []),
+// 	},
+// }
 </script>

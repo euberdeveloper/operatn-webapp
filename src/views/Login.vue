@@ -1,23 +1,32 @@
-<template lang="pug">
-v-app#inspire
-  v-main
-    .bg-opera
-    v-container.fill-height(fluid)
-      v-row(align='center', justify='center')
-        v-col(cols='12', sm='8', md='4')
-          v-card.elevation-12
-            v-toolbar(color='primary', dark, flat)
-              v-toolbar-title Login Portineria Opera
-              v-spacer
-            v-card-text
-              v-form(@keyup.native.enter='login()')
-                v-text-field(label='Login', name='login', v-model='input.username', prepend-icon='mdi-account', type='text')
-                v-text-field#password(label='Password', name='password', v-model='input.password', prepend-icon='mdi-lock', type='password')
-            v-card-actions
-              v-spacer
-              v-btn(color='primary', @click='login()') Login
-            v-alert(v-if='alert', :value='!(!this.alert)', v-alert, prominent, type='error', transition='slide-x-transition')
-              | {{alert}}
+<template>
+<v-app id="inspire">
+    <v-main>
+        <div class="bg-opera"></div>
+        <v-container class="fill-height" fluid="fluid">
+            <v-row align="center" justify="center">
+                <v-col cols="12" sm="8" md="4">
+                    <v-card class="elevation-12">
+                        <v-toolbar color="primary" dark="dark" flat="flat">
+                            <v-toolbar-title>Login Portineria Opera</v-toolbar-title>
+                            <v-spacer></v-spacer>
+                        </v-toolbar>
+                        <v-card-text>
+                            <v-form @keyup.native.enter="login()">
+                                <v-text-field label="Login" name="login" v-model="input.username" prepend-icon="mdi-account" type="text"></v-text-field>
+                                <v-text-field id="password" label="Password" name="password" v-model="input.password" prepend-icon="mdi-lock" type="password"></v-text-field>
+                            </v-form>
+                        </v-card-text>
+                        <v-card-actions>
+                            <v-spacer></v-spacer>
+                            <v-btn color="primary" @click="login()">Login</v-btn>
+                        </v-card-actions>
+                        <v-alert v-if="alert" :value="!(!this.alert)" v-alert="v-alert" prominent="prominent" type="error" transition="slide-x-transition">{{alert}}</v-alert>
+                    </v-card>
+                </v-col>
+            </v-row>
+        </v-container>
+    </v-main>
+</v-app>
 
 </template>
 

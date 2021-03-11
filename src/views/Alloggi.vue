@@ -1,8 +1,10 @@
 <template lang=pug>
-v-card
-  v-card-title.headline.font-weight-regular.primary.white--text Alloggi Sparsi
-  v-card-text
-    v-subheader.pa-0 Da definire
+<v-card>
+    <v-card-title class="headline font-weight-regular primary white--text">Alloggi Sparsi</v-card-title>
+    <v-card-text>
+        <v-subheader class="pa-0">Da definire</v-subheader>
+    </v-card-text>
+</v-card>
 
 </template>
 
