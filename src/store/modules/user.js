@@ -3,7 +3,7 @@ import Vue from 'vue'
 const getDefaultState = () => {
   return {
     user: null,
-    interceptor : null,
+    interceptor: null,
     role: -1
   }
 }
@@ -12,50 +12,50 @@ export default {
   namespaced: true,
   state: getDefaultState(),
   mutations: {
-    resetState (state) {
+    resetState(state) {
       Object.assign(state, getDefaultState())
     },
-    set_role(state, role){
+    set_role(state, role) {
       state.role = role
     },
-    auth_success(state, user){
-      state.user = user
-      state.role = user.ruolo
+    add_interceptor(state, token) {
       state.interceptor = Vue.prototype.$api.interceptors.request.use(function (config) {
-        const token = user.accesstoken
-        config.headers.Authorization =  'Bearer ' + token
-        return config
-      })
+        config.headers.Authorization = `Bearer ${token}`;
+        return config;
+      });
     },
-    logout(state){
+    set_user(state, user) {
+      state.user = user;
+      state.role = user.ruolo;
+    },
+    logout(state) {
       state.user = null
       if (state.interceptor)
         Vue.prototype.$api.interceptors.request.eject(state.interceptor)
     },
   },
   actions: {
-    load({ commit }) {
-      if (localStorage.getItem('user'))
-        commit('auth_success', JSON.parse(localStorage.getItem('user')))
+    async load({ commit }) {
+      console.log(0)
+      const token = localStorage.getItem('token');
+      if (token) {
+        commit('add_interceptor', token);
+        const apiResult = await Vue.prototype.$api.get("/utenti/me");
+        const user = apiResult.data;  
+        commit('set_user', user);
+      }
     },
-    login({ commit }, input) {
-      return new Promise((resolve, reject) => {
-        Vue.prototype.$api.post("/auth/login", input).then(result => {
-          localStorage.setItem('user', JSON.stringify(result.data))
-          commit('auth_success', result.data)
-          resolve(result.data)
-        }, error => {
-          reject(error)
-        });
-      })
+    async login({ commit }, input) {
+      const result = await Vue.prototype.$api.post("/auth/login", input);
+      const data = result.data;
+      localStorage.setItem('token', data.token);
+      commit('add_interceptor', data.token)
+      commit('set_user', data.user)
+      return result.data;
     },
-    logout({commit}) {
-      // eslint-disable-next-line no-unused-vars
-      return new Promise((resolve, reject) =>{
-        commit('logout')
-        localStorage.removeItem('user')
-        resolve()
-      })
+    async logout({ commit }) {
+      commit('logout');
+      localStorage.removeItem('token')
     }
   },
   getters: {

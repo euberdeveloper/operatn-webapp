@@ -68,7 +68,7 @@ export default {
     items () {
       let k = this.role;
       let items = [];
-      if (k == 0 || k == 3)
+      if (k == "ADMIN" || k == "PORTINERIA")
         items = items.concat([
           { divider: true, role:'PORTINERIA' },
           {
@@ -83,7 +83,7 @@ export default {
             path: "/controlli"
           },
         ]);
-      if (k == 1 || k == 3)
+      if (k == "SPORTELLO" || k == "ADMIN")
         items = items.concat([
           { divider: true, role:'SPORTELLO' },
           {
@@ -112,26 +112,26 @@ export default {
           },
         ]);
         items.push()
-      if (k == 2 || k == 3)
+      if (k == "CONTROLLO_ALLOGGI" || k == "ADMIN")
         items = items.concat([
           { divider: true, role:'CONTROLLO ALLOGGI' },
           { icon: "mdi-spray-bottle", text: "Spese Servizi", path: "/spese-servizi" },
           { icon: "mdi-heart-broken", text: "Guasti", path: "/guasti" },
         ]);
-      if (k == 3)
+      if (k == "ADMIN")
         items = items.concat([
           { divider: true, role:'ADMIN' },
           { icon: "mdi-account-supervisor-circle", text: "Gestione utenti", path: "/utenti" },
           { icon: "mdi-file-document-edit", text: "Gestione Firma", path: "/firmatario" },
         ]);
-      if(k == 4 || k == 3 || k == 1) {
+      if(k == "RAGIONERIA" || k == "ADMIN" || k == "SPORTELLO") {
         items = items.concat([
           { divider: true, role:'RAGIONERIA' },
           { icon: "mdi-file-document-edit", text: "Ricerca contratti", path: "/ricerca-contratti" },
           { icon: "mdi-email-multiple", text: "Ricerca bollette", path: "/bollette" },
         ]);
       }
-      if (k == 1 || k == 3)
+      if (k == "SPORTELLO" || k == "ADMIN")
         items = items.concat([
           { divider: true, role:'CONFIGURAZIONI' },
           {

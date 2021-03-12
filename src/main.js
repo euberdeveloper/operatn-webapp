@@ -11,8 +11,10 @@ Vue.use({
       baseURL: '/api'
     })
     Vue.prototype.$api.interceptors.response.use(res => { return res}, err => {
-      if (err.response.status === 401)
+      if (err.response.status === 403)
         alert('Il tuo utente non risulta autorizzato a compiere questa azione.')
+      if (err.response.status === 401)
+        alert('Il tuo utente non risulta autenticato')
       if (err.response.status >= 400)
         return Promise.reject(err)
       return err;
