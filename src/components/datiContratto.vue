@@ -107,7 +107,7 @@
                         dense="dense"
                         label="Tipo Utente"
                         :items="tipiUtente"
-                        item-text="descrizione"
+                        item-text="desc"
                         return-object="return-object"
                       ></v-autocomplete>
                     </v-col>
@@ -483,14 +483,12 @@ export default {
       if (!this.v.tariffa) return "";
       this.$store.commit("inserimentoContratto/setImportoConsumi", this.totale_consumi);
       this.$store.commit("inserimentoContratto/setImportoCanone", this.totale_canone);
-      console.log(this.v.tariffa);
       return Number.parseFloat(this.totale_canone) + Number.parseFloat(this.totale_consumi) + Number.parseFloat(this.v.tariffa.cauzione);
     },
   },
   watch: {
     "v.fabbricato": {
       handler(val) {
-        console.log(val.length);
         if (val != null && val.length !== 0) this.updateAlloggi(val);
       },
       deep: true,

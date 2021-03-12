@@ -6,7 +6,7 @@ const getDefaultState = () => {
     fabbricati: [],
     tipiContratti: [],
     tipiUtente: [],
-    tipiRate: [],
+    tipiRate: ['GIORNALIERA', 'MENSILE'],
     operazione: '',
     contratti: [],
     alertSucc: '',
@@ -62,9 +62,6 @@ export default {
     },
     setTipiUtente(state, val) {
       state.tipiUtente = val
-    },
-    setTipiRate(state, val) {
-      state.tipiRate = val
     },
     setTipiContratti(state, val) {
       state.tipiContratti = val
@@ -124,63 +121,35 @@ export default {
           }
         )
     },
-    loadTipiUtente({ commit }) {
-      Vue.prototype.$api
-        .get("/ragioneria/tipi/utente")
-        .then(
-          res => {
-            commit('setTipiUtente', res.data)
-          },
-          error => {
-            commit('setTipiUtente', [])
-            console.error(error)
-          }
-        )
+    async loadTipiUtente({ commit }) {
+      try {
+        const response = await Vue.prototype.$api.get("/tipi-ospite");
+        commit('setTipiUtente', response.data.map(el => ({...el, desc: `${el.sigla} - ${el.tipoOspite}`})));
+      }
+      catch (error) {
+        commit('setTipiUtente', []);
+        console.error(error);
+      }
     },
-    loadTipiRate({ commit }) {
-      Vue.prototype.$api
-        .get("/ragioneria/tipi/rata")
-        .then(
-          res => {
-            commit('setTipiRate', res.data)
-          },
-          error => {
-            commit('setTipiRate', [])
-            console.error(error)
-          }
-        )
+    async loadFabbricati({ commit }) {
+      try {
+        const response = await Vue.prototype.$api.get("/fabbricati");
+        commit('setFabbricati', response.data.map(fabbricato => ({ ...fabbricato, desc: `${fabbricato.codice} - ${fabbricato.nome}` })))
+      }
+      catch (error) {
+        commit('setFabbricati', [])
+        console.error(error)
+      }
     },
-    loadFabbricati({ commit }) {
-      Vue.prototype.$api
-        .get("/fabbricati")
-        .then(
-          res => {
-            commit('setFabbricati', res.data.map(x => {
-              x.desc = x.codice_fabbricato + ' ' + x.descrizione_fabbricato
-              return x
-            }))
-          },
-          error => {
-            commit('setFabbricati', [])
-            console.error(error)
-          }
-        )
-    },
-    loadTipiContratti({ commit }) {
-      Vue.prototype.$api
-        .get("/ragioneria/tipi")
-        .then(
-          res => {
-            commit('setTipiContratti', res.data.map(x => {
-              x.desc_sigla = x.sigla + ' - ' + x.descrizione
-              return x;
-            }))
-          },
-          error => {
-            commit('setTipiContratti', [])
-            console.error(error)
-          }
-        )
+    async loadTipiContratti({ commit }) {
+      try {
+        const response = await Vue.prototype.$api.get("/tipi-contratto");
+        commit('setTipiContratti', response.data.map(t => ({ ...t, desc: `${t.sigla} - ${t.nome}` })))
+      }
+      catch (error) {
+        commit('setTipiContratti', [])
+        console.error(error)
+      }
     },
     loadContratti({ commit, state }) {
       if (!state.operazione)

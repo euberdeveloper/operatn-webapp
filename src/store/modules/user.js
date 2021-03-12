@@ -36,7 +36,6 @@ export default {
   },
   actions: {
     async load({ commit }) {
-      console.log(0)
       const token = localStorage.getItem('token');
       if (token) {
         commit('add_interceptor', token);
