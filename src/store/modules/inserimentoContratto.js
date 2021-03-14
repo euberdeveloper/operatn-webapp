@@ -228,27 +228,12 @@ export default {
         )
     },
     submit({ state, commit, dispatch }, val) {
-      let obj = val ? val : state.nuovo
-
+      console.log(state);
       Vue.prototype.$api
-        .post(`/ragioneria/contratto${(val && !val.proroga) ? '/' + val.id : ''}`, {
-          id_anagrafica_persona: obj.persona.id,
-          id_anagrafica_alloggio: obj.stanza.id,
-          id_rag_tipo_contratto: obj.tipoContratto.id,
-          id_rag_tariffa: obj.tariffa.id,
-          data_inizio: obj.inizio,
-          data_fine: obj.fine,
-          anno_accademico: obj.annoContratto,
-          id_tipo_rata: obj.id_tipo_rata,
-          id_utilizzo_stanza: obj.id_utilizzo_stanza == -1 ? obj.stanza.id_tipo_stanza : obj.id_utilizzo_stanza,
-          totale_canone: state.importi.totale_canone,
-          totale_consumi: state.importi.totale_consumi,
-          pagante_cauzione: state.importi.pagante,
-          quiet: state.importi.quiet,
-        })
+        .post(`/contratti`, val)
         .then(
           () => {
-            commit('setSuccess', val ? 'Modifica eseguita con successo' : 'Inserimento eseguito con successo')
+            commit('setSuccess', 'Inserimento eseguito con successo')
             commit('setDialogContratto', false)
             commit('resetStateWithKey', val ? 'modifica' : 'nuovo')
             dispatch('loadContratti')

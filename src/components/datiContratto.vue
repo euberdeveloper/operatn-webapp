@@ -123,8 +123,6 @@
                         dense="dense"
                         label="Tipo Rata"
                         :items="tipiRate"
-                        item-text="descrizione"
-                        item-value="id"
                       ></v-autocomplete>
                     </v-col>
                   </v-row>
@@ -401,8 +399,8 @@
                       <v-text-field readonly="readonly" dense="dense" label="Prezzo canoni" v-model="tariffa.prezzoCanoni"></v-text-field>
                     </v-col>
                     <v-col class="py-0" cols="12" sm="4">
-                      <v-text-field readonly="readonly" dense="dense" label="Prezzo consumi" v-model="tariffa.prezzoConsumi"> </v-text-field> </v-col
-                    >
+                      <v-text-field readonly="readonly" dense="dense" label="Prezzo consumi" v-model="tariffa.prezzoConsumi"> </v-text-field>
+                    </v-col>
                   </v-row>
                   <!-- <v-row class="mx-1">
                     <v-col class="py-0" cols="12" sm="4">
@@ -502,6 +500,24 @@ export default {
     };
   },
   computed: {
+    body() {
+      return {
+        dataInizio: this.v.inizio,
+        dataFine: this.v.fine,
+        idQuietanziante: this.quietanziante,
+        idTariffa: this.tariffa?.id,
+        idTipoContratto: this.tipoContratto,
+        tipoRata: this.v.id_tipo_rata,
+        cauzione: this.cauzione,
+        checkout: this.checkout,
+        ospiti: [
+          {
+            idOspite: this.v.persona.id,
+            postiLetto: this.filters.doppiaUsoSingolo ? this.stanzaSelezionata.postiLetto.map(el => el.id) : [this.stanzaSelezionata.id],
+          }
+        ],
+      };
+    },
     postiLetto() {
       return this.filters.doppiaUsoSingolo
         ? this.alloggi.map((a) => ({ ...a, desc: `${a.unitaImmobiliare} - ${a.numeroStanza}` }))
@@ -530,11 +546,11 @@ export default {
     },
     tariffa() {
       console.log({
-         idTipoOspite: this.v.cod_tipoutente?.id,
-          idUtilizzoStanza: this.utilizzoStanza?.id,
-          idTipoFabbricato: this.v.fabbricato?.idTipoFabbricato,
-          idTipoTariffa: this.tipoTariffa,
-      })
+        idTipoOspite: this.v.cod_tipoutente?.id,
+        idUtilizzoStanza: this.utilizzoStanza?.id,
+        idTipoFabbricato: this.v.fabbricato?.idTipoFabbricato,
+        idTipoTariffa: this.tipoTariffa,
+      });
       return this.tariffe.find(
         (t) =>
           t.idTipoOspite == this.v.cod_tipoutente?.id &&
@@ -664,8 +680,9 @@ export default {
       event.preventDefault();
     },
     submit() {
-      if (this.type == "nuovo") this.$store.dispatch("inserimentoContratto/submit");
-      else this.$store.dispatch("inserimentoContratto/submit", this.v);
+       this.$store.dispatch("inserimentoContratto/submit", this.body)
+      // if (this.type == "nuovo") this.$store.dispatch("inserimentoContratto/submit");
+      // else this.$store.dispatch("inserimentoContratto/submit", this.body);
     },
   },
 };
