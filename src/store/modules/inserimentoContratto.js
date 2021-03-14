@@ -140,7 +140,7 @@ export default {
     async loadTipiUtente({ commit }) {
       try {
         const response = await Vue.prototype.$api.get("/tipi-ospite");
-        commit('setTipiUtente', response.data.map(el => ({...el, desc: `${el.sigla} - ${el.tipoOspite}`})));
+        commit('setTipiUtente', response.data.map(el => ({ ...el, desc: `${el.sigla} - ${el.tipoOspite}` })));
       }
       catch (error) {
         commit('setTipiUtente', []);
@@ -150,7 +150,7 @@ export default {
     async loadUtilizziStanza({ commit }) {
       try {
         const response = await Vue.prototype.$api.get("/utilizzi-stanza");
-        commit('setUtilizziStanza', response.data.map(el => ({...el, desc: el.utilizzoStanza})));
+        commit('setUtilizziStanza', response.data.map(el => ({ ...el, desc: el.utilizzoStanza })));
       }
       catch (error) {
         commit('setUtilizziStanza', []);
@@ -190,7 +190,7 @@ export default {
     async loadTipiTariffa({ commit }) {
       try {
         const response = await Vue.prototype.$api.get("/tipi-tariffa");
-        commit('setTipiTariffa', response.data.map(el => ({...el, desc: el.tipoTariffa})))
+        commit('setTipiTariffa', response.data.map(el => ({ ...el, desc: el.tipoTariffa })))
       }
       catch (error) {
         commit('setTipiTariffa', [])
@@ -207,25 +207,36 @@ export default {
         console.error(error)
       }
     },
-    loadContratti({ commit, state }) {
-      if (!state.operazione)
-        return;
-      Vue.prototype.$api
-        .get(`/ragioneria/contratto?filter=${state.operazione.toLowerCase().split(' ')[0]}`)
-        .then(
-          res => {
-            commit('setContratti', res.data.map(x => {
-              x.data_inizio = moment(x.data_inizio).format('YYYY-MM-DD')
-              x.data_fine = moment(x.data_fine).format('YYYY-MM-DD')
-              x.data_nascita = moment(x.data_nascita).format('YYYY-MM-DD')
-              return x;
-            }))
-          },
-          error => {
-            commit('setContratti', [])
-            console.error(error)
-          }
-        )
+    async loadContratti({ commit, state }) {
+      let op;
+      switch (state.operazione) {
+        case 'Modifica / Annulla':
+        case 'Da Firmare':
+          op = 'da-firmare';
+          break;
+        case 'Firmati':
+          op = 'da-contabilizzare';
+          break;
+        case 'Contabilizzati':
+          op = 'contabilizzati';
+          break;
+        case 'Chiusura Anticipata':
+          op = 'bo';
+          break;
+        case 'Proroga':
+          op = 'bo';
+          break;
+        default:
+          return;
+      }
+      try {
+        const response = await Vue.prototype.$api.get(`/contratti/${op}`);
+        commit('setContratti', response.data);
+      }
+      catch (error) {
+        commit('setContratti', [])
+        console.error(error)
+      }
     },
     submit({ state, commit, dispatch }, val) {
       console.log(state);
