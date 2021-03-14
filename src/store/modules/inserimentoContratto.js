@@ -6,7 +6,11 @@ const getDefaultState = () => {
     fabbricati: [],
     tipiContratti: [],
     tipiUtente: [],
+    tariffe: [],
+    quietanzianti: [],
+    utilizziStanza: [],
     tipiRate: ['GIORNALIERA', 'MENSILE'],
+    tipiTariffa: [],
     operazione: '',
     contratti: [],
     alertSucc: '',
@@ -59,6 +63,18 @@ export default {
     },
     setFabbricati(state, val) {
       state.fabbricati = val
+    },
+    setTariffe(state, val) {
+      state.tariffe = val
+    },
+    setTipiTariffa(state, val) {
+      state.tipiTariffa = val
+    },
+    setQuietanzianti(state, val) {
+      state.quietanzianti = val
+    },
+    setUtilizziStanza(state, val) {
+      state.utilizziStanza = val
     },
     setTipiUtente(state, val) {
       state.tipiUtente = val
@@ -131,13 +147,53 @@ export default {
         console.error(error);
       }
     },
+    async loadUtilizziStanza({ commit }) {
+      try {
+        const response = await Vue.prototype.$api.get("/utilizzi-stanza");
+        commit('setUtilizziStanza', response.data.map(el => ({...el, desc: el.utilizzoStanza})));
+      }
+      catch (error) {
+        commit('setUtilizziStanza', []);
+        console.error(error);
+      }
+    },
     async loadFabbricati({ commit }) {
       try {
-        const response = await Vue.prototype.$api.get("/fabbricati");
+        const response = await Vue.prototype.$api.get("/fabbricati?tipoFabbricato=true");
         commit('setFabbricati', response.data.map(fabbricato => ({ ...fabbricato, desc: `${fabbricato.codice} - ${fabbricato.nome}` })))
       }
       catch (error) {
         commit('setFabbricati', [])
+        console.error(error)
+      }
+    },
+    async loadQuietanzianti({ commit }) {
+      try {
+        const response = await Vue.prototype.$api.get("/quietanzianti");
+        commit('setQuietanzianti', response.data.map(q => ({ ...q, desc: q.quietanziante })))
+      }
+      catch (error) {
+        commit('setQuietanzianti', [])
+        console.error(error)
+      }
+    },
+    async loadTariffe({ commit }) {
+      try {
+        const response = await Vue.prototype.$api.get("/tariffe?tipoOspite=true&utilizzoStanza=true&tipoFabbricato=true&tipoTariffa=true");
+        commit('setTariffe', response.data)
+      }
+      catch (error) {
+        commit('setTariffe', [])
+        console.error(error)
+      }
+    },
+    async loadTipiTariffa({ commit }) {
+      try {
+        const response = await Vue.prototype.$api.get("/tipi-tariffa");
+        commit('setTipiTariffa', response.data.map(el => ({...el, desc: el.tipoTariffa})))
+      }
+      catch (error) {
+        commit('setTipiTariffa', [])
         console.error(error)
       }
     },

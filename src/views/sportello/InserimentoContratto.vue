@@ -9,8 +9,12 @@
             type="nuovo"
             v-model="nuovo"
             :fabbricati="fabbricati"
+            :quietanzianti="quietanzianti"
             :tipi-contratti="tipiContratti"
             :tipi-utente="tipiUtente"
+            :tariffe="tariffe"
+            :tipi-tariffa="tipiTariffa"
+            :utilizzi-stanza="utilizziStanza"
             :tipi-rate="tipiRate"
           ></dati-contratto>
         </v-tab-item>
@@ -69,16 +73,21 @@ export default {
     return {
       modifica_orig: null,
       dropdown_icon: [],
+      tipiRate: ['MENSILE', 'UNICA', 'DA_BANDO']
     };
   },
   mounted() {
     this.$store.dispatch("inserimentoContratto/loadFabbricati");
     this.$store.dispatch("inserimentoContratto/loadTipiUtente");
     this.$store.dispatch("inserimentoContratto/loadTipiContratti");
-    this.$store.dispatch("inserimentoContratto/loadTipiRate");
+    this.$store.dispatch("inserimentoContratto/loadQuietanzianti");
+    this.$store.dispatch("inserimentoContratto/loadTariffe");
+    this.$store.dispatch("inserimentoContratto/loadUtilizziStanza");
+    this.$store.dispatch("inserimentoContratto/loadTipiTariffa");
+
   },
   computed: {
-    ...mapState("inserimentoContratto", ["fabbricati", "tipiContratti", "tipiUtente", "tipiRate", "contratti", "dialogContratto", "alertSucc"]),
+    ...mapState("inserimentoContratto", ["fabbricati", "utilizziStanza", "tipiContratti", "tipiTariffa", "tariffe", "quietanzianti", "tipiUtente", "contratti", "dialogContratto", "alertSucc"]),
     headers_op() {
       if (this.contratti.length === 0) return [];
       let k = Object.keys(this.contratti[0]).map((x) => {

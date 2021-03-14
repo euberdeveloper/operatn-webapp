@@ -42,17 +42,17 @@
           <v-form v-if="validDate">
             <v-card class="my-2" outlined="outlined">
               <v-card-text>
-                <div>Dati Utente</div>
+                <div>Dati Ospite</div>
               </v-card-text>
               <v-icon class="chevron" style="position: absolute; right: 12pt; top: 8pt" @click="expandCollapse(0)"
-                >mdi-chevron-{{ expand_sections[1] ? "up" : "down" }}</v-icon
+                >mdi-chevron-{{ expand_sections[0] ? "up" : "down" }}</v-icon
               >
               <v-expand-transition>
                 <div v-show="expand_sections[0] === true">
                   <v-row class="mx-0 my-0 py-0">
                     <v-col class="py-0 px-0">
                       <user-select
-                        return-object="return-object"
+                        return-object
                         hide-no-data="hide-no-data"
                         dense="dense"
                         prepend-icon="mdi-account"
@@ -72,19 +72,24 @@
                       <v-text-field readonly="readonly" dense="dense" v-model="v.persona.nome" label="Nome"></v-text-field>
                     </v-col>
                     <v-col class="py-0" cols="12" sm="6">
-                      <v-text-field readonly="readonly" dense="dense" v-model="v.persona.data_nascita" label="Data Nascita"></v-text-field>
+                      <v-text-field readonly="readonly" dense="dense" v-model="v.persona.dataDiNascita" label="Data Nascita"></v-text-field>
                     </v-col>
                     <v-col class="py-0" cols="12" sm="6">
                       <v-text-field readonly="readonly" dense="dense" v-model="v.persona.email" label="E-mail"></v-text-field>
                     </v-col>
                     <v-col class="py-0" cols="12" sm="6">
-                      <v-text-field readonly="readonly" dense="dense" v-model="v.persona.telefono" label="Telefono"></v-text-field>
+                      <v-text-field readonly="readonly" dense="dense" v-model="v.persona.telefonoPrincipale" label="Telefono"></v-text-field>
                     </v-col>
                     <v-col class="py-0" cols="12" sm="6">
                       <v-text-field readonly="readonly" dense="dense" v-model="v.persona.sesso" label="Sesso"></v-text-field>
                     </v-col>
                     <v-col class="py-0" cols="12" sm="6">
-                      <v-text-field readonly="readonly" dense="dense" v-model="v.persona.facolta" label="Cod. Dipartimento"></v-text-field>
+                      <v-text-field
+                        readonly="readonly"
+                        dense="dense"
+                        :value="`${v.persona.dipartimentoUnitn.codice} - ${v.persona.dipartimentoUnitn.sigla}`"
+                        label="Cod. Dipartimento"
+                      ></v-text-field>
                     </v-col>
                   </v-row>
                 </div>
@@ -94,11 +99,11 @@
               <v-card-text>
                 <div>Dati Pagamento</div>
               </v-card-text>
-              <v-icon class="chevron" style="position: absolute; right: 12pt; top: 8pt" @click="expandCollapse(4)"
+              <v-icon class="chevron" style="position: absolute; right: 12pt; top: 8pt" @click="expandCollapse(1)"
                 >mdi-chevron-{{ expand_sections[1] ? "up" : "down" }}</v-icon
               >
               <v-expand-transition>
-                <div v-show="expand_sections[4] === true">
+                <div v-show="expand_sections[1] === true">
                   <v-row class="mx-1 mt-3 py-0">
                     <v-col class="py-0" cols="12" sm="6">
                       <v-autocomplete
@@ -108,7 +113,7 @@
                         label="Tipo Utente"
                         :items="tipiUtente"
                         item-text="desc"
-                        return-object="return-object"
+                        return-object
                       ></v-autocomplete>
                     </v-col>
                     <v-col class="py-0" cols="12" sm="6">
@@ -123,6 +128,38 @@
                       ></v-autocomplete>
                     </v-col>
                   </v-row>
+                  <v-row class="mx-1 mt-3 py-0">
+                    <v-col class="py-0" cols="12" sm="6">
+                      <v-autocomplete
+                        v-model="utilizzoStanza"
+                        :readonly="v.contabilizzato"
+                        dense="dense"
+                        label="Utilizzo stanza"
+                        :items="utilizziStanza"
+                        item-text="desc"
+                        return-object
+                      ></v-autocomplete>
+                    </v-col>
+                    <v-col class="py-0" cols="12" sm="6">
+                      <v-autocomplete
+                        v-model="tipoTariffa"
+                        :readonly="v.contabilizzato"
+                        dense="dense"
+                        label="Tipo tariffa"
+                        :items="tipiTariffa"
+                        item-text="desc"
+                        item-value="id"
+                      ></v-autocomplete>
+                    </v-col>
+                  </v-row>
+                  <v-row class="mx-1 mt-3 py-0">
+                    <v-col class="py-0" cols="12" sm="6">
+                      <v-checkbox label="Checkout" v-model="checkout"></v-checkbox>
+                    </v-col>
+                    <v-col class="py-0" cols="12" sm="6">
+                      <v-checkbox label="Cauzione" v-model="cauzione"></v-checkbox>
+                    </v-col>
+                  </v-row>
                 </div>
               </v-expand-transition>
             </v-card>
@@ -130,15 +167,15 @@
               <v-card-text>
                 <div>Dati Appartamento</div>
               </v-card-text>
-              <v-icon class="chevron" style="position: absolute; right: 12pt; top: 8pt" @click="expandCollapse(1)"
-                >mdi-chevron-{{ expand_sections[1] ? "up" : "down" }}</v-icon
+              <v-icon class="chevron" style="position: absolute; right: 12pt; top: 8pt" @click="expandCollapse(2)"
+                >mdi-chevron-{{ expand_sections[2] ? "up" : "down" }}</v-icon
               >
               <v-expand-transition>
-                <div v-show="expand_sections[1] === true">
+                <div v-show="expand_sections[2] === true">
                   <v-row class="mx-1 my-0 py-0">
                     <v-col class="py-0">
                       <v-autocomplete
-                        return-object="return-object"
+                        return-object
                         cache-items="cache-items"
                         flat="flat"
                         hide-no-data="hide-no-data"
@@ -188,7 +225,13 @@
                                   ></v-autocomplete>
                                 </v-col>
                                 <v-col class="py-0" cols="12" md="6">
-                                  <v-autocomplete label="Sesso" dense="dense" clearable="clearable" :items="['M', 'F']" v-model="filters.sesso"></v-autocomplete>
+                                  <v-autocomplete
+                                    label="Sesso"
+                                    dense="dense"
+                                    clearable="clearable"
+                                    :items="['MASCHIO', 'FEMMINA']"
+                                    v-model="filters.sesso"
+                                  ></v-autocomplete>
                                 </v-col>
                                 <v-col class="py-0" cols="12" md="6">
                                   <v-checkbox label="Doppia uso singolo" v-model="filters.doppiaUsoSingolo"></v-checkbox>
@@ -205,12 +248,12 @@
                           <v-row>
                             <v-col class="mt-2">
                               <v-autocomplete
-                                v-model="v.stanza"
-                                item-text="numero_stanza"
-                                :items="filteredRooms"
+                                v-model="stanzaSelezionata"
+                                item-text="desc"
+                                :items="postiLetto"
                                 dense="dense"
                                 :readonly="v.contabilizzato"
-                                return-object="return-object"
+                                return-object
                                 label="Stanza con i filtri"
                               ></v-autocomplete>
                             </v-col>
@@ -241,7 +284,7 @@
                       <v-icon v-if="v.stanza.handicap &amp;&amp; v.stanza.handicap == 'S'" desnse="desnse">mdi-wheelchair-accessibility</v-icon>
                     </v-col>
                     <v-col class="py-0">
-                      <v-text-field :value="v.stanza.codice_unita_immobiliare" readonly="readonly" dense="dense" label="Unita' Immobiliare"></v-text-field>
+                      <v-text-field :value="stanzaSelezionata.unitaImmobiliare" readonly="readonly" dense="dense" label="Unita' Immobiliare"></v-text-field>
                     </v-col>
                     <v-col class="py-0" v-if="!!v.stanza.posto_letto">
                       <v-checkbox class="mt-0" :readonly="v.contabilizzato" dense="dense" label="Doppia uso singolo"></v-checkbox>
@@ -251,6 +294,42 @@
               </v-expand-transition>
             </v-card>
             <v-card class="my-2" outlined="outlined">
+              <v-card-text>
+                <div>Dati Contratto</div>
+              </v-card-text>
+              <v-icon class="chevron" style="position: absolute; right: 12pt; top: 8pt" @click="expandCollapse(3)"
+                >mdi-chevron-{{ expand_sections[3] ? "up" : "down" }}</v-icon
+              >
+              <v-expand-transition>
+                <div v-show="expand_sections[3] === true">
+                  <v-row class="mx-1 mt-3 py-0">
+                    <v-col class="py-0" cols="12" sm="6">
+                      <v-autocomplete
+                        v-model="tipoContratto"
+                        :readonly="v.contabilizzato"
+                        dense="dense"
+                        label="Tipo Contratto"
+                        :items="tipiContratti"
+                        item-text="desc"
+                        item-value="id"
+                      ></v-autocomplete>
+                    </v-col>
+                    <v-col class="py-0" cols="12" sm="6">
+                      <v-autocomplete
+                        v-model="quietanziante"
+                        :readonly="v.contabilizzato"
+                        dense="dense"
+                        label="Quietanziante"
+                        :items="quietanzianti"
+                        item-text="desc"
+                        item-value="id"
+                      ></v-autocomplete>
+                    </v-col>
+                  </v-row>
+                </div>
+              </v-expand-transition>
+            </v-card>
+            <!-- <v-card class="my-2" outlined="outlined">
               <v-card-text>
                 <div>Dati Contratto</div>
               </v-card-text>
@@ -273,7 +352,7 @@
                         item-text="desc_sigla"
                         item-value="id"
                         v-model="v.tipoContratto"
-                        return-object="return-object"
+                        return-object
                         prepend-icon="mdi-file-document-edit"
                         clearable="clearable"
                       ></v-autocomplete>
@@ -304,29 +383,28 @@
                   </v-row>
                 </div>
               </v-expand-transition>
-            </v-card>
+            </v-card> -->
             <v-card class="my-2" outlined="outlined">
               <v-card-text>
-                <div>Dati Importi</div>
+                <div>Dati Importi ttt {{ v.tariffa }}</div>
               </v-card-text>
-              <v-icon class="chevron" style="position: absolute; right: 12pt; top: 8pt" @click="expandCollapse(3)"
-                >mdi-chevron-{{ expand_sections[1] ? "up" : "down" }}</v-icon
+              <v-icon class="chevron" style="position: absolute; right: 12pt; top: 8pt" @click="expandCollapse(4)"
+                >mdi-chevron-{{ expand_sections[4] ? "up" : "down" }}</v-icon
               >
               <v-expand-transition>
-                <div v-show="expand_sections[3] === true" v-if="v.tipoContratto">
+                <div v-show="expand_sections[4] === true">
                   <v-card-actions>
-                    <v-btn class="mx-4" @click="getTariffa">Calcola<v-icon>mdi-refresh</v-icon> </v-btn>
-                    <v-alert class="ma-2" v-if="noTariffaValid" type="error">Nessuna tariffa disponibile per i dati forniti</v-alert>
+                    <v-alert class="ma-2" v-if="!tariffa" type="error">Nessuna tariffa disponibile per i dati forniti</v-alert>
                   </v-card-actions>
-                  <v-row class="mx-1">
+                  <v-row class="mx-1" v-if="tariffa">
                     <v-col class="py-0" cols="12" sm="4">
-                      <v-text-field readonly="readonly" dense="dense" label="Totale Canone" v-model="totale_canone"></v-text-field>
+                      <v-text-field readonly="readonly" dense="dense" label="Prezzo canoni" v-model="tariffa.prezzoCanoni"></v-text-field>
                     </v-col>
                     <v-col class="py-0" cols="12" sm="4">
-                      <v-text-field readonly="readonly" dense="dense" label="Totale Consumi" v-model="totale_consumi"> </v-text-field>
-                    </v-col>
+                      <v-text-field readonly="readonly" dense="dense" label="Prezzo consumi" v-model="tariffa.prezzoConsumi"> </v-text-field> </v-col
+                    >
                   </v-row>
-                  <v-row class="mx-1">
+                  <!-- <v-row class="mx-1">
                     <v-col class="py-0" cols="12" sm="4">
                       <v-text-field v-if="isNaN(v.tipoContratto.cauzione)" readonly="readonly" dense="dense" label="Cauzione" value="Non specificato"></v-text-field>
                       <v-text-field v-else readonly="readonly" dense="dense" label="Cauzione" v-model="v.tipoContratto.cauzione"></v-text-field>
@@ -356,7 +434,7 @@
                     <v-col class="py-0" cols="12" sm="4">
                       <v-text-field readonly="readonly" dense="dense" label="Totale" v-model="totale" color="blue darken-2"></v-text-field>
                     </v-col>
-                  </v-row>
+                  </v-row> -->
                 </div>
               </v-expand-transition>
             </v-card>
@@ -384,11 +462,18 @@
 import Vue from "vue";
 import moment from "moment";
 export default {
-  props: ["value", "fabbricati", "type", "tipi-contratti", "tipi-utente", "tipi-rate"],
+  props: ["value", "fabbricati", "tariffe", "type", "tipiTariffa", "utilizziStanza", "quietanzianti", "tipi-contratti", "tipi-utente", "tipi-rate"],
   data() {
     return {
-      expand_sections: [true, true, true, true, true, true],
+      tipoContratto: "",
+      utilizzoStanza: null,
+      tipoTariffa: null,
+      quietanziante: "",
+      checkout: true,
+      cauzione: true,
+      expand_sections: [false, false, false, false, false, false],
       v: this.$props.value,
+      stanzaSelezionata: {},
       frequenze: [
         {
           text: "M - Mensile",
@@ -401,6 +486,7 @@ export default {
       ],
       notNullRule: [(v) => !!v || "Campo obbligatorio"],
       alloggi: [],
+      tipiStanze: [],
       filtriStanza: false,
       filters: {
         bagno: true,
@@ -416,6 +502,19 @@ export default {
     };
   },
   computed: {
+    postiLetto() {
+      return this.filters.doppiaUsoSingolo
+        ? this.alloggi.map((a) => ({ ...a, desc: `${a.unitaImmobiliare} - ${a.numeroStanza}` }))
+        : this.alloggi.reduce((acc, curr) => {
+            const postiLetto = curr.postiLetto.map((pl) => ({
+              id: pl.id,
+              unitaImmobiliare: curr.unitaImmobiliare,
+              desc: `${curr.unitaImmobiliare} - ${curr.numeroStanza} - ${pl.postoLetto}`,
+            }));
+            acc.push(...postiLetto);
+            return acc;
+          }, []);
+    },
     deleteBtnText() {
       if (this.$props.type == "modifica") return "Elimina contratto";
       else return "Annulla inserimento";
@@ -429,25 +528,20 @@ export default {
       this.updateT;
       return this.v.stanza.numero_stanza ?? "";
     },
-    filteredRooms() {
-      return this.alloggi.filter((x) => {
-        if (this.filters.bagno && x.presenza_bagno == "N") return false;
-        if (this.filters.handicap && x.handicap == "N") return false;
-        if (this.filters.tipoStanza && x.id_tipo_stanza != this.filters.tipoStanza) return false;
-        if (this.filters.doppiaUsoSingolo && x.id_tipo_stanza != 2) return false;
-        return true;
-      });
-    },
-    tipiStanze() {
-      let tipi = this.alloggi.map((x) => {
-        return {
-          value: x.id_tipo_stanza,
-          text: x.descrizione,
-        };
-      });
-      return tipi.filter(function (v, i) {
-        return tipi.indexOf(v) == i;
-      });
+    tariffa() {
+      console.log({
+         idTipoOspite: this.v.cod_tipoutente?.id,
+          idUtilizzoStanza: this.utilizzoStanza?.id,
+          idTipoFabbricato: this.v.fabbricato?.idTipoFabbricato,
+          idTipoTariffa: this.tipoTariffa,
+      })
+      return this.tariffe.find(
+        (t) =>
+          t.idTipoOspite == this.v.cod_tipoutente?.id &&
+          t.idUtilizzoStanza == this.utilizzoStanza?.id &&
+          t.idTipoFabbricato == this.v.fabbricato?.idTipoFabbricato &&
+          t.idTipoTariffa == this.tipoTariffa
+      );
     },
     totale_canone: {
       set(val) {
@@ -494,9 +588,19 @@ export default {
       deep: true,
       immediate: true,
     },
-    filteredRooms: {
-      handler(val) {
-        if (val.length == 0) this.v.stanza = "";
+    "filters.bagno": {
+      handler() {
+        this.updateAlloggi(this.v.fabbricato);
+      },
+    },
+    "filters.handicap": {
+      handler() {
+        this.updateAlloggi(this.v.fabbricato);
+      },
+    },
+    "filters.tipoStanza": {
+      handler() {
+        this.updateAlloggi(this.v.fabbricato);
       },
     },
     "filters.sesso": {
@@ -524,25 +628,28 @@ export default {
       deep: true,
     },
   },
+  async mounted() {
+    this.tipiStanze = (await Vue.prototype.$api.get(`/tipi-stanza`)).data.map((el) => ({ value: el.id, text: el.tipoStanza }));
+  },
   methods: {
-    updateAlloggi(val) {
-      Vue.prototype.$api
-        .get(`/fabbricati/${val.id}/alloggi?endDate=${this.v.fine}&startDate=${this.v.inizio}${this.filters.sesso ? `&mf=${this.filters.sesso}` : ""}`)
-        .then(
-          (res) => {
-            this.alloggi = res.data;
-          },
-          (error) => {
-            this.alloggi = [];
-            console.error(error);
-          }
-        );
+    async updateAlloggi(val) {
+      try {
+        let params = `dataInizio=${this.v.inizio}&dataFine=${this.v.fine}&idTipoStanza=${this.filters.tipoStanza}`;
+        if (this.filters.bagno) params += `&bagno=true`;
+        if (this.filters.handicap) params += `&handicap=true`;
+        if (this.filters.doppiaUsoSingolo) params += `&doppiaUsoSingolo=true`;
+        if (this.filters.sesso) params += `&sesso=${this.filters.sesso}`;
+        const response = await Vue.prototype.$api.get(`/fabbricati/${val.id}/stanze/libere?${params}`);
+        this.alloggi = response.data;
+      } catch (error) {
+        this.alloggi = [];
+        console.error(error);
+      }
     },
     expandCollapse(i) {
       // this.expand_sections[i] = !this.expand_sections[i]
       // e' necessario aggiornare tutto l'array per invocare il ricalcolo del virtual-dom
       this.expand_sections = this.expand_sections.map((x, j) => {
-        if (i == 3) this.getTariffa();
         if (i === j) return !x;
         else return x;
       });
@@ -559,28 +666,6 @@ export default {
     submit() {
       if (this.type == "nuovo") this.$store.dispatch("inserimentoContratto/submit");
       else this.$store.dispatch("inserimentoContratto/submit", this.v);
-    },
-    getTariffa() {
-      Vue.prototype.$api
-        .get(
-          `/ragioneria/tariffa?tipoUtente=${this.v.cod_tipoutente.id}&tipoStanza=${this.v.stanza.id_tipo_stanza}&tipoResidenza=${this.v.fabbricato.id_tipo_residenza}&frequenza=${this.v.tipoContratto.frequenza}`
-        )
-        .then(
-          (res) => {
-            if (res.data.length === 0) {
-              this.noTariffaValid = true;
-              return;
-            }
-            this.noTariffaValid = false;
-            let tariffa = res.data.rows[0];
-            this.v.tariffa = tariffa;
-            this.$emit("input", this.v);
-            this.updateT++;
-          },
-          (error) => {
-            console.error(error);
-          }
-        );
     },
   },
 };

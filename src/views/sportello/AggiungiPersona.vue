@@ -20,7 +20,7 @@
       <v-row>
         <v-col class="mt-5" cols="12" md="2"><span class="ml-4 body-1">Persona da modificare</span></v-col>
         <v-col>
-          <user-select class="mt-4" v-model="persona" prepend-icon="mdi-badge-account" return-object="return-object"></user-select>
+          <user-select class="mt-4" v-model="persona" prepend-icon="mdi-badge-account" return-object></user-select>
         </v-col>
       </v-row>
     </div>

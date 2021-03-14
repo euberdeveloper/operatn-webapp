@@ -9,7 +9,7 @@
     </v-row>
     <v-row class="mx-2 mt-2">
       <v-col class="py-0">
-        user-select return-object="return-object" hide-no-data="hide-no-data" dense="dense" prepend-icon="mdi-account" v-model="campi.persona" 
+        user-select return-object hide-no-data="hide-no-data" dense="dense" prepend-icon="mdi-account" v-model="campi.persona" 
       </v-col>
       <v-col class="py-0">
         v-text-field v-model="campi.id_persona" dense="dense" required="required" :rules="[(value) =&gt; !isNaN(value) || 'Inserire il codice identificativo della persona', (value) =&gt; value != 'Inserire il codice identificativo della persona']" label="Id persona" 
@@ -51,7 +51,7 @@
         <v-row class="mx-3 mt-1">
           <v-col>
             v-card-text class="pl-0" Seleziona il servizio da erogare
-            v-select :items="items" label="Servizio da aggiungere" v-model="servizio" :item-value="(item) =&gt; item.id" :item-text="(item) =&gt; item.descrizione" return-object="return-object" 
+            v-select :items="items" label="Servizio da aggiungere" v-model="servizio" :item-value="(item) =&gt; item.id" :item-text="(item) =&gt; item.descrizione" return-object 
           </v-col>
         </v-row>
         <v-row class="mx-3 mt-1">

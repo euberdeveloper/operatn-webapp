@@ -18,7 +18,7 @@
             </v-row>
             <v-row class="mx-2 mt-2">
                 <v-col class="py-0">
-                    <user-select return-object="return-object" hide-no-data="hide-no-data" dense="dense" prepend-icon="mdi-account" v-model="campi.persona"></user-select>
+                    <user-select return-object hide-no-data="hide-no-data" dense="dense" prepend-icon="mdi-account" v-model="campi.persona"></user-select>
                 </v-col>
                 <v-col class="py-0">
                     <v-text-field v-model="campi.id_persona" dense="dense" required="required" :rules="[(value) =&gt; !isNaN(value) || 'Inserire il codice identificativo della persona', (value) =&gt; value != 'Inserire il codice identificativo della persona']" label="Id persona"></v-text-field>

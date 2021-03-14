@@ -7,7 +7,7 @@
     :search-input.sync="searchPpl"
     class="mx-4"
     flat
-    label="Persona"
+    label="Ospite"
     item-text="Description"
     item-value="id"
     solo-inverted
@@ -30,7 +30,7 @@ export default {
     return {
       users: [],
       searchPpl: '',
-      page: 0,
+      page: 1,
       canLoadMore: false,
     };
   },
@@ -48,8 +48,8 @@ export default {
       if (usrs.length === 0 && this.internalValue != null && Object.keys(this.internalValue).length > 0)
         usrs = [this.internalValue]
       return usrs.map(entry => {
-        const Description = `ID:${entry.id} ${entry.cognome.trim()} ${entry.nome.trim()} ${entry.sesso.trim()} DN:${new Date(
-          entry.data_nascita
+        const Description = `ID:${entry.id} ${entry.cognome.trim()} ${entry.nome.trim()} ${entry.sesso.charAt(0)} DN:${new Date(
+          entry.dataDiNascita
         ).toLocaleDateString("it-IT")}`;
         return Object.assign({}, entry, { Description })
       })
@@ -59,11 +59,11 @@ export default {
     searchPpl(val) {
       if (!val || val.trim() == "" || !!this.model) return;
       val = val.trim();
-      this.page = 0;
+      this.page = 1;
       this.search();
     },
     page(val) {
-      if (val == 0) return;
+      if (val == 1) return;
       this.search();
     },
     value(val) {
@@ -81,11 +81,11 @@ export default {
     },
     search() {
       Vue.prototype.$api
-        .get(`/person?search=${this.searchPpl}&page=${this.page}${(this.startDate && this.endDate)?`&startDate=${this.startDate}&endDate=${this.endDate}`:''}&pagesize=50`)
+        .get(`/ospiti?search=${this.searchPpl}&dipartimentoUnitn=true&page=${this.page}${(this.startDate && this.endDate)?`&startDate=${this.startDate}&endDate=${this.endDate}`:''}&pageSize=50`)
         .then(
           result => {
             this.canLoadMore = result.data.length >= 50;
-            if (this.page == 0) this.users = result.data;
+            if (this.page == 1) this.users = result.data;
             else
               result.data.forEach(element => {
                 this.users.push(element);
