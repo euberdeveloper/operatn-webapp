@@ -469,7 +469,7 @@ export default {
       quietanziante: "",
       checkout: true,
       cauzione: true,
-      expand_sections: [false, false, false, false, false, false],
+      expand_sections: [true, true, true, true, true, true],
       v: this.$props.value,
       stanzaSelezionata: {},
       frequenze: [
