@@ -153,7 +153,7 @@ export default {
         prezzo_consumi: b.importoConsumi,
         prezzo_totale: b.importoTotale,
         competenza_dal: new Date(b.competenzaDal)?.toLocaleDateString(),
-        competenza_al: new Date(b.competanzaAl)?.toLocaleDateString(),
+        competenza_al: new Date(b.competenzaAl)?.toLocaleDateString(),
         tipo: b.tipoBolletta.tipoBolletta
       }))
       return {
