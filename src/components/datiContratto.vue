@@ -455,7 +455,7 @@
     </v-card-actions>
   </div>
 </template>
-
+competenzaAl
 <script>
 import Vue from "vue";
 import moment from "moment";
