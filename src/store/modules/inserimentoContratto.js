@@ -232,12 +232,13 @@ export default {
       try {
         const response = await Vue.prototype.$api.get(`/contratti/${op}`);
         commit('setContratti', response.data.map(c => ({
+          id: c.id,
           data_inizio: c.dataInizio,
           data_fine: c.dataFine,
-          nome: c.contrattiSuOspite[0].ospite.persona.nome,
-          cognome: c.contrattiSuOspite[0].ospite.persona.cognome,
-          stanza: c.contrattiSuOspite[0].contrattiSuOspiteSuPostoLetto[0].postoLetto.stanza.numeroStanza,
-          fabbricato: c.contrattiSuOspite[0].contrattiSuOspiteSuPostoLetto[0].postoLetto.stanza.fabbricato.codice
+          nome: c.contrattiSuOspite?.[0].ospite.persona.nome,
+          cognome: c.contrattiSuOspite?.[0].ospite.persona.cognome,
+          stanza: c.contrattiSuOspite?.[0].contrattiSuOspiteSuPostoLetto?.[0]?.postoLetto?.stanza?.numeroStanza,
+          fabbricato: c.contrattiSuOspite?.[0].contrattiSuOspiteSuPostoLetto?.[0]?.postoLetto?.stanza?.fabbricato?.codice
         })));
       }
       catch (error) {

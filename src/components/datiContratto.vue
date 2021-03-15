@@ -384,7 +384,7 @@
             </v-card> -->
             <v-card class="my-2" outlined="outlined">
               <v-card-text>
-                <div>Dati Importi ttt {{ v.tariffa }}</div>
+                <div>Dati Importi</div>
               </v-card-text>
               <v-icon class="chevron" style="position: absolute; right: 12pt; top: 8pt" @click="expandCollapse(4)"
                 >mdi-chevron-{{ expand_sections[4] ? "up" : "down" }}</v-icon
