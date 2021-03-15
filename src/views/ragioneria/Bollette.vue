@@ -70,12 +70,12 @@
                 </v-col>
             </v-row>
             <v-divider class="mb-1"></v-divider>
-            <v-card class="ma-1" v-for="(i, index) of risultati" :key="index">
-                <v-card-title style="text-transform: capitalize;">Intestatario: {{ i.nome }} {{ i.cognome }}</v-card-title>
+            <v-card class="ma-1">
+                <v-card-title style="text-transform: capitalize;">Intestatario: {{ risultati.nome }} {{ risultati.cognome }}</v-card-title>
                 <v-card-subtitle>
-                    <div>Contratto valido da {{ i.data_inizio }} a {{ i.data_fine }}, {{ i.data_firma_contratto == null ? 'non firmato' : `firmato in data ${i.data_firma_contratto}` }}, {{ i.contabilizzato == null ? `non contabilizzato` : `contabilizzato in data ${i.contabilizzato}`}}</div>
+                    <div>Contratto valido da {{ risultati.data_inizio }} a {{ risultati.data_fine }}<!--, {{ i.data_firma_contratto ? 'non firmato' : `firmato in data ${i.data_firma_contratto}` }}, {{ i.contabilizzato ? `non contabilizzato` : `contabilizzato in data ${i.contabilizzato}`}} --></div>
                 </v-card-subtitle>
-                <v-data-table class="elevation-1" id="print" :headers="headers" dense="" :items="i.bollette"></v-data-table>
+                <v-data-table class="elevation-1" id="print" :headers="headers" dense="" :items="risultati.bollette"></v-data-table>
             </v-card>
         </v-main>
     </v-expand-transition>
@@ -86,7 +86,7 @@
 import Vue from "vue";
 import { mapState } from "vuex";
 const pdfMake = require("pdfmake/build/pdfmake.js");
-import XLSX from "xlsx";
+//import XLSX from "xlsx";
 /*
 -------------------- CAUZIONE ---------------------
 div 
@@ -125,13 +125,14 @@ export default {
   },
   computed: {
     esportaCSV() {
-      let value = JSON.parse(JSON.stringify(this.risultati_raw));
-      let a = XLSX.utils.json_to_sheet(value);
-      let b = XLSX.utils.sheet_to_csv(a);
-      return `data:application/octet-stream,${b.toString()}`;
+      return '';
+      // let value = JSON.parse(JSON.stringify(this.risultati_raw));
+      // let a = XLSX.utils.json_to_sheet(value);
+      // let b = XLSX.utils.sheet_to_csv(a);
+      // return `data:application/octet-stream,${b.toString()}`;
     },
     headers() {
-      let h = ["num_bolletta", "scadenza", "prezzo", "competenza_da", "competenza_a", "tipo"].map((x) => {
+      let h = ["numero", "scadenza", "prezzo_canoni", "prezzo_consumi", "prezzo_totale", "competenza_dal", "competenza_al", "tipo"].map((x) => {
         return { text: x, value: x };
       });
       return h;
@@ -144,63 +145,97 @@ export default {
     ...mapState("inserimentoContratto", ["tipiContratti", "tipiUtente"]),
   },
   methods: {
-    submitCampi() {
-      let params = new URLSearchParams(this.campi);
-      console.log(params.toString());
-      Vue.prototype.$api.get(`/ragioneria/bollette/?${params.toString()}`).then(
-        (res) => {
-          this.risultati = JSON.stringify(res.data);
-          this.risultati = JSON.parse(this.risultati);
-          this.form = false;
-          this.submitted = true;
-          let temp = [];
-          if (this.risultati[0] == undefined) this.ricerca = false;
-          else
-            this.risultati.forEach((element) => {
-              let c = temp.findIndex((persona) => persona.id == element.id);
-              if (c === -1) {
-                this.ricerca = true;
-                temp.push({
-                  id: element.id,
-                  nome: element.nome,
-                  cognome: element.cognome,
-                  data_inizio: element.data_inizio,
-                  data_fine: element.data_fine,
-                  contabilizzato: element.contabilizzato,
-                  data_firma_contratto: element.data_firma_contratto,
-                  cauzione: {
-                    data_pagamento: element.data_pagamento,
-                    data_restituzione: element.data_restituzione,
-                  },
-                  bollette: [
-                    {
-                      num_bolletta: element.num_bolletta,
-                      scadenza: element.scadenza,
-                      prezzo: element.prezzo,
-                      competenza_da: element.competenza_da,
-                      competenza_a: element.competenza_a,
-                      tipo: element.tipo,
-                    },
-                  ],
-                });
-              } else {
-                temp[c].bollette.push({
-                  num_bolletta: element.num_bolletta,
-                  scadenza: element.scadenza,
-                  prezzo: element.prezzo,
-                  competenza_da: element.competenza_da,
-                  competenza_a: element.competenza_a,
-                  tipo: element.tipo,
-                });
-              }
-            });
-          this.risultati_raw = JSON.parse(JSON.stringify(this.risultati));
-          this.risultati = temp;
-        },
-        (error) => {
-          console.log(error);
-        }
-      );
+    purgeResult(bollette) {
+      const b = bollette.map(b => ({
+        numero: b.numero,
+        scadenza: new Date(b.dataScadenza)?.toLocaleDateString(),
+        prezzo_canoni: b.importoCanoni,
+        prezzo_consumi: b.importoConsumi,
+        prezzo_totale: b.importoTotale,
+        competenza_dal: new Date(b.competenzaDal)?.toLocaleDateString(),
+        competenza_al: new Date(b.competanzaAl)?.toLocaleDateString(),
+        tipo: b.tipoBolletta.tipoBolletta
+      }))
+      return {
+        data_inizio: new Date(bollette?.[0]?.contratto?.dataInizio)?.toLocaleDateString(),
+        data_fine: new Date(bollette?.[0]?.contratto?.dataFine)?.toLocaleDateString(),
+        nome: bollette?.[0]?.contratto?.contrattiSuOspite?.[0]?.ospite?.persona?.nome,
+        cognome: bollette?.[0]?.contratto?.contrattiSuOspite?.[0]?.ospite?.persona?.cognome,
+        bollette: b
+      };
+    },
+    async submitCampi() {
+      if (!this.campi.id_contratto) alert('selezionare id contratto')
+
+      try {
+        const result = await Vue.prototype.$api.get(`/contratti/${this.campi.id_contratto}/bollette?contratto=true&tipoBolletta=true&contratto.contrattiSuOspite=true&contratto.contrattiSuOspite.ospite=true&contratto.contrattiSuOspite.ospite.persona=true`);
+        const purged = this.purgeResult(result.data);
+        this.risultati = purged;
+         this.ricerca = purged.bollette.length > 0;
+         console.log(this.ricerca)
+        this.form = false;
+        this.submitted = true;
+      }
+      catch(error) {
+        console.error(error)
+        alert('Errore generico');
+      }
+      // let params = new URLSearchParams(this.campi);
+      // console.log(params.toString());
+      // Vue.prototype.$api.get(`/contratto/bollette/?${params.toString()}`).then(
+      //   (res) => {
+      //     this.risultati = JSON.stringify(res.data);
+      //     this.risultati = JSON.parse(this.risultati);
+      //     this.form = false;
+      //     this.submitted = true;
+      //     let temp = [];
+      //     if (this.risultati[0] == undefined) this.ricerca = false;
+      //     else
+      //       this.risultati.forEach((element) => {
+      //         let c = temp.findIndex((persona) => persona.id == element.id);
+      //         if (c === -1) {
+      //           this.ricerca = true;
+      //           temp.push({
+      //             id: element.id,
+      //             nome: element.nome,
+      //             cognome: element.cognome,
+      //             data_inizio: element.data_inizio,
+      //             data_fine: element.data_fine,
+      //             contabilizzato: element.contabilizzato,
+      //             data_firma_contratto: element.data_firma_contratto,
+      //             cauzione: {
+      //               data_pagamento: element.data_pagamento,
+      //               data_restituzione: element.data_restituzione,
+      //             },
+      //             bollette: [
+      //               {
+      //                 num_bolletta: element.num_bolletta,
+      //                 scadenza: element.scadenza,
+      //                 prezzo: element.prezzo,
+      //                 competenza_da: element.competenza_da,
+      //                 competenza_a: element.competenza_a,
+      //                 tipo: element.tipo,
+      //               },
+      //             ],
+      //           });
+      //         } else {
+      //           temp[c].bollette.push({
+      //             num_bolletta: element.num_bolletta,
+      //             scadenza: element.scadenza,
+      //             prezzo: element.prezzo,
+      //             competenza_da: element.competenza_da,
+      //             competenza_a: element.competenza_a,
+      //             tipo: element.tipo,
+      //           });
+      //         }
+      //       });
+      //     this.risultati_raw = JSON.parse(JSON.stringify(this.risultati));
+      //     this.risultati = temp;
+      //   },
+      //   (error) => {
+      //     console.log(error);
+      //   }
+      // );
     },
     clearCampi() {
       this.submitted = false;
