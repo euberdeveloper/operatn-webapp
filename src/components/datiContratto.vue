@@ -263,7 +263,7 @@
                         placeholder="Clicca per selezionare"
                         dense="dense"
                         @focus="filtriStanza = true"
-                        v-model="stanzaSelezionata.desc"
+                        :value="stanzaSelezionata ? stanzaSelezionata.desc : ''"
                         @keydown="ignore"
                       ></v-text-field>
                     </v-col>
@@ -276,7 +276,7 @@
                       <v-icon v-if="v.stanza.handicap &amp;&amp; v.stanza.handicap == 'S'" desnse="desnse">mdi-wheelchair-accessibility</v-icon>
                     </v-col>
                     <v-col class="py-0">
-                      <v-text-field :value="stanzaSelezionata.unitaImmobiliare" readonly="readonly" dense="dense" label="Unita' Immobiliare"></v-text-field>
+                      <v-text-field :value="stanzaSelezionata ? stanzaSelezionata.unitaImmobiliare : ''" readonly="readonly" dense="dense" label="Unita' Immobiliare"></v-text-field>
                     </v-col>
                     <v-col class="py-0" v-if="!!v.stanza.posto_letto">
                       <v-checkbox class="mt-0" :readonly="v.contabilizzato" dense="dense" label="Doppia uso singolo"></v-checkbox>
@@ -693,8 +693,26 @@ export default {
     ignore(event) {
       event.preventDefault();
     },
-    submit() {
-      this.$store.dispatch("inserimentoContratto/submit", this.body);
+    async submit() {
+      try {
+        console.log('ciao')
+        await this.$store.dispatch("inserimentoContratto/submit", this.body);
+        console.log('come')
+        this.quietanziante = null;
+        this.tipoContratto = null;
+        this.tipoTariffa = null;
+        this.utilizzoStanza = null;
+        this.cauzione = true;
+        this.checkout = true;
+        this.stanzaSelezionata = null;
+        this.v.inizio = null;
+        this.v.fine = null;
+        this.v.id_tipo_rata = null;
+        this.v.persona = null;
+      } catch (error) {
+        console.error(error);
+        alert("Errore");
+      }
       // if (this.type == "nuovo") this.$store.dispatch("inserimentoContratto/submit");
       // else this.$store.dispatch("inserimentoContratto/submit", this.body);
     },

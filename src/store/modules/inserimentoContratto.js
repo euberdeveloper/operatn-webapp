@@ -246,23 +246,14 @@ export default {
         console.error(error)
       }
     },
-    submit({ state, commit, dispatch }, val) {
-      console.log(state);
-      Vue.prototype.$api
-        .post(`/contratti`, val)
-        .then(
-          () => {
-            commit('setSuccess', 'Inserimento eseguito con successo')
-            commit('setDialogContratto', false)
-            commit('resetStateWithKey', val ? 'modifica' : 'nuovo')
-            dispatch('loadContratti')
-            setTimeout(() => commit('setSuccess', false), 5000)
-          },
-          error => {
-            // commit('setTipiContratti', [])
-            console.error(error)
-          }
-        )
+    async submit({ state, commit, dispatch }, val) {
+      console.debug(state)
+      await Vue.prototype.$api.post(`/contratti`, val)
+      commit('setSuccess', 'Inserimento eseguito con successo')
+      commit('setDialogContratto', false)
+      commit('resetStateWithKey', val ? 'modifica' : 'nuovo')
+      dispatch('loadContratti')
+      setTimeout(() => commit('setSuccess', false), 5000)
     },
     deleteItem({ dispatch }, val) {
       Vue.prototype.$api
