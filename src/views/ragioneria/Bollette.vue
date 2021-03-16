@@ -148,17 +148,17 @@ export default {
     purgeResult(bollette) {
       const b = bollette.map(b => ({
         numero: b.numero,
-        scadenza: new Date(b.dataScadenza)?.toLocaleDateString(),
+        scadenza: new Date(b.dataScadenza)?.toLocaleDateString('it'),
         prezzo_canoni: b.importoCanoni,
         prezzo_consumi: b.importoConsumi,
         prezzo_totale: b.importoTotale,
-        competenza_dal: new Date(b.competenzaDal)?.toLocaleDateString(),
-        competenza_al: new Date(b.competenzaAl)?.toLocaleDateString(),
+        competenza_dal: new Date(b.competenzaDal)?.toLocaleDateString('it'),
+        competenza_al: new Date(b.competenzaAl)?.toLocaleDateString('it'),
         tipo: b.tipoBolletta.tipoBolletta
       }))
       return {
-        data_inizio: new Date(bollette?.[0]?.contratto?.dataInizio)?.toLocaleDateString(),
-        data_fine: new Date(bollette?.[0]?.contratto?.dataFine)?.toLocaleDateString(),
+        data_inizio: new Date(bollette?.[0]?.contratto?.dataInizio)?.toLocaleDateString('it'),
+        data_fine: new Date(bollette?.[0]?.contratto?.dataFine)?.toLocaleDateString('it'),
         nome: bollette?.[0]?.contratto?.contrattiSuOspite?.[0]?.ospite?.persona?.nome,
         cognome: bollette?.[0]?.contratto?.contrattiSuOspite?.[0]?.ospite?.persona?.cognome,
         bollette: b

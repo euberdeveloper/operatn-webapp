@@ -117,13 +117,7 @@
                       ></v-autocomplete>
                     </v-col>
                     <v-col class="py-0" cols="12" sm="6">
-                      <v-autocomplete
-                        v-model="v.id_tipo_rata"
-                        :readonly="v.contabilizzato"
-                        dense="dense"
-                        label="Tipo Rata"
-                        :items="tipiRate"
-                      ></v-autocomplete>
+                      <v-autocomplete v-model="v.id_tipo_rata" :readonly="v.contabilizzato" dense="dense" label="Tipo Rata" :items="tipiRate"></v-autocomplete>
                     </v-col>
                   </v-row>
                   <v-row class="mx-1 mt-3 py-0">
@@ -269,7 +263,7 @@
                         placeholder="Clicca per selezionare"
                         dense="dense"
                         @focus="filtriStanza = true"
-                        v-model="numeroStanza"
+                        v-model="stanzaSelezionata.desc"
                         @keydown="ignore"
                       ></v-text-field>
                     </v-col>
@@ -462,10 +456,10 @@ export default {
   props: ["value", "fabbricati", "tariffe", "type", "tipiTariffa", "utilizziStanza", "quietanzianti", "tipi-contratti", "tipi-utente", "tipi-rate"],
   data() {
     return {
-      tipoContratto: "",
+      tipoContratto: null,
       utilizzoStanza: null,
       tipoTariffa: null,
-      quietanziante: "",
+      quietanziante: null,
       checkout: true,
       cauzione: true,
       expand_sections: [true, true, true, true, true, true],
@@ -512,8 +506,8 @@ export default {
         ospiti: [
           {
             idOspite: this.v.persona.id,
-            postiLetto: this.filters.doppiaUsoSingolo ? this.stanzaSelezionata.postiLetto.map(el => el.id) : [this.stanzaSelezionata.id],
-          }
+            postiLetto: this.filters.doppiaUsoSingolo ? this.stanzaSelezionata.postiLetto.map((el) => el.id) : [this.stanzaSelezionata.id],
+          },
         ],
       };
     },
@@ -544,12 +538,6 @@ export default {
       return this.v.stanza.numero_stanza ?? "";
     },
     tariffa() {
-      console.log({
-        idTipoOspite: this.v.cod_tipoutente?.id,
-        idUtilizzoStanza: this.utilizzoStanza?.id,
-        idTipoFabbricato: this.v.fabbricato?.idTipoFabbricato,
-        idTipoTariffa: this.tipoTariffa,
-      });
       return this.tariffe.find(
         (t) =>
           t.idTipoOspite == this.v.cod_tipoutente?.id &&
@@ -596,6 +584,33 @@ export default {
     },
   },
   watch: {
+    tipiContratti: {
+      handler() {
+        if (this.tipoContratto === null) {
+          this.tipoContratto = this.tipiContratti.find((t) => {
+            return t.sigla === "AFSB";
+          })?.id;
+        }
+      },
+    },
+    tipiTariffa: {
+      handler() {
+        if (this.tipoTariffa === null) {
+          this.tipoTariffa = this.tipiTariffa.find((t) => {
+            return t.tipoTariffa === "MENSILE";
+          })?.id;
+        }
+      },
+    },
+    quietanzianti: {
+      handler() {
+        if (this.quietanziante === null) {
+          this.quietanziante = this.quietanzianti.find((q) => {
+            return q.quietanziante === "Beneficiario";
+          })?.id;
+        }
+      },
+    },
     "v.fabbricato": {
       handler(val) {
         if (val != null && val.length !== 0) this.updateAlloggi(val);
@@ -679,7 +694,7 @@ export default {
       event.preventDefault();
     },
     submit() {
-       this.$store.dispatch("inserimentoContratto/submit", this.body)
+      this.$store.dispatch("inserimentoContratto/submit", this.body);
       // if (this.type == "nuovo") this.$store.dispatch("inserimentoContratto/submit");
       // else this.$store.dispatch("inserimentoContratto/submit", this.body);
     },
