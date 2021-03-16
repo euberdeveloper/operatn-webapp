@@ -83,7 +83,7 @@
                     <v-col class="py-0" cols="12" sm="6">
                       <v-text-field readonly="readonly" dense="dense" v-model="v.persona.sesso" label="Sesso"></v-text-field>
                     </v-col>
-                    <v-col class="py-0" cols="12" sm="6">
+                    <v-col class="py-0" cols="12" sm="6" v-if="v.persona.dipartimentoUnitn">
                       <v-text-field
                         readonly="readonly"
                         dense="dense"
