@@ -276,7 +276,12 @@
                       <v-icon v-if="v.stanza.handicap &amp;&amp; v.stanza.handicap == 'S'" desnse="desnse">mdi-wheelchair-accessibility</v-icon>
                     </v-col>
                     <v-col class="py-0">
-                      <v-text-field :value="stanzaSelezionata ? stanzaSelezionata.unitaImmobiliare : ''" readonly="readonly" dense="dense" label="Unita' Immobiliare"></v-text-field>
+                      <v-text-field
+                        :value="stanzaSelezionata ? stanzaSelezionata.unitaImmobiliare : ''"
+                        readonly="readonly"
+                        dense="dense"
+                        label="Unita' Immobiliare"
+                      ></v-text-field>
                     </v-col>
                     <v-col class="py-0" v-if="!!v.stanza.posto_letto">
                       <v-checkbox class="mt-0" :readonly="v.contabilizzato" dense="dense" label="Doppia uso singolo"></v-checkbox>
@@ -695,9 +700,9 @@ export default {
     },
     async submit() {
       try {
-        console.log('ciao')
+        console.log("ciao");
         await this.$store.dispatch("inserimentoContratto/submit", this.body);
-        console.log('come')
+        console.log("come");
         this.quietanziante = null;
         this.tipoContratto = null;
         this.tipoTariffa = null;
