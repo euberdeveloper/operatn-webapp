@@ -690,30 +690,25 @@ export default {
       });
     },
     deleteContract() {
-      confirm("Sei sicuro di voler eliminare questo contratto?") &&
-        setTimeout(() => {
-          this.$store.dispatch("inserimentoContratto/deleteContract");
-        });
+      this.quietanziante = null;
+      this.tipoContratto = null;
+      this.tipoTariffa = null;
+      this.utilizzoStanza = null;
+      this.cauzione = true;
+      this.checkout = true;
+      this.stanzaSelezionata = null;
+      this.v.inizio = null;
+      this.v.fine = null;
+      this.v.id_tipo_rata = null;
+      this.v.persona = null;
     },
     ignore(event) {
       event.preventDefault();
     },
     async submit() {
       try {
-        console.log("ciao");
         await this.$store.dispatch("inserimentoContratto/submit", this.body);
-        console.log("come");
-        this.quietanziante = null;
-        this.tipoContratto = null;
-        this.tipoTariffa = null;
-        this.utilizzoStanza = null;
-        this.cauzione = true;
-        this.checkout = true;
-        this.stanzaSelezionata = null;
-        this.v.inizio = null;
-        this.v.fine = null;
-        this.v.id_tipo_rata = null;
-        this.v.persona = null;
+        this.deleteContract();
       } catch (error) {
         console.error(error);
         alert("Errore");
