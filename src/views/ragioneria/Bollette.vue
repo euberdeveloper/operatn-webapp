@@ -155,7 +155,7 @@ export default {
         prezzo_totale: b.importoTotale,
         competenza_dal: new Date(b.competenzaDal)?.toLocaleDateString('it'),
         competenza_al: new Date(b.competenzaAl)?.toLocaleDateString('it'),
-        quietanziante: b?.contratto?.quietanziante?.quietanziante,
+        quietanziante: b?.quietanziante?.quietanziante,
         tipo: b.tipoBolletta.tipoBolletta
       }))
       return {
@@ -170,7 +170,7 @@ export default {
       if (!this.campi.id_contratto) alert('selezionare id contratto')
 
       try {
-        const result = await Vue.prototype.$api.get(`/contratti/${this.campi.id_contratto}/bollette?tipoBolletta=true&contratto=true&contratto.quietanziante=true&contratto.contrattiSuOspite=true&contratto.contrattiSuOspite.ospite=true&contratto.contrattiSuOspite.ospite.persona=true`);
+        const result = await Vue.prototype.$api.get(`/contratti/${this.campi.id_contratto}/bollette?tipoBolletta=true&contratto=true&quietanziante=true&contratto.contrattiSuOspite=true&contratto.contrattiSuOspite.ospite=true&contratto.contrattiSuOspite.ospite.persona=true`);
         const purged = this.purgeResult(result.data);
         this.risultati = purged;
          this.ricerca = purged.bollette.length > 0;
