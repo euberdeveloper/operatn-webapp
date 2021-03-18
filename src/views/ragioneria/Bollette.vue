@@ -132,7 +132,7 @@ export default {
       // return `data:application/octet-stream,${b.toString()}`;
     },
     headers() {
-      let h = ["numero", "scadenza", "prezzo_canoni", "prezzo_consumi", "prezzo_totale", "competenza_dal", "competenza_al", "tipo"].map((x) => {
+      let h = ["numero", "scadenza", "prezzo_canoni", "prezzo_consumi", "prezzo_totale", "competenza_dal", "competenza_al", "quietanziante", "tipo"].map((x) => {
         return { text: x, value: x };
       });
       return h;
@@ -146,6 +146,7 @@ export default {
   },
   methods: {
     purgeResult(bollette) {
+      console.log(bollette[0])
       const b = bollette.map(b => ({
         numero: b.numero,
         scadenza: new Date(b.dataScadenza)?.toLocaleDateString('it'),
@@ -154,6 +155,7 @@ export default {
         prezzo_totale: b.importoTotale,
         competenza_dal: new Date(b.competenzaDal)?.toLocaleDateString('it'),
         competenza_al: new Date(b.competenzaAl)?.toLocaleDateString('it'),
+        quietanziante: b?.contratto?.quietanziante?.quietanziante,
         tipo: b.tipoBolletta.tipoBolletta
       }))
       return {
@@ -168,7 +170,7 @@ export default {
       if (!this.campi.id_contratto) alert('selezionare id contratto')
 
       try {
-        const result = await Vue.prototype.$api.get(`/contratti/${this.campi.id_contratto}/bollette?contratto=true&tipoBolletta=true&contratto.contrattiSuOspite=true&contratto.contrattiSuOspite.ospite=true&contratto.contrattiSuOspite.ospite.persona=true`);
+        const result = await Vue.prototype.$api.get(`/contratti/${this.campi.id_contratto}/bollette?tipoBolletta=true&contratto=true&contratto.quietanziante=true&contratto.contrattiSuOspite=true&contratto.contrattiSuOspite.ospite=true&contratto.contrattiSuOspite.ospite.persona=true`);
         const purged = this.purgeResult(result.data);
         this.risultati = purged;
          this.ricerca = purged.bollette.length > 0;
