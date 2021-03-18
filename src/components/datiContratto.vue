@@ -323,6 +323,19 @@
                       ></v-autocomplete>
                     </v-col>
                   </v-row>
+                  <v-row class="mx-1 mt-3 py-0">
+                    <v-col class="py-0" cols="12">
+                      <v-textarea
+                        prepend-icon="mdi-comment"
+                        rows="3"
+                        label="Note sul contratto"
+                        v-model="note"
+                        hint="Eventuali note che possono essere lasciate in bianco"
+                        outlined
+                        auto-grow
+                      ></v-textarea>
+                    </v-col>
+                  </v-row>
                 </div>
               </v-expand-transition>
             </v-card>
@@ -467,6 +480,7 @@ export default {
       quietanziante: null,
       checkout: true,
       cauzione: true,
+      note: null,
       expand_sections: [true, true, true, true, true, true],
       v: this.$props.value,
       stanzaSelezionata: {},
@@ -508,6 +522,7 @@ export default {
         tipoRata: this.v.id_tipo_rata,
         cauzione: this.cauzione,
         checkout: this.checkout,
+        note: this.note || null,
         ospiti: [
           {
             idOspite: this.v.persona.id,
