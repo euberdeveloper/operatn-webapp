@@ -72,7 +72,7 @@
                       <v-text-field readonly="readonly" dense="dense" v-model="v.persona.nome" label="Nome"></v-text-field>
                     </v-col>
                     <v-col class="py-0" cols="12" sm="6">
-                      <v-text-field readonly="readonly" dense="dense" v-model="v.persona.dataDiNascita" label="Data Nascita"></v-text-field>
+                      <v-text-field readonly="readonly" dense="dense" v-model="dataDiNascita" label="Data Nascita"></v-text-field>
                     </v-col>
                     <v-col class="py-0" cols="12" sm="6">
                       <v-text-field readonly="readonly" dense="dense" v-model="v.persona.email" label="E-mail"></v-text-field>
@@ -512,6 +512,9 @@ export default {
     };
   },
   computed: {
+    dataDiNascita() {
+      return this.v?.persona?.dataDiNascita ? new Date(this.v.persona.dataDiNascita)?.toLocaleDateString('it') : null;
+    },
     body() {
       return {
         dataInizio: this.v.inizio,
