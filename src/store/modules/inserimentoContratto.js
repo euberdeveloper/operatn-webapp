@@ -215,10 +215,10 @@ export default {
           op = 'da-firmare';
           break;
         case 'Firmati':
-          op = 'da-contabilizzare';
+          op = 'firmati';
           break;
         case 'Contabilizzati':
-          op = 'contabilizzati';
+          op = 'firmati';
           break;
         case 'Chiusura Anticipata':
           op = 'bo';
