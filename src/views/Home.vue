@@ -117,6 +117,7 @@ export default {
           { divider: true, role:'CONTROLLO ALLOGGI' },
           { icon: "mdi-spray-bottle", text: "Spese Servizi", path: "/spese-servizi" },
           { icon: "mdi-heart-broken", text: "Guasti", path: "/guasti" },
+          { icon: "mdi-heart-broken", text: "Tabellone", path: "/tabellone" },
         ]);
       if (k == "ADMIN")
         items = items.concat([

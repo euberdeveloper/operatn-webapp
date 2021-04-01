@@ -85,6 +85,10 @@ const routes = [
 				path: '/tariffe',
 				component: () => import(/* webpackChunkName: "inserimento-tipo-tariffa" */ '@/views/configurazioni/InserimentoTariffa.vue')
 			},
+			{
+				path: '/tabellone',
+				component: () => import(/* webpackChunkName: "tabellone" */ '@/views/controllo/Tabellone.vue')
+			}
 		]
 	},
 	{
