@@ -45,9 +45,13 @@
                 type="modifica"
                 v-model="modifica"
                 :fabbricati="fabbricati"
-                :tipi-contratti="tipiContratti"
-                :tipi-utente="tipiUtente"
-                :tipi-rate="tipiRate"
+              :quietanzianti="quietanzianti"
+              :tipi-contratti="tipiContratti"
+              :tipi-utente="tipiUtente"
+              :tariffe="tariffe"
+              :tipi-tariffa="tipiTariffa"
+              :utilizzi-stanza="utilizziStanza"
+              :tipi-rate="tipiRate"
               ></dati-contratto>
             </v-col>
           </v-row>
@@ -93,16 +97,21 @@ export default {
       dataFirma: null,
       dataFirmaOk: -1,
       desc: 0,
+      tipiRate: ['MENSILE', 'UNICA', 'DA_BANDO']
     };
   },
   mounted() {
-    this.$store.dispatch("inserimentoContratto/loadFabbricati");
+   this.$store.dispatch("inserimentoContratto/loadFabbricati");
     this.$store.dispatch("inserimentoContratto/loadTipiUtente");
     this.$store.dispatch("inserimentoContratto/loadTipiContratti");
-    this.$store.dispatch("inserimentoContratto/loadTipiRate");
+    this.$store.dispatch("inserimentoContratto/loadQuietanzianti");
+    this.$store.dispatch("inserimentoContratto/loadTariffe");
+    this.$store.dispatch("inserimentoContratto/loadUtilizziStanza");
+    this.$store.dispatch("inserimentoContratto/loadTipiTariffa");
+    
   },
   computed: {
-    ...mapState("inserimentoContratto", ["fabbricati", "tipiContratti", "tipiUtente", "tipiRate", "contratti", "dialogContratto", "alertSucc"]),
+    ...mapState("inserimentoContratto", ["fabbricati", "utilizziStanza", "tipiContratti", "tipiTariffa", "tariffe", "quietanzianti", "tipiUtente", "contratti", "dialogContratto", "alertSucc"]),
     headers_op() {
       if (this.contratti.length === 0) return [];
       let k = Object.keys(this.contratti[0]).map((x) => {
@@ -151,10 +160,13 @@ export default {
   },
   methods: {
     ...mapActions("inserimentoContratto", ["loadEditContratto"]),
-    deleteItem(item) {
-      confirm(
-        `Sei sicuro di voler eliminare il contratto di ${item.nome} ${item.cognome} che inizierebbe il ${item.data_inizio} per la stanza ${item.numero_stanza} in ${item.descrizione_fabbricato} con contratto ${item.sigla}`
-      ) && this.$store.dispatch("inserimentoContratto/deleteItem", item);
+    async deleteItem(item) {
+      if(confirm(
+        `Sei sicuro di voler eliminare il contratto di ${item.nome} ${item.cognome} che inizierebbe il ${item.data_inizio}?`
+      )) {
+        this.$store.dispatch("inserimentoContratto/deleteItem", item);
+
+      }
     },
     dateSign(item) {
       this.data = item;

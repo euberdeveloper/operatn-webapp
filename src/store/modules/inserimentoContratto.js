@@ -257,7 +257,7 @@ export default {
     },
     deleteItem({ dispatch }, val) {
       Vue.prototype.$api
-        .delete(`/ragioneria/contratto/${val.id}`)
+        .delete(`/contratti/${val.id}`)
         .then(
           () => {
             dispatch('loadContratti')
@@ -328,7 +328,7 @@ export default {
       commit('setDialogContratto', true)
       console.log(val)
       Vue.prototype.$api
-        .get(`/ragioneria/contratto/${val.id}`)
+        .get(`http://localhost:3000/api/contratti/${val.id}?quietanziante=true&tariffa=true&tariffa.tipoTariffa=true&tariffa.utilizzoStanza=true&tariffa.tipoOspite=true&tariffa.tipoOspite.contoRicaviConsumi=true&tariffa.tipoOspite.contoRicaviCanoni=true&tariffa.tipoFabbricato=true&tipoContratto=true&tipoContratto.tipoStudente=true&bollette=true&bollette.tipoBolletta=true`)
         .then(
           // {
           //   inizio: "",
@@ -349,18 +349,17 @@ export default {
             console.log(res)
             commit('setEditContratto', {
               id: res.data.id,
-              persona: res.data.persona,
-              stanza: res.data.stanza,
-              fabbricato: res.data.fabbricato,
-              tipoContratto: res.data.contratto,
-              tariffa: res.data.tariffa,
-              cod_tipoutente: res.data.tipoUtente,
-              inizio: val.proroga ? '' : moment(res.data.data_inizio).format('YYYY-MM-DD'),
-              fine: val.proroga ? '' : moment(res.data.data_fine).format('YYYY-MM-DD'),
-              annoContratto: res.data.anno_accademico,
-              id_tipo_rata: res.data.id_tipo_rata,
-              id_utilizzo_stanza: res.data.id_utilizzo_stanza,
-              proroga: val.proroga,
+              persona: res.data.contrattiSuOspite[0].ospite,
+              quietanziante: res.data.idQuietanziante,
+              cod_tipoutente: res.data.tariffa.tipoOspite.id,
+              utilizzoStanza: res.data.tariffa.utilizzoStanza.id,
+              fabbricato: res.data.contrattiSuOspite[0].ospite.contrattiSuOspiteSuPostoLetto[0].postoLetto.stanza.fabbricato,
+              tipoTariffa: res.data.tariffa.tipoTariffa,
+              idTipoContratto: res.data.idTipoContratto,
+              id_tipo_rata: res.data.idTipoRata,
+              cauzione: !!res.data.cauzione,
+              checkout: !!res.data.checkout,
+              note: res.data.note
             })
 
           },

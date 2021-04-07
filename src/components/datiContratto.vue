@@ -31,7 +31,7 @@
                 </v-col>
                 <v-col>
                   <input-date-picker v-if="v.contabilizzato" v-model="v.chiusura" dense="dense" label="Chiusura"></input-date-picker>
-                  <v-btn class="red white--text" @click="deleteContract">
+                  <v-btn class="red white--text" @click="deleteContract" v-if="type !== 'modifica'">
                     <v-icon left="left" dense="dense">mdi-delete-forever</v-icon>
                     {{ deleteBtnText }}
                   </v-btn>
@@ -548,8 +548,7 @@ export default {
           }, []);
     },
     deleteBtnText() {
-      if (this.$props.type == "modifica") return "Elimina contratto";
-      else return "Annulla inserimento";
+      return "Annulla inserimento";
     },
     anniAccademici() {
       return [...Array(new Date().getFullYear() - 2015 + 5).keys()].map((x) => {
