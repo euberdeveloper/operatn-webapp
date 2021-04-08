@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import moment from 'moment'
+//import moment from 'moment'
 
 const getDefaultState = () => {
   return {
@@ -246,8 +246,8 @@ export default {
         console.error(error)
       }
     },
-    async submit({ state, commit, dispatch }, val) {
-      console.debug(state)
+    async submit({ _, commit, dispatch }, val) {
+      console.log(_ ? '' : '')
       await Vue.prototype.$api.post(`/contratti`, val)
       commit('setSuccess', 'Inserimento eseguito con successo')
       commit('setDialogContratto', false)
@@ -320,13 +320,11 @@ export default {
       commit('setDialogContratto', false)
     },
     cancelSign({ dispatch, commit, state }) {
-      console.log(state.modifica);
       dispatch('cancelSignContract', state.modifica)
       commit('setDialogContratto', false)
     },
     loadEditContratto({ commit }, val) {
       commit('setDialogContratto', true)
-      console.log(val)
       Vue.prototype.$api
         .get(`http://localhost:3000/api/contratti/${val.id}?quietanziante=true&tariffa=true&tariffa.tipoTariffa=true&tariffa.utilizzoStanza=true&tariffa.tipoOspite=true&tariffa.tipoOspite.contoRicaviConsumi=true&tariffa.tipoOspite.contoRicaviCanoni=true&tariffa.tipoFabbricato=true&tipoContratto=true&tipoContratto.tipoStudente=true&bollette=true&bollette.tipoBolletta=true`)
         .then(
@@ -346,21 +344,7 @@ export default {
           //   }
           // }
           res => {
-            console.log(res)
-            commit('setEditContratto', {
-              id: res.data.id,
-              persona: res.data.contrattiSuOspite[0].ospite,
-              quietanziante: res.data.idQuietanziante,
-              cod_tipoutente: res.data.tariffa.tipoOspite.id,
-              utilizzoStanza: res.data.tariffa.utilizzoStanza.id,
-              fabbricato: res.data.contrattiSuOspite[0].ospite.contrattiSuOspiteSuPostoLetto[0].postoLetto.stanza.fabbricato,
-              tipoTariffa: res.data.tariffa.tipoTariffa,
-              idTipoContratto: res.data.idTipoContratto,
-              id_tipo_rata: res.data.idTipoRata,
-              cauzione: !!res.data.cauzione,
-              checkout: !!res.data.checkout,
-              note: res.data.note
-            })
+            commit('setEditContratto', res.data)
 
           },
           error => {

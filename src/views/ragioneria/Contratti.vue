@@ -43,15 +43,14 @@
               <dati-contratto
                 v-if="dialogContratto"
                 type="modifica"
-                v-model="modifica"
                 :fabbricati="fabbricati"
-              :quietanzianti="quietanzianti"
-              :tipi-contratti="tipiContratti"
-              :tipi-utente="tipiUtente"
-              :tariffe="tariffe"
-              :tipi-tariffa="tipiTariffa"
-              :utilizzi-stanza="utilizziStanza"
-              :tipi-rate="tipiRate"
+                :quietanzianti="quietanzianti"
+                :tipi-contratti="tipiContratti"
+                :tipi-utente="tipiUtente"
+                :tariffe="tariffe"
+                :tipi-tariffa="tipiTariffa"
+                :utilizzi-stanza="utilizziStanza"
+                :tipi-rate="tipiRate"
               ></dati-contratto>
             </v-col>
           </v-row>

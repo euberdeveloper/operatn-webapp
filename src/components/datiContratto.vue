@@ -132,7 +132,6 @@
                         return-object
                       ></v-autocomplete>
                     </v-col>
-                    {{tariffa}}
                     <v-col class="py-0" cols="12" sm="6">
                       <v-autocomplete
                         v-model="tipoTariffa"
@@ -483,7 +482,7 @@ export default {
       cauzione: true,
       note: null,
       expand_sections: [true, true, true, true, true, true],
-      v: this.$props.value,
+      v: this.$props.value ?? {},
       stanzaSelezionata: {},
       frequenze: [
         {
@@ -514,7 +513,15 @@ export default {
   },
   computed: {
     dataDiNascita() {
-      return this.v?.persona?.dataDiNascita ? new Date(this.v.persona.dataDiNascita)?.toLocaleDateString('it') : null;
+      return this.v?.persona?.dataDiNascita ? new Date(this.v.persona.dataDiNascita)?.toLocaleDateString("it") : null;
+    },
+    modifica: {
+      get() {
+        return { ...this.$store.state.inserimentoContratto.modifica };
+      },
+      set(val) {
+        this.$store.commit("inserimentoContratto/setModifica", { ...val });
+      },
     },
     body() {
       return {
@@ -564,7 +571,7 @@ export default {
       return this.tariffe.find(
         (t) =>
           t.idTipoOspite == this.v.cod_tipoutente?.id &&
-          t.idUtilizzoStanza ==  (this.utilizzoStanza?.id === 5 ? 1 : this.utilizzoStanza?.id) &&
+          t.idUtilizzoStanza == (this.utilizzoStanza?.id === 5 ? 1 : this.utilizzoStanza?.id) &&
           t.idTipoFabbricato == this.v.fabbricato?.idTipoFabbricato &&
           t.idTipoTariffa == this.tipoTariffa
       );
@@ -607,6 +614,12 @@ export default {
     },
   },
   watch: {
+    modifica() {
+      this.startModifica();
+    },
+    tipiStanze() {
+      this.startModifica();
+    },
     tipiContratti: {
       handler() {
         if (this.tipoContratto === null) {
@@ -685,6 +698,40 @@ export default {
     this.tipiStanze = (await Vue.prototype.$api.get(`/tipi-stanza`)).data.map((el) => ({ value: el.id, text: el.tipoStanza }));
   },
   methods: {
+    startModifica() {
+      function formatDate(date) {
+        return date.toISOString().slice(0, 10);
+      }
+      if (this.type === "modifica" && this.tipiStanze.length) {
+        const contratto = this.modifica;
+        this.v = {
+          cod_tipoutente: this.tipiUtente.find((el) => el.id == contratto.tariffa.tipoOspite.id),
+          inizio: formatDate(new Date(contratto.dataInizio)),
+          fine: formatDate(new Date(contratto.dataFine)),
+        };
+        const ospite = contratto.contrattiSuOspite[0].ospite;
+        const postoLetto = contratto.contrattiSuOspite[0].contrattiSuOspiteSuPostoLetto[0].postoLetto;
+        const stanza = postoLetto.stanza;
+        console.log("contratto", contratto);
+        this.tipoContratto = contratto.idTipoContratto;
+        this.utilizzoStanza = this.utilizziStanza.find((el) => el.id === contratto.tariffa.utilizzoStanza.id);
+        this.tipoTariffa = contratto.tariffa.tipoTariffa.id;
+        this.quietanziante = contratto.quietanziante.id;
+        this.checkout = !!contratto.checkout;
+        this.cauzione = !!contratto.cauzione;
+        this.note = contratto.note;
+        this.v.persona = { ...ospite, ...ospite.persona };
+        this.v.id_tipo_rata = contratto.tipoRata;
+        this.v.stanza = { presenza_bagno: stanza.bagno };
+        this.v.fabbricato = stanza.fabbricato;
+        this.filters.tipoStanza = this.tipiStanze.find((el) => el.value === stanza.idTipoStanza).value;
+        this.stanzaSelezionata = {
+          id: postoLetto.id,
+          unitaImmobiliare: stanza.unitaImmobiliare,
+          desc: `${stanza.unitaImmobiliare} - ${stanza.numeroStanza} - ${postoLetto.postoLetto}`,
+        };
+      }
+    },
     async updateAlloggi(val) {
       try {
         let params = `dataInizio=${this.v.inizio}&dataFine=${this.v.fine}&idTipoStanza=${this.filters.tipoStanza}`;
@@ -724,13 +771,28 @@ export default {
       event.preventDefault();
     },
     async submit() {
-      try {
-        await this.$store.dispatch("inserimentoContratto/submit", this.body);
-        this.deleteContract();
-      } catch (error) {
-        console.error(error);
-        alert("Errore");
+      if (this.type !== "modifica") {
+        try {
+          await this.$store.dispatch("inserimentoContratto/submit", this.body);
+          this.deleteContract();
+        } catch (error) {
+          console.error(error);
+          alert("Errore");
+        }
+      } else {
+        try {
+          console.log(this.body)
+          await Vue.prototype.$api.put(`/contratti/${this.modifica.id}`, this.body);
+          this.deleteContract();
+          this.$store.commit('inserimentoContratto/setDialogContratto', false)
+          this.$store.commit('inserimentoContratto/resetStateWithKey', 'modifica')
+          this.$store.dispatch('inserimentoContratto/loadContratti');
+        } catch (error) {
+          console.error(error);
+          alert("Errore");
+        }
       }
+
       // if (this.type == "nuovo") this.$store.dispatch("inserimentoContratto/submit");
       // else this.$store.dispatch("inserimentoContratto/submit", this.body);
     },
