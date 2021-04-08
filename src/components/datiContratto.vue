@@ -132,6 +132,7 @@
                         return-object
                       ></v-autocomplete>
                     </v-col>
+                    {{tariffa}}
                     <v-col class="py-0" cols="12" sm="6">
                       <v-autocomplete
                         v-model="tipoTariffa"
@@ -563,7 +564,7 @@ export default {
       return this.tariffe.find(
         (t) =>
           t.idTipoOspite == this.v.cod_tipoutente?.id &&
-          t.idUtilizzoStanza ==  this.utilizzoStanza?.id === 5 ? 1 : this.utilizzoStanza?.id &&
+          t.idUtilizzoStanza ==  (this.utilizzoStanza?.id === 5 ? 1 : this.utilizzoStanza?.id) &&
           t.idTipoFabbricato == this.v.fabbricato?.idTipoFabbricato &&
           t.idTipoTariffa == this.tipoTariffa
       );
