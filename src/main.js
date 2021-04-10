@@ -8,7 +8,7 @@ import axios from 'axios'
 Vue.use({
   install(Vue) {
     Vue.prototype.$api = axios.create({
-      baseURL: 'http://10.0.0.75:3000/api/'
+      baseURL: '/api'//'http://10.0.0.75:3000/api/'
     })
     Vue.prototype.$api.interceptors.response.use(res => { return res}, err => {
       if (err.response.status === 403)
