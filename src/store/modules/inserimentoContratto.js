@@ -326,7 +326,7 @@ export default {
     loadEditContratto({ commit }, val) {
       commit('setDialogContratto', true)
       Vue.prototype.$api
-        .get(`http://localhost:3000/api/contratti/${val.id}?quietanziante=true&tariffa=true&tariffa.tipoTariffa=true&tariffa.utilizzoStanza=true&tariffa.tipoOspite=true&tariffa.tipoOspite.contoRicaviConsumi=true&tariffa.tipoOspite.contoRicaviCanoni=true&tariffa.tipoFabbricato=true&tipoContratto=true&tipoContratto.tipoStudente=true&bollette=true&bollette.tipoBolletta=true`)
+        .get(`/contratti/${val.id}?quietanziante=true&tariffa=true&tariffa.tipoTariffa=true&tariffa.utilizzoStanza=true&tariffa.tipoOspite=true&tariffa.tipoOspite.contoRicaviConsumi=true&tariffa.tipoOspite.contoRicaviCanoni=true&tariffa.tipoFabbricato=true&tipoContratto=true&tipoContratto.tipoStudente=true&bollette=true&bollette.tipoBolletta=true`)
         .then(
           // {
           //   inizio: "",
