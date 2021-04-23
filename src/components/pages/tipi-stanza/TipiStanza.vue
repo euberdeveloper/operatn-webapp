@@ -1,11 +1,18 @@
 <template>
-  <div>ciao</div>
+  <div>
+    ciao
+  </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 
 @Component
-export default class Home extends Vue {
+export default class TipiStanza extends Vue {
+  
 }
 </script>
+
+<style lang="scss" scoped>
+
+</style>

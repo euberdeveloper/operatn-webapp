@@ -1,51 +1,95 @@
 <template>
-  <v-app>
-    <v-app-bar
-      app
-      color="primary"
-      dark
-    >
-      <div class="d-flex align-center">
-        <v-img
-          alt="Vuetify Logo"
-          class="shrink mr-2"
-          contain
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
-          transition="scale-transition"
-          width="40"
-        />
-
-        <v-img
-          alt="Vuetify Name"
-          class="shrink mt-1 hidden-sm-and-down"
-          contain
-          min-width="100"
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
-          width="100"
-        />
-      </div>
-
-      <v-spacer></v-spacer>
-
-      <v-btn
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
-        text
-      >
-        <span class="mr-2">Latest Release</span>
-        <v-icon>mdi-open-in-new</v-icon>
-      </v-btn>
-    </v-app-bar>
-
-    <v-main>
-    </v-main>
+  <v-app id="app">
+    <router-view name="bar" />
+    <router-view name="menu" />
+    <router-view />
+    <operatn-error-dialog v-model="showErrorDialog" :text="errorDialogText" />
+    <operatn-confirm-dialog v-if="showConfirmDialog" v-model="showConfirmDialog" :text="confirmDialog.text" :callback="confirmDialog.callback" />
   </v-app>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue, Watch } from "vue-property-decorator";
+import OperatnErrorDialog from "@/components/gears/OperatnErrorDialog.vue";
+import OperatnConfirmDialog from "@/components/gears/OperatnConfirmDialog.vue";
 
-@Component
+import { ActionTypes } from "@/store";
+
+@Component({
+  components: {
+    OperatnErrorDialog,
+    OperatnConfirmDialog
+  },
+})
 export default class App extends Vue {
+  /* COMPUTED */
+
+  get errorDialogText(): string | null {
+    return this.$store.state.errorDialogText;
+  }
+  get confirmDialog() {
+    return this.$store.state.confirmDialog;
+  }
+
+  get showErrorDialog(): boolean {
+    return this.errorDialogText !== null;
+  }
+  set showErrorDialog(value: boolean) {
+    if (value) {
+      this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, value as any);
+    } else {
+      this.$store.dispatch(ActionTypes.HIDE_ERROR_DIALOG);
+    }
+  }
+
+  get showConfirmDialog(): boolean {
+    return this.confirmDialog !== null;
+  }
+  set showConfirmDialog(value: boolean) {
+    if (value) {
+      this.$store.dispatch(ActionTypes.SHOW_CONFIRM_DIALOG, value as any);
+    } else {
+      this.$store.dispatch(ActionTypes.HIDE_CONFIRM_DIALOG);
+    }
+  }
+
+  get isDarkTheme(): boolean {
+    return this.$store.state.darkTheme;
+  }
+
+  get primaryColour(): string | null {
+    return this.$store.state.primaryColour;
+  }
+
+  /* WATCH */
+
+  @Watch("isDarkTheme")
+  watchDarkTheme() {
+    this.$vuetify.theme.dark = this.isDarkTheme;
+  }
+
+  @Watch("primaryColour")
+  watchPrimaryColour() {
+    if (this.primaryColour) {
+      this.$vuetify.theme.themes.light.primary = this.primaryColour;
+      this.$vuetify.theme.themes.dark.primary = this.primaryColour;
+    }
+  }
+
+  /* LIFE CYCLE */
+
+  mounted() {
+    this.$vuetify.theme.dark = this.isDarkTheme;
+    if (this.primaryColour) {
+      this.$vuetify.theme.themes.light.primary = this.primaryColour;
+      this.$vuetify.theme.themes.dark.primary = this.primaryColour;
+    }
+  }
 }
 </script>
+
+<style lang="scss">
+html {
+  overflow-y: auto;
+}
+</style>
