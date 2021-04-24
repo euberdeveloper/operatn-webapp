@@ -6,7 +6,18 @@
         >Gestione degli utenti che possono accedere a questa piattaforma. Attenzione, il tuo utente non viene viene visualizzato.</v-subheader
       >
     </v-card-text>
-    <v-data-table :headers="headers" :items="utenti" item-key="uid" sort-by="nomeUtente" :search="search" :group-by.sync="aggregateBy" class="elevation-1" multi-sort>
+    <v-data-table
+      v-model="selectedUtenti"
+      :headers="headers"
+      :items="utenti"
+      item-key="uid"
+      show-select
+      sort-by="nomeUtente"
+      :search="search"
+      :group-by.sync="aggregateBy"
+      class="elevation-1"
+      multi-sort
+    >
       <template v-slot:top>
         <v-toolbar flat>
           <v-toolbar-title>Utenti</v-toolbar-title>
@@ -68,6 +79,10 @@
         </v-edit-dialog>
       </template>
 
+      <template v-slot:item.dataCreazione="{ value }">
+        <span class="ml-3">{{ new Date(value).toLocaleString() }}</span>
+      </template>
+
       <template v-slot:item.actions="{ item }">
         <v-icon small color="primary" class="mr-2" @click="openEditUtente(item)">mdi-pencil</v-icon>
         <v-icon small color="error" @click="askDeleteUtente(item)">mdi-delete</v-icon>
@@ -75,9 +90,15 @@
     </v-data-table>
 
     <!-- PLUS FAB BUTTON -->
-    <v-fab-transition>
+    <v-fab-transition v-if="!isSelecting" key="plus">
       <v-btn color="primary" @click="openCreateUtente" fab large fixed bottom right>
         <v-icon>mdi-plus</v-icon>
+      </v-btn>
+    </v-fab-transition>
+    <!-- DELETE FAB BUTTON -->
+    <v-fab-transition v-else key="delete">
+      <v-btn color="error" @click="askDeleteSelected" fab large fixed bottom right>
+        <v-icon>mdi-delete</v-icon>
       </v-btn>
     </v-fab-transition>
 
@@ -132,8 +153,8 @@ import { UtentiCreateBody, UtentiReturned, UtentiUpdateBody, UtentiUpdateRuoloBo
 import { ActionTypes } from "@/store";
 import { getRoleIcon } from "@/utils";
 
-import OperatnUtenteEditForm from "@/components/gears/OperatnUtenteEditForm.vue";
-import OperatnUtenteCreateForm from "@/components/gears/OperatnUtenteCreateForm.vue";
+import OperatnUtenteEditForm from "@/components/gears/forms/OperatnUtenteEditForm.vue";
+import OperatnUtenteCreateForm from "@/components/gears/forms/OperatnUtenteCreateForm.vue";
 
 @Component({
   components: {
@@ -146,6 +167,8 @@ export default class Utenti extends Vue {
   private utenti: UtentiReturned[] = [];
   private search = "";
   private aggregateBy: string | null = null;
+
+  private selectedUtenti: UtentiReturned[] = [];
   private backupItem: UtentiReturned | null = null;
 
   private showEditDialog = false;
@@ -157,6 +180,10 @@ export default class Utenti extends Vue {
   private createBody: UtentiCreateBody | null = null;
 
   /* GETTERS AND SETTERS */
+
+  get isSelecting(): boolean {
+    return this.selectedUtenti.length > 0;
+  }
 
   get headers(): DataTableHeader[] {
     return [
@@ -175,6 +202,12 @@ export default class Utenti extends Vue {
         text: "Ruolo",
         value: "ruolo",
         groupable: true,
+        filterable: false,
+      },
+      {
+        text: "Data creazione",
+        value: "dataCreazione",
+        groupable: false,
         filterable: false,
       },
       {
@@ -271,6 +304,25 @@ export default class Utenti extends Vue {
     });
   }
 
+  askDeleteSelected(): void {
+    this.$store.dispatch(ActionTypes.SHOW_CONFIRM_DIALOG, {
+      text: `Sei sicuro di voler eliminare gli utenti selezionati?`,
+      callback: async (answer) => {
+        if (answer) {
+          for (const utente of this.selectedUtenti) {
+            try {
+              await this.deleteUtente(utente.uid);
+              const index = this.selectedUtenti.findIndex((u) => u.uid === utente.uid);
+              if (index !== undefined) {
+                this.selectedUtenti.splice(index, 1);
+              }
+            } catch (error) {}
+          }
+        }
+      },
+    });
+  }
+
   openCreateUtente(): void {
     this.createBodyValid = false;
     this.showCreateDialog = true;
@@ -291,6 +343,7 @@ export default class Utenti extends Vue {
           nomeUtente: this.createBody.nomeUtente,
           email: this.createBody.email,
           ruolo: this.createBody.ruolo,
+          dataCreazione: new Date(),
         });
 
         this.createBody = null;
@@ -331,7 +384,6 @@ export default class Utenti extends Vue {
     }
 
     if (this.updateBodyValid && this.updateBody) {
-      console.log("entrà");
       try {
         await this.$api.utenti.update(this.updateBody.uid, {
           nomeUtente: this.updateBody.nomeUtente,
@@ -348,6 +400,7 @@ export default class Utenti extends Vue {
           nomeUtente: this.updateBody.nomeUtente as string,
           email: this.updateBody.email as string,
           ruolo: this.updateBody.ruolo,
+          dataCreazione: this.backupItem?.dataCreazione as Date,
         });
 
         this.updateBody = null;

@@ -10,8 +10,8 @@
 
 <script lang="ts">
 import { Component, Vue, Watch } from "vue-property-decorator";
-import OperatnErrorDialog from "@/components/gears/OperatnErrorDialog.vue";
-import OperatnConfirmDialog from "@/components/gears/OperatnConfirmDialog.vue";
+import OperatnErrorDialog from "@/components/gears/dialogs/OperatnErrorDialog.vue";
+import OperatnConfirmDialog from "@/components/gears/dialogs/OperatnConfirmDialog.vue";
 
 import { ActionTypes } from "@/store";
 
@@ -46,9 +46,7 @@ export default class App extends Vue {
     return this.confirmDialog !== null;
   }
   set showConfirmDialog(value: boolean) {
-    if (value) {
-      this.$store.dispatch(ActionTypes.SHOW_CONFIRM_DIALOG, value as any);
-    } else {
+    if (!value) {
       this.$store.dispatch(ActionTypes.HIDE_CONFIRM_DIALOG);
     }
   }

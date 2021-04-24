@@ -69,7 +69,7 @@ export default class OperatnConfirmDialog extends Vue {
   /* METHODS */
 
   async action(answer: boolean): Promise<void> {
-    this.show = false;
+    this.internalShow = false;
     await this.callback(answer);
   }
 }

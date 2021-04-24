@@ -117,8 +117,8 @@ export default class OperatnUtenteCreateForm extends Vue {
 
   @Watch("value", { deep: true, immediate: true })
   watchValue() {
-    if (this.value !== null) {
-      this.internalValue = this.value;
+    if (this.value === null) {
+      this.internalValue = this.getEmptyUtente();
     }
   }
 
