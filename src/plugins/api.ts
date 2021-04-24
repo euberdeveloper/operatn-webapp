@@ -1,10 +1,10 @@
 import Vue from 'vue';
 import { OperaTN } from "operatn-api-client";
-import { PluginObject } from 'vue/types/umd';
+import CONFIG from '@/config';
 
-const api = new OperaTN('http://192.168.1.7:3000/api', null, null);
+const api = new OperaTN(CONFIG.API_URL, null, null);
 
-const apiPlugin: PluginObject<any> = {
+const apiPlugin = {
     install: function (Vue) {
         Vue.prototype.$api = api;
     }

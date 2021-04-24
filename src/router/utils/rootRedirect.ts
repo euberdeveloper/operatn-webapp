@@ -5,6 +5,8 @@ export default function(): string {
     const role: RuoloUtente | undefined = store.state.user?.ruolo;
     
     switch (role) {
+      case RuoloUtente.ROOT:
+        return `/root`;
       case RuoloUtente.ADMIN:
         return `/admin`;
       case RuoloUtente.CONTROLLO_ALLOGGI:

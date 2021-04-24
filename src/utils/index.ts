@@ -2,8 +2,10 @@ import { RuoloUtente } from "operatn-api-client";
 
 export function getRoleIcon(role?: RuoloUtente | null): string | null {
     switch (role) {
-        case RuoloUtente.ADMIN:
+        case RuoloUtente.ROOT:
             return 'mdi-powershell';
+        case RuoloUtente.ADMIN:
+            return 'mdi-account-supervisor';
         case RuoloUtente.CONTROLLO_ALLOGGI:
             return 'mdi-home-search';
         case RuoloUtente.PORTINERIA:

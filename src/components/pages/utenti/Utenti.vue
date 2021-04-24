@@ -2,7 +2,9 @@
   <v-card>
     <v-card-title class="headline primary white--text">Utenti</v-card-title>
     <v-card-text>
-      <v-subheader class="px-0 mt-4 text-subtitle-1">Gestione degli utenti che possono accedere a questa piattaforma.</v-subheader>
+      <v-subheader class="px-0 mt-4 text-subtitle-1"
+        >Gestione degli utenti che possono accedere a questa piattaforma. Attenzione, il tuo utente non viene viene visualizzato.</v-subheader
+      >
     </v-card-text>
     <v-data-table :headers="headers" :items="utenti" item-key="uid" sort-by="nomeUtente" :search="search" :group-by.sync="aggregateBy" class="elevation-1" multi-sort>
       <template v-slot:top>
@@ -124,7 +126,7 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import { DataTableHeader } from "vuetify";
-import { BadRequestError, InvalidBodyError, InvalidPathParamError, NotFoundError } from "operatn-api-client";
+import { BadRequestError, InvalidBodyError, InvalidPathParamError, NotFoundError, UniqueConstraintError, UniqueRootError } from "operatn-api-client";
 import { UtentiCreateBody, UtentiReturned, UtentiUpdateBody, UtentiUpdateRuoloBody } from "operatn-api-client/api/controllers/utenti/index";
 
 import { ActionTypes } from "@/store";
@@ -133,11 +135,10 @@ import { getRoleIcon } from "@/utils";
 import OperatnUtenteEditForm from "@/components/gears/OperatnUtenteEditForm.vue";
 import OperatnUtenteCreateForm from "@/components/gears/OperatnUtenteCreateForm.vue";
 
-
 @Component({
   components: {
     OperatnUtenteEditForm,
-    OperatnUtenteCreateForm
+    OperatnUtenteCreateForm,
   },
 })
 export default class Utenti extends Vue {
@@ -206,6 +207,8 @@ export default class Utenti extends Vue {
       if (error) {
         if (error instanceof InvalidPathParamError) {
           this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, "Uid utente non valido");
+        } else if (error instanceof UniqueConstraintError) {
+          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Ci deve essere uno ed un solo utente root`);
         } else if (error instanceof InvalidBodyError) {
           this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Dati da aggiornare dell'utente non validi`);
         } else if (error instanceof NotFoundError) {
@@ -246,6 +249,8 @@ export default class Utenti extends Vue {
       if (error) {
         if (error instanceof InvalidPathParamError) {
           this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, "Uid utente non valido");
+        } else if (error instanceof UniqueRootError) {
+          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `L'utente root non può essere eliminato`);
         } else if (error instanceof NotFoundError) {
           this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Utente non trovato`);
         } else if (error instanceof BadRequestError) {
@@ -278,7 +283,6 @@ export default class Utenti extends Vue {
     }
 
     if (this.createBodyValid && this.createBody) {
-
       try {
         const uid = await this.$api.utenti.create(this.createBody);
 
@@ -286,14 +290,16 @@ export default class Utenti extends Vue {
           uid,
           nomeUtente: this.createBody.nomeUtente,
           email: this.createBody.email,
-          ruolo: this.createBody.ruolo
+          ruolo: this.createBody.ruolo,
         });
 
         this.createBody = null;
         this.showCreateDialog = false;
       } catch (error) {
         if (error) {
-          if (error instanceof InvalidBodyError) {
+          if (error instanceof UniqueRootError) {
+            this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Ci può essere un solo utente root`);
+          } else if (error instanceof InvalidBodyError) {
             this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Dati dell'utente da creare non validi`);
           } else if (error instanceof BadRequestError) {
             this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Richiesta non valida`);
@@ -325,8 +331,7 @@ export default class Utenti extends Vue {
     }
 
     if (this.updateBodyValid && this.updateBody) {
-
-      console.log('entrà')
+      console.log("entrà");
       try {
         await this.$api.utenti.update(this.updateBody.uid, {
           nomeUtente: this.updateBody.nomeUtente,
@@ -366,7 +371,8 @@ export default class Utenti extends Vue {
 
   async mounted() {
     try {
-      this.utenti = await this.$api.utenti.getAll();
+      const utenti = await this.$api.utenti.getAll();
+      this.utenti = utenti.filter((u) => u.uid !== this.$store.state.user?.uid);
     } catch (error) {
       if (error) {
         this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, "Errore: impossibile caricare gli utenti");

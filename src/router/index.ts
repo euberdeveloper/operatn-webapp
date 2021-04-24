@@ -8,6 +8,14 @@ import beforeEach from './utils/beforeEach';
 /* LOGIN */
 import Login from '@/views/login/LoginView.vue';
 
+/* ROOT */
+import Root from '@/views/root/RootView.vue';
+import RootBar from '@/views/root/RootBarView.vue';
+import RootMenu from '@/views/root/RootMenuView.vue';
+import RootUtenti from '@/views/root/utenti/RootUtentiView.vue';
+import RootTipiStanza from '@/views/root/tipi-stanza/RootTipiStanzaView.vue';
+import RootTipiFabbricato from '@/views/root/tipi-fabbricato/RootTipiFabbricatoView.vue';
+
 /* ADMIN */
 import Admin from '@/views/admin/AdminView.vue';
 import AdminBar from '@/views/admin/AdminBarView.vue';
@@ -56,6 +64,36 @@ const routes: Array<RouteConfig> = [
         path: 'tipi-fabbricato',
         name: 'admin-tipi-fabbricato',
         component: AdminTipiFabbricato
+      }
+    ]
+  },
+  {
+    path: '/root',
+    components: {
+      default: Root,
+      bar: RootBar,
+      menu: RootMenu
+    },
+    meta: { authentication: [RuoloUtente.ROOT] },
+    children: [
+      {
+        path: '',
+        redirect: 'utenti'
+      },
+      {
+        path: 'utenti',
+        name: 'root-utenti',
+        component: RootUtenti
+      },
+      {
+        path: 'tipi-stanza',
+        name: 'root-tipi-stanza',
+        component: RootTipiStanza
+      },
+      {
+        path: 'tipi-fabbricato',
+        name: 'root-tipi-fabbricato',
+        component: RootTipiFabbricato
       }
     ]
 
