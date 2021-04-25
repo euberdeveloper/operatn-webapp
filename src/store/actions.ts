@@ -10,6 +10,8 @@ import { Mutations, MutationTypes } from './mutations'
 export enum ActionTypes {
     HIDE_ERROR_DIALOG = 'HIDE_ERROR_DIALOG',
     SHOW_ERROR_DIALOG = 'SHOW_ERROR_DIALOG',
+    HIDE_SUCCESS_DIALOG = 'HIDE_SUCCESS_DIALOG',
+    SHOW_SUCCESS_DIALOG = 'SHOW_SUCCESS_DIALOG',
     HIDE_CONFIRM_DIALOG = 'HIDE_CONFIRM_DIALOG',
     SHOW_CONFIRM_DIALOG = 'SHOW_CONFIRM_DIALOG',
     SET_TOKEN = 'SET_TOKEN',
@@ -35,6 +37,8 @@ type AugmentedActionContext = {
 export interface Actions {
     [ActionTypes.HIDE_ERROR_DIALOG]({ commit }: AugmentedActionContext): void;
     [ActionTypes.SHOW_ERROR_DIALOG]({ commit }: AugmentedActionContext, text: string): void;
+    [ActionTypes.HIDE_SUCCESS_DIALOG]({ commit }: AugmentedActionContext): void;
+    [ActionTypes.SHOW_SUCCESS_DIALOG]({ commit }: AugmentedActionContext, text: string): void;
     [ActionTypes.HIDE_CONFIRM_DIALOG]({ commit }: AugmentedActionContext): void;
     [ActionTypes.SHOW_CONFIRM_DIALOG]({ commit }: AugmentedActionContext, value: { text: string; callback: (answer: boolean) => void | Promise<void> } | null): void;
     [ActionTypes.SET_TOKEN]({ commit }: AugmentedActionContext, token: string | null): void;
@@ -56,6 +60,12 @@ export const actions: ActionTree<State, State> & Actions = {
     },
     [ActionTypes.SHOW_ERROR_DIALOG]({ commit }, text) {
         commit(MutationTypes.SET_ERROR_DIALOG_TEXT, text);
+    },
+    [ActionTypes.HIDE_SUCCESS_DIALOG]({ commit }) {
+        commit(MutationTypes.SET_SUCCESS_DIALOG_TEXT, null);
+    },
+    [ActionTypes.SHOW_SUCCESS_DIALOG]({ commit }, text) {
+        commit(MutationTypes.SET_SUCCESS_DIALOG_TEXT, text);
     },
     [ActionTypes.HIDE_CONFIRM_DIALOG]({ commit }) {
         commit(MutationTypes.SET_CONFIRM_DIALOG, null);

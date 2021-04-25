@@ -56,6 +56,15 @@
 
           <v-divider />
 
+          <v-list-item to="./user-info">
+            <v-list-item-icon class="mr-3">
+              <v-icon dense>mdi-information-outline</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>Profilo</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+
           <v-list-item @click="logout">
             <v-list-item-icon class="mr-3">
               <v-icon dense>mdi-logout</v-icon>

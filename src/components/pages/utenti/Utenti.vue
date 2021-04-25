@@ -103,61 +103,45 @@
     </v-fab-transition>
 
     <!-- CREATE DIALOG -->
-    <v-dialog v-model="showCreateDialog" persistent width="50vw">
-      <v-card>
-        <v-toolbar color="primary" dark>
-          <v-toolbar-title>Nuovo utente</v-toolbar-title>
-        </v-toolbar>
-        <v-card-text>
-          <operatn-utente-create-form v-model="createBody" :formValid.sync="createBodyValid" class="mt-6" />
-        </v-card-text>
-        <v-card-actions class="pa-4">
-          <v-spacer />
-          <v-btn large color="error" @click="closeCreateUtente(false)">
-            ANNULLA
-            <v-icon right dark>mdi-cancel</v-icon>
-          </v-btn>
-          <v-btn large color="primary" @click="closeCreateUtente(true)" :disabled="!createBodyValid">SALVA<v-icon right dark>mdi-content-save</v-icon></v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <operatn-action-dialog
+      title="Nuobo utente"
+      v-model="showCreateDialog"
+      :disabled="!createBodyValid"
+      @cancel="closeCreateUtente(false)"
+      @confirm="closeCreateUtente(true)"
+    >
+      <operatn-utente-create-form v-if="showCreateDialog" v-model="createBody" :formValid.sync="createBodyValid" class="mt-6" />
+    </operatn-action-dialog>
 
     <!-- EDIT DIALOG -->
-    <v-dialog v-model="showEditDialog" persistent width="50vw">
-      <v-card>
-        <v-toolbar color="primary" dark>
-          <v-toolbar-title>Modifica utente</v-toolbar-title>
-        </v-toolbar>
-        <v-card-text>
-          <operatn-utente-edit-form v-model="updateBody" :formValid.sync="updateBodyValid" class="mt-6" />
-        </v-card-text>
-        <v-card-actions class="pa-4">
-          <v-spacer />
-          <v-btn large color="error" @click="closeEditUtente(false)">
-            ANNULLA
-            <v-icon right dark>mdi-cancel</v-icon>
-          </v-btn>
-          <v-btn large color="primary" @click="closeEditUtente(true)" :disabled="!updateBodyValid">SALVA<v-icon right dark>mdi-content-save</v-icon></v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <operatn-action-dialog
+      title="Modifica utente"
+      v-model="showEditDialog"
+      :disabled="!updateBodyValid"
+      @cancel="closeEditUtente(false)"
+      @confirm="closeEditUtente(true)"
+    >
+      <operatn-utente-edit-form v-if="showEditDialog" v-model="updateBody" :formValid.sync="updateBodyValid" :canChangePassword="isRoot" class="mt-6" />
+    </operatn-action-dialog>
   </v-card>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import { DataTableHeader } from "vuetify";
-import { BadRequestError, InvalidBodyError, InvalidPathParamError, NotFoundError, UniqueConstraintError, UniqueRootError } from "operatn-api-client";
-import { UtentiCreateBody, UtentiReturned, UtentiUpdateBody, UtentiUpdateRuoloBody } from "operatn-api-client/api/controllers/utenti/index";
+import { BadRequestError, InvalidBodyError, InvalidPathParamError, NotFoundError, RuoloUtente, UniqueConstraintError, UniqueRootError } from "operatn-api-client";
+import { UtentiCreateBody, UtentiReturned, UtentiUpdateBody, UtentiUpdateRuoloBody, UtentiUpdatePasswordBody } from "operatn-api-client/api/controllers/utenti/index";
 
 import { ActionTypes } from "@/store";
 import { getRoleIcon } from "@/utils";
 
+import OperatnActionDialog from "@/components/gears/dialogs/OperatnActionDialog.vue";
 import OperatnUtenteEditForm from "@/components/gears/forms/OperatnUtenteEditForm.vue";
 import OperatnUtenteCreateForm from "@/components/gears/forms/OperatnUtenteCreateForm.vue";
 
 @Component({
   components: {
+    OperatnActionDialog,
     OperatnUtenteEditForm,
     OperatnUtenteCreateForm,
   },
@@ -173,7 +157,7 @@ export default class Utenti extends Vue {
 
   private showEditDialog = false;
   private updateBodyValid = false;
-  private updateBody: (UtentiUpdateBody & UtentiUpdateRuoloBody & { uid: string }) | null = null;
+  private updateBody: (UtentiUpdateBody & UtentiUpdateRuoloBody & UtentiUpdatePasswordBody & { uid: string }) | null = null;
 
   private showCreateDialog = false;
   private createBodyValid = false;
@@ -183,6 +167,10 @@ export default class Utenti extends Vue {
 
   get isSelecting(): boolean {
     return this.selectedUtenti.length > 0;
+  }
+
+  get isRoot(): boolean {
+    return this.$store.state.user?.ruolo === RuoloUtente.ROOT;
   }
 
   get headers(): DataTableHeader[] {
@@ -309,7 +297,7 @@ export default class Utenti extends Vue {
       text: `Sei sicuro di voler eliminare gli utenti selezionati?`,
       callback: async (answer) => {
         if (answer) {
-          for (const utente of this.selectedUtenti) {
+          for (const utente of [...this.selectedUtenti]) {
             try {
               await this.deleteUtente(utente.uid);
               const index = this.selectedUtenti.findIndex((u) => u.uid === utente.uid);
@@ -370,6 +358,7 @@ export default class Utenti extends Vue {
       nomeUtente: utente.nomeUtente,
       email: utente.email,
       ruolo: utente.ruolo,
+      password: "",
     };
     this.backupItem = utente;
     this.updateBodyValid = false;
@@ -392,6 +381,10 @@ export default class Utenti extends Vue {
 
         if (this.backupItem?.ruolo !== this.updateBody.ruolo) {
           await this.$api.utenti.changeRuolo(this.updateBody.uid, { ruolo: this.updateBody.ruolo });
+        }
+
+        if (this.updateBody.password) {
+          await this.$api.utenti.changePassword(this.updateBody.uid, { password: this.updateBody.password });
         }
 
         const index = this.utenti.findIndex((u) => u.uid === this.updateBody?.uid);

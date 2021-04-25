@@ -6,6 +6,7 @@ export interface State {
     user: UtentiReturned | null;
     showMenu: boolean;
     errorDialogText: string | null;
+    successDialogText: string | null;
     confirmDialog: { text: string; callback: (answer: boolean) => void | Promise<void> } | null;
     darkTheme: boolean;
     primaryColour: string | null;
@@ -17,6 +18,7 @@ export const state: State = {
     user: null,
     showMenu: true,
     errorDialogText: null,
+    successDialogText: null,
     confirmDialog: null,
     darkTheme: false,
     primaryColour: null,

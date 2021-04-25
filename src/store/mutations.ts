@@ -5,6 +5,7 @@ import { State } from './state'
 
 export enum MutationTypes {
     SET_ERROR_DIALOG_TEXT = 'SET_ERROR_DIALOG_TEXT',
+    SET_SUCCESS_DIALOG_TEXT = 'SET_SUCCESS_DIALOG_TEXT',
     SET_CONFIRM_DIALOG = 'SET_CONFIRM_DIALOG',
     SET_USER = 'SET_USER',
     SET_TOKEN = 'SET_TOKEN',
@@ -15,6 +16,7 @@ export enum MutationTypes {
 
 export interface Mutations<S = State> {
     [MutationTypes.SET_ERROR_DIALOG_TEXT](state: S, text: string | null): void;
+    [MutationTypes.SET_SUCCESS_DIALOG_TEXT](state: S, text: string | null): void;
     [MutationTypes.SET_CONFIRM_DIALOG](state: S, value: { text: string; callback: (answer: boolean) => void | Promise<void> } | null): void;
     [MutationTypes.SET_USER](state: S, user: UtentiReturned | null): void;
     [MutationTypes.SET_TOKEN](state: S, token: string | null): void;
@@ -26,6 +28,9 @@ export interface Mutations<S = State> {
 export const mutations: MutationTree<State> & Mutations = {
     [MutationTypes.SET_ERROR_DIALOG_TEXT](state, text) {
         state.errorDialogText = text;
+    },
+    [MutationTypes.SET_SUCCESS_DIALOG_TEXT](state, text) {
+        state.successDialogText = text;
     },
     [MutationTypes.SET_CONFIRM_DIALOG](state, value) {
         state.confirmDialog = value;

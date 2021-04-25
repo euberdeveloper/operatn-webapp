@@ -12,40 +12,47 @@
             <v-card class="elevation-12" v-show="showCard">
               <!-- TITLE -->
               <v-toolbar color="primary" class="d-flex justify-center" dark flat>
-                <v-toolbar-title>Login OperaTN</v-toolbar-title>
+                <v-toolbar-title>OperaTN - Recupero password</v-toolbar-title>
               </v-toolbar>
-              <!-- FORM -->
+              <!-- CONTENT -->
               <v-card-text>
-                <v-form @keyup.native.enter="login()" v-model="loginFormValid">
-                  <v-text-field
-                    type="text"
-                    label="Username"
-                    name="username"
-                    :rules="[$validator.requiredText('Password')]"
-                    v-model="username"
-                    prepend-icon="mdi-account"
-                  />
+                <!-- LOADING -->
+                <v-skeleton-loader class="mb-6" type="article, actions" v-if="fetching"></v-skeleton-loader>
+                <!-- FORM -->
+                <v-form @keyup.native.enter="recoverPassword()" v-model="formValid" v-else-if="utente">
                   <v-text-field
                     :type="passwordType"
                     label="Password"
                     name="password"
                     v-model="password"
-                    :rules="[$validator.requiredText('Password')]"
+                    :rules="[$validator.requiredText('Password'), $validator.password()]"
                     prepend-icon="mdi-lock"
                     :append-icon="passwordIcon"
                     @click:append="showPassword = !showPassword"
                   />
+                  <v-text-field
+                    :type="passwordType"
+                    label="Conferma password"
+                    name="password-confirmation"
+                    v-model="passwordConfirmation"
+                    :rules="[$validator.requiredText('Conferma password'), $validator.passwordsCoincide(password)]"
+                    prepend-icon="mdi-lock-check"
+                    :append-icon="passwordIcon"
+                    @click:append="showPassword = !showPassword"
+                  />
                 </v-form>
+                <!-- ERRORE -->
+                <v-alert text outlined color="deep-orange" icon="mdi-cloud-alert" v-else> Token non valido </v-alert>
               </v-card-text>
               <!-- BUTTON -->
               <v-card-actions class="d-flex justify-center pb-4">
-                <v-btn color="primary" large :disabled="!loginFormValid" :loading="loading" @click="login()">Login</v-btn>
+                <v-btn color="primary" large :disabled="!formValid" :loading="loading" @click="recoverPassword()" v-if="utente">CAMBIA PASSWORD</v-btn>
                 <div class="help">
                   <v-tooltip left nudge-top="15" nudge-right="7">
                     <template v-slot:activator="{ on, attrs }">
-                      <v-btn color="primary" v-on="on" v-bind="attrs" to="/password-recovery" icon small><v-icon>mdi-lifebuoy</v-icon></v-btn>
+                      <v-btn color="primary" v-on="on" v-bind="attrs" to="/login" icon small><v-icon>mdi-key-variant</v-icon></v-btn>
                     </template>
-                    <span>Password dimenticata?</span>
+                    <span>Login</span>
                   </v-tooltip>
                 </div>
               </v-card-actions>
@@ -58,30 +65,30 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import { AuthLoginBody } from "operatn-api-client/api/controllers/auth/index";
+import { Component, Prop, Vue } from "vue-property-decorator";
 import { ActionTypes } from "@/store";
+import { UtentiReturned } from "operatn-api-client/api/controllers/utenti/index";
 
 @Component
 export default class Login extends Vue {
+  /* PROPS */
+  @Prop({ type: String, required: true })
+  token!: string;
+
   /* DATA */
 
-  private username: string | null = null;
+  private fetching = false;
+  private utente: UtentiReturned | null = null;
+
   private password: string | null = null;
+  private passwordConfirmation: string | null = null;
   private showCard = false;
   private showPassword = false;
 
-  private loginFormValid = false;
+  private formValid = false;
   private loading = false;
 
   /* GETTERS AND SETTERS */
-
-  get loginBody() {
-    return {
-      username: this.username,
-      password: this.password,
-    };
-  }
 
   get passwordType(): "text" | "password" {
     return this.showPassword ? "text" : "password";
@@ -90,27 +97,23 @@ export default class Login extends Vue {
     return this.showPassword ? "mdi-eye-off" : "mdi-eye";
   }
 
-  get requestedRoute(): string {
-    return (this.$route.query.requestedRoute as string) ?? "/";
-  }
-
   /* METHODS */
 
   reset(): void {
-    this.username = "";
     this.password = "";
+    this.passwordConfirmation = "";
   }
 
-  async login(): Promise<void> {
-    if (this.loginFormValid && !this.loading) {
+  async recoverPassword(): Promise<void> {
+    if (this.formValid && !this.loading) {
       try {
         this.loading = true;
-        await this.$store.dispatch(ActionTypes.LOGIN, this.loginBody as AuthLoginBody);
+        await this.$api.utenti.recoverPassword(this.token, { password: this.password as string });
         this.reset();
-        this.$router.replace(this.requestedRoute);
+        this.$store.dispatch(ActionTypes.SHOW_SUCCESS_DIALOG, "Password cambiata correttamente. Premi sull'icona in basso a destra per andare al login");
       } catch (error) {
         if (error) {
-          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, "Credenziali errate");
+          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, "Errore nel cambiare la password");
         }
       } finally {
         this.loading = false;
@@ -120,8 +123,15 @@ export default class Login extends Vue {
 
   /* LIFE CYCLE */
 
-  mounted() {
+  async mounted() {
     this.showCard = true;
+    try {
+      this.fetching = true;
+     this.utente = await this.$api.utenti.getUserByRecoveryToken(this.token);
+    } catch (error) {
+    } finally {
+      this.fetching = false;
+    }
   }
 }
 </script>

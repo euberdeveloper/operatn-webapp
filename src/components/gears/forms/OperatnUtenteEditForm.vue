@@ -3,9 +3,6 @@
     <v-container fluid>
       <v-row align="center" justify="center">
         <v-col cols="6">
-          <v-text-field type="text" label="Uid" name="uid" clearable prepend-icon="mdi-key" disabled :value="internalValue.uid" />
-        </v-col>
-        <v-col cols="6">
           <v-text-field
             type="text"
             label="Nome utente"
@@ -16,8 +13,6 @@
             v-model="internalValue.nomeUtente"
           />
         </v-col>
-      </v-row>
-      <v-row>
         <v-col cols="6">
           <v-text-field
             type="email"
@@ -29,8 +24,34 @@
             v-model="internalValue.email"
           />
         </v-col>
+      </v-row>
+      <v-row>
         <v-col cols="6">
-          <v-select v-model="internalValue.ruolo" label="Ruolo" name="ruolo" clearable prepend-icon="mdi-spider" :items="$store.state.roles" :rules="[$validator.requiredText('Ruolo'), $validator.ruoloUtente()]" />
+          <v-select
+            v-model="internalValue.ruolo"
+            label="Ruolo"
+            name="ruolo"
+            clearable
+            prepend-icon="mdi-spider"
+            :items="$store.state.roles"
+            :rules="[$validator.requiredText('Ruolo'), $validator.ruoloUtente()]"
+          />
+        </v-col>
+        <v-col cols="6">
+          <v-text-field
+            :type="passwordType"
+            label="Password"
+            name="password"
+            hint="Riempire il campo per cambiare password"
+            clearable
+            prepend-icon="mdi-lock"
+            :append-icon="passwordIcon"
+            @click:append="showPassword = !showPassword"
+            :rules="[]"
+            v-model="internalValue.password"
+            v-if="canChangePassword"
+          />
+          <v-text-field type="text" label="Uid" name="uid" clearable prepend-icon="mdi-key" disabled :value="internalValue.uid" v-else />
         </v-col>
       </v-row>
     </v-container>
@@ -38,7 +59,7 @@
 </template>
 
 <script lang="ts">
-import { UtentiUpdateBody, UtentiUpdateRuoloBody } from "operatn-api-client/api/controllers/utenti/index";
+import { UtentiUpdateBody, UtentiUpdatePasswordBody, UtentiUpdateRuoloBody } from "operatn-api-client/api/controllers/utenti/index";
 import Vue from "vue";
 import { Component, Prop, Watch } from "vue-property-decorator";
 
@@ -52,12 +73,26 @@ export default class OperatnUtenteEditForm extends Vue {
   /* PROPS */
 
   @Prop({ type: Object, default: null })
-  value!: UtentiUpdateBody & UtentiUpdateRuoloBody;
+  value!: UtentiUpdateBody & UtentiUpdateRuoloBody & UtentiUpdatePasswordBody;
 
   @Prop({ type: Boolean, default: false })
   formValid!: boolean;
 
+  @Prop({ type: Boolean, required: true })
+  canChangePassword!: boolean;
+
+  /* DATA */
+
+  private showPassword = false;
+
   /* GETTERS AND SETTERS */
+
+  get passwordType(): "text" | "password" {
+    return this.showPassword ? "text" : "password";
+  }
+  get passwordIcon(): "mdi-eye" | "mdi-eye-off" {
+    return this.showPassword ? "mdi-eye-off" : "mdi-eye";
+  }
 
   get internalValue() {
     return this.value;
@@ -75,11 +110,12 @@ export default class OperatnUtenteEditForm extends Vue {
 
   /* METHODS */
 
-  getEmptyUtente(): UtentiUpdateBody & UtentiUpdateRuoloBody {
+  getEmptyUtente(): UtentiUpdateBody & UtentiUpdateRuoloBody & UtentiUpdatePasswordBody {
     return {
       nomeUtente: "",
       email: "",
       ruolo: "",
+      password: "",
     };
   }
 
@@ -87,15 +123,9 @@ export default class OperatnUtenteEditForm extends Vue {
 
   @Watch("value", { deep: true, immediate: true })
   watchValue() {
-    if (this.value !== null) {
-      this.internalValue = this.value;
+    if (this.value === null) {
+      this.internalValue = this.getEmptyUtente();
     }
-  }
-
-  /* LIFE CYCLE */
-
-  created() {
-    this.internalValue = this.value === null ? this.getEmptyUtente() : this.value;
   }
 }
 </script>

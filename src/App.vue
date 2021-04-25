@@ -4,6 +4,7 @@
     <router-view name="menu" />
     <router-view />
     <operatn-error-dialog v-model="showErrorDialog" :text="errorDialogText" />
+    <operatn-success-dialog v-model="showSuccessDialog" :text="successDialogText" />
     <operatn-confirm-dialog v-if="showConfirmDialog" v-model="showConfirmDialog" :text="confirmDialog.text" :callback="confirmDialog.callback" />
   </v-app>
 </template>
@@ -11,6 +12,7 @@
 <script lang="ts">
 import { Component, Vue, Watch } from "vue-property-decorator";
 import OperatnErrorDialog from "@/components/gears/dialogs/OperatnErrorDialog.vue";
+import OperatnSuccessDialog from "@/components/gears/dialogs/OperatnSuccessDialog.vue";
 import OperatnConfirmDialog from "@/components/gears/dialogs/OperatnConfirmDialog.vue";
 
 import { ActionTypes } from "@/store";
@@ -18,7 +20,8 @@ import { ActionTypes } from "@/store";
 @Component({
   components: {
     OperatnErrorDialog,
-    OperatnConfirmDialog
+    OperatnSuccessDialog,
+    OperatnConfirmDialog,
   },
 })
 export default class App extends Vue {
@@ -26,6 +29,9 @@ export default class App extends Vue {
 
   get errorDialogText(): string | null {
     return this.$store.state.errorDialogText;
+  }
+  get successDialogText(): string | null {
+    return this.$store.state.successDialogText;
   }
   get confirmDialog() {
     return this.$store.state.confirmDialog;
@@ -35,10 +41,17 @@ export default class App extends Vue {
     return this.errorDialogText !== null;
   }
   set showErrorDialog(value: boolean) {
-    if (value) {
-      this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, value as any);
-    } else {
+    if (!value) {
       this.$store.dispatch(ActionTypes.HIDE_ERROR_DIALOG);
+    }
+  }
+
+  get showSuccessDialog(): boolean {
+    return this.successDialogText !== null;
+  }
+  set showSuccessDialog(value: boolean) {
+    if (!value) {
+      this.$store.dispatch(ActionTypes.HIDE_SUCCESS_DIALOG);
     }
   }
 
@@ -71,6 +84,9 @@ export default class App extends Vue {
     if (this.primaryColour) {
       this.$vuetify.theme.themes.light.primary = this.primaryColour;
       this.$vuetify.theme.themes.dark.primary = this.primaryColour;
+    } else {
+      this.$vuetify.theme.themes.light.primary = "#1976D2";
+      this.$vuetify.theme.themes.dark.primary = "#1976D2";
     }
   }
 
