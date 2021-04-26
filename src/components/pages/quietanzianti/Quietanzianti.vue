@@ -1,36 +1,36 @@
 <template>
   <operatn-base-resource-manager
-    title="Tipi stanza"
-    description="Gestione dei tipi stanza dell'opera. Attenzione, eliminare un tipo di stanza elimina a cascata tutti i fabbricati ed i contratti ad esso associati."
-    tableTitle="Tipi stanza"
+    title="Quietanzianti"
+    description="Gestione dei quietanzianti dell'opera. Attenzione, eliminare un quietanziante elimina a cascata tutti i contratti ad esso associati."
+    tableTitle="Quietanzianti"
     :tableSelectedValues.sync="selectedValues"
     :tableColumns="columns"
     :tableActions="actions"
-    :tableValues="tipiStanza"
+    :tableValues="quietanzianti"
     tableItemKey="id"
     tableShowSelect
-    createDialogTitle="Nuovo tipo stanza"
+    createDialogTitle="Nuovo quietanziante"
     :createDialogShow.sync="showCreateDialog"
     :createDialogDisabled="!createBodyValid"
-    editDialogTitle="Modifica tipo stanza"
+    editDialogTitle="Modifica quietanziante"
     :editDialogShow.sync="showEditDialog"
     :editDialogDisabled="!updateBodyValid"
-    @fabCreateClick="openCreateTipoStanza"
+    @fabCreateClick="openCreateQuietanziante"
     @fabDeleteClick="askDeleteSelected"
-    @createDialogConfirm="closeCreateTipoStanza(true)"
-    @createDialogCancel="closeCreateTipoStanza(false)"
-    @editDialogConfirm="closeEditTipoStanza(true)"
-    @editDialogCancel="closeEditTipoStanza(false)"
+    @createDialogConfirm="closeCreateQuietanziante(true)"
+    @createDialogCancel="closeCreateQuietanziante(false)"
+    @editDialogConfirm="closeEditQuietanziante(true)"
+    @editDialogCancel="closeEditQuietanziante(false)"
   >
     <template v-slot:createDialog>
-      <operatn-tipo-stanza-form v-if="showCreateDialog" v-model="createBody" :formValid.sync="createBodyValid" :tipiStanza="tipiStanza" class="mt-6" />
+      <operatn-quietanziante-form v-if="showCreateDialog" v-model="createBody" :formValid.sync="createBodyValid" :quietanzianti="quietanzianti" class="mt-6" />
     </template>
     <template v-slot:editDialog>
-      <operatn-tipo-stanza-form
+      <operatn-quietanziante-form
         v-if="showEditDialog"
         v-model="updateBody"
         :formValid.sync="updateBodyValid"
-        :tipiStanza="tipiStanza"
+        :quietanzianti="quietanzianti"
         :backupValue="backupItem"
         class="mt-6"
       />
@@ -40,41 +40,41 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import { BadRequestError, InvalidBodyError, InvalidPathParamError, NotFoundError, TipoStanza } from "operatn-api-client";
+import { BadRequestError, InvalidBodyError, InvalidPathParamError, NotFoundError, Quietanziante } from "operatn-api-client";
 
 import { ActionTypes } from "@/store";
 
 import OperatnActionDialog from "@/components/gears/dialogs/OperatnActionDialog.vue";
 import OperatnBaseResourceManager, { Column, Actions } from "@/components/gears/bases/OperatnBaseResourceManager.vue";
-import OperatnTipoStanzaForm from "@/components/gears/forms/OperatnTipoStanzaForm.vue";
-import { TipiStanzaCreateBody, TipiStanzaReplaceBody } from "operatn-api-client/api/controllers/index";
+import OperatnQuietanzianteForm from "@/components/gears/forms/OperatnQuietanzianteForm.vue";
+import { QuietanziantiCreateBody, QuietanziantiReplaceBody } from "operatn-api-client/api/controllers/index";
 
 @Component({
   components: {
     OperatnActionDialog,
     OperatnBaseResourceManager,
-    OperatnTipoStanzaForm,
+    OperatnQuietanzianteForm,
   },
 })
-export default class TipiStanza extends Vue {
+export default class Quietanzianti extends Vue {
   /* DATA */
-  private tipiStanza: TipoStanza[] = [];
+  private quietanzianti: Quietanziante[] = [];
 
-  private selectedValues: TipoStanza[] = [];
-  private backupItem: TipoStanza | null = null;
+  private selectedValues: Quietanziante[] = [];
+  private backupItem: Quietanziante | null = null;
 
   private showEditDialog = false;
   private updateBodyValid = false;
-  private updateBody: TipiStanzaReplaceBody | null = null;
+  private updateBody: QuietanziantiReplaceBody | null = null;
   private updateId: number | null = null;
 
   private showCreateDialog = false;
   private createBodyValid = false;
-  private createBody: TipiStanzaCreateBody | null = null;
+  private createBody: QuietanziantiCreateBody | null = null;
 
   /* GETTERS AND SETTERS */
 
-  get columns(): Column<TipoStanza>[] {
+  get columns(): Column<Quietanziante>[] {
     return [
       {
         text: "ID",
@@ -83,8 +83,8 @@ export default class TipiStanza extends Vue {
         editable: false,
       },
       {
-        text: "Tipo stanza",
-        value: "tipoStanza",
+        text: "Quietanziante",
+        value: "quietanziante",
         groupable: false,
 
         editable: true,
@@ -96,39 +96,39 @@ export default class TipiStanza extends Vue {
           hint: "Premi invio per salvare",
           counter: true,
           rules: [
-            this.$validator.requiredText("Tipo stanza")
+            this.$validator.requiredText("Quietanziante")
           ],
         },
       },
     ];
   }
 
-  get actions(): Actions<TipoStanza> {
+  get actions(): Actions<Quietanziante> {
     return {
-      onEdit: (item) => this.openEditTipoStanza(item),
-      onDelete: (item) => this.askDeleteTipoStanza(item),
+      onEdit: (item) => this.openEditQuietanziante(item),
+      onDelete: (item) => this.askDeleteQuietanziante(item),
     };
   }
 
   /* METHODS */
 
-  backup(item: TipoStanza): void {
+  backup(item: Quietanziante): void {
     this.backupItem = { ...item };
   }
 
-  async update(value: TipoStanza): Promise<void> {
+  async update(value: Quietanziante): Promise<void> {
     try {
-      await this.$api.tipiStanza.replace(value.id, { tipoStanza: value.tipoStanza });
+      await this.$api.quietanzianti.replace(value.id, { quietanziante: value.quietanziante });
     } catch (error) {
-      const index = this.tipiStanza.findIndex((t) => t.id === value.id);
-      this.tipiStanza.splice(index, 1, this.backupItem as TipoStanza);
+      const index = this.quietanzianti.findIndex((t) => t.id === value.id);
+      this.quietanzianti.splice(index, 1, this.backupItem as Quietanziante);
       if (error) {
         if (error instanceof InvalidPathParamError) {
-          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, "Id tipo stanza non valido");
+          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, "Id quietanziante non valido");
         } else if (error instanceof InvalidBodyError) {
-          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Dati da aggiornare del tipo stanza non validi`);
+          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Dati da aggiornare del quietanziante non validi`);
         } else if (error instanceof NotFoundError) {
-          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Tipo stanza non trovato`);
+          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Quietanziante non trovato`);
         } else if (error instanceof BadRequestError) {
           this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Richiesta non valida.`);
         }
@@ -136,17 +136,17 @@ export default class TipiStanza extends Vue {
     }
   }
 
-  async deleteTipoStanza(id: number): Promise<void> {
+  async deleteQuietanziante(id: number): Promise<void> {
     try {
-      await this.$api.tipiStanza.delete(id);
-      const index = this.tipiStanza.findIndex((t) => t.id === id);
-      this.tipiStanza.splice(index, 1);
+      await this.$api.quietanzianti.delete(id);
+      const index = this.quietanzianti.findIndex((t) => t.id === id);
+      this.quietanzianti.splice(index, 1);
     } catch (error) {
       if (error) {
         if (error instanceof InvalidPathParamError) {
-          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, "Uid tipo stanza non valido");
+          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, "Uid quietanziante non valido");
         } else if (error instanceof NotFoundError) {
-          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Tipo stanza non trovato`);
+          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Quietanziante non trovato`);
         } else if (error instanceof BadRequestError) {
           this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Richiesta non valida.`);
         }
@@ -154,12 +154,12 @@ export default class TipiStanza extends Vue {
     }
   }
 
-  askDeleteTipoStanza(value: TipoStanza): void {
+  askDeleteQuietanziante(value: Quietanziante): void {
     this.$store.dispatch(ActionTypes.SHOW_CONFIRM_DIALOG, {
-      text: `Sei sicuro di voler eliminare il tipo stanza ${value.tipoStanza}?`,
+      text: `Sei sicuro di voler eliminare il quietanziante ${value.quietanziante}?`,
       callback: async (answer) => {
         if (answer) {
-          await this.deleteTipoStanza(value.id);
+          await this.deleteQuietanziante(value.id);
         }
       },
     });
@@ -167,13 +167,13 @@ export default class TipiStanza extends Vue {
 
   askDeleteSelected(): void {
     this.$store.dispatch(ActionTypes.SHOW_CONFIRM_DIALOG, {
-      text: `Sei sicuro di voler eliminare i tipi di stanza selezionati?`,
+      text: `Sei sicuro di voler eliminare i quietanzianti selezionati?`,
       callback: async (answer) => {
         if (answer) {
-          for (const tipoStanza of [...this.selectedValues]) {
+          for (const quietanziante of [...this.selectedValues]) {
             try {
-              await this.deleteTipoStanza(tipoStanza.id);
-              const index = this.selectedValues.findIndex((t) => t.id === tipoStanza.id);
+              await this.deleteQuietanziante(quietanziante.id);
+              const index = this.selectedValues.findIndex((t) => t.id === quietanziante.id);
               if (index !== undefined) {
                 this.selectedValues.splice(index, 1);
               }
@@ -184,11 +184,11 @@ export default class TipiStanza extends Vue {
     });
   }
 
-  openCreateTipoStanza(): void {
+  openCreateQuietanziante(): void {
     this.createBodyValid = false;
     this.showCreateDialog = true;
   }
-  async closeCreateTipoStanza(save: boolean): Promise<void> {
+  async closeCreateQuietanziante(save: boolean): Promise<void> {
     if (!save) {
       this.createBody = null;
       this.showCreateDialog = false;
@@ -197,11 +197,11 @@ export default class TipiStanza extends Vue {
 
     if (this.createBodyValid && this.createBody) {
       try {
-        const id = await this.$api.tipiStanza.create(this.createBody);
+        const id = await this.$api.quietanzianti.create(this.createBody);
 
-        this.tipiStanza.push({
+        this.quietanzianti.push({
           id,
-          tipoStanza: this.createBody.tipoStanza,
+          quietanziante: this.createBody.quietanziante,
         });
 
         this.createBody = null;
@@ -209,7 +209,7 @@ export default class TipiStanza extends Vue {
       } catch (error) {
         if (error) {
           if (error instanceof InvalidBodyError) {
-            this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Dati del tipo di stanza da creare non validi`);
+            this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Dati del quietanziante da creare non validi`);
           } else if (error instanceof BadRequestError) {
             this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Richiesta non valida`);
           } else {
@@ -220,16 +220,16 @@ export default class TipiStanza extends Vue {
     }
   }
 
-  openEditTipoStanza(tipoStanza: TipoStanza): void {
+  openEditQuietanziante(quietanziante: Quietanziante): void {
     this.updateBody = {
-      tipoStanza: tipoStanza.tipoStanza,
+      quietanziante: quietanziante.quietanziante,
     };
-    this.updateId = tipoStanza.id;
+    this.updateId = quietanziante.id;
     this.updateBodyValid = false;
     this.showEditDialog = true;
-    this.backup(tipoStanza);
+    this.backup(quietanziante);
   }
-  async closeEditTipoStanza(save: boolean): Promise<void> {
+  async closeEditQuietanziante(save: boolean): Promise<void> {
     if (!save) {
       this.updateBody = null;
       this.updateId = null;
@@ -240,14 +240,14 @@ export default class TipiStanza extends Vue {
 
     if (this.updateBodyValid && this.updateBody) {
       try {
-        await this.$api.tipiStanza.replace(this.updateId as number, {
-          tipoStanza: this.updateBody.tipoStanza,
+        await this.$api.quietanzianti.replace(this.updateId as number, {
+          quietanziante: this.updateBody.quietanziante,
         });
 
-        const index = this.tipiStanza.findIndex((t) => t.id === this.updateId);
-        this.tipiStanza.splice(index, 1, {
+        const index = this.quietanzianti.findIndex((t) => t.id === this.updateId);
+        this.quietanzianti.splice(index, 1, {
           id: this.updateId as number,
-          tipoStanza: this.updateBody.tipoStanza,
+          quietanziante: this.updateBody.quietanziante,
         });
 
         this.updateBody = null;
@@ -257,7 +257,7 @@ export default class TipiStanza extends Vue {
       } catch (error) {
         if (error) {
           if (error instanceof InvalidBodyError) {
-            this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Dati del tipo di stanza da creare non validi`);
+            this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Dati del quietanziante da creare non validi`);
           } else if (error instanceof BadRequestError) {
             this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Richiesta non valida`);
           } else {
@@ -272,10 +272,10 @@ export default class TipiStanza extends Vue {
 
   async mounted() {
     try {
-      this.tipiStanza = await this.$api.tipiStanza.getAll();
+      this.quietanzianti = await this.$api.quietanzianti.getAll();
     } catch (error) {
       if (error) {
-        this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, "Errore: impossibile caricare i tipi di stanza");
+        this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, "Errore: impossibile caricare i quietanzianti");
       }
     }
   }

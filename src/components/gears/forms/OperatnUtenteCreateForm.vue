@@ -1,5 +1,5 @@
 <template>
-  <v-form v-model="internalFormValid" v-if="internalValue">
+  <v-form v-model="internalFormValid" @submit.prevent v-if="internalValue">
     <v-container fluid>
       <v-row align="center" justify="center">
         <v-col cols="6">
@@ -46,7 +46,7 @@
             prepend-icon="mdi-lock"
             :append-icon="passwordIcon"
             @click:append="showPassword = !showPassword"
-            :rules="[$validator.requiredText('Password')]"
+            :rules="[$validator.requiredText('Password'), $validator.password()]"
             v-model="internalValue.password"
           />
         </v-col>

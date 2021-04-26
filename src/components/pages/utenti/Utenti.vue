@@ -1,134 +1,40 @@
 <template>
-  <v-card>
-    <v-card-title class="headline primary white--text">Utenti</v-card-title>
-    <v-card-text>
-      <v-subheader class="px-0 mt-4 text-subtitle-1"
-        >Gestione degli utenti che possono accedere a questa piattaforma. Attenzione, il tuo utente non viene viene visualizzato.</v-subheader
-      >
-    </v-card-text>
-    <v-data-table
-      v-model="selectedUtenti"
-      :headers="headers"
-      :items="utenti"
-      item-key="uid"
-      show-select
-      sort-by="nomeUtente"
-      :search="search"
-      :group-by.sync="aggregateBy"
-      class="elevation-1"
-      multi-sort
-    >
-      <template v-slot:top>
-        <v-toolbar flat>
-          <v-toolbar-title>Utenti</v-toolbar-title>
-          <v-spacer />
-          <v-container class="pa-0 fill-height">
-            <v-text-field v-model="search" label="Cerca" dense solo outlined clearable hide-details prepend-inner-icon="mdi-magnify"></v-text-field>
-          </v-container>
-        </v-toolbar>
-      </template>
-
-      <template v-slot:header.ruolo="{ header }">
-        <span>{{ header.text }}</span>
-        <v-btn icon x-small title="aggrega" @click="aggregateBy = header.value" class="ml-1">
-          <v-icon x-small>mdi-layers-triple</v-icon>
-        </v-btn>
-      </template>
-
-      <template v-slot:item.nomeUtente="{ item, header, value }">
-        <v-edit-dialog :return-value.sync="item[header.value]" :large="$vuetify.breakpoint.xs" @save="update(item)" @open="backup(item)">
-          {{ value }}
-          <template v-slot:input>
-            <v-text-field
-              class="mb-4"
-              v-model="item[header.value]"
-              label="Modifica"
-              hint="Premi invio per salvare"
-              :rules="[$validator.requiredText('nomeUtente'), $validator.nomeUtente()]"
-              single-line
-              counter
-            />
-          </template>
-        </v-edit-dialog>
-      </template>
-
-      <template v-slot:item.email="{ item, header, value }">
-        <v-edit-dialog :return-value.sync="item[header.value]" :large="$vuetify.breakpoint.xs" @save="update(item)" @open="backup(item)">
-          {{ value }}
-          <template v-slot:input>
-            <v-text-field
-              class="mb-4"
-              v-model="item[header.value]"
-              label="Modifica"
-              hint="Premi invio per salvare"
-              :rules="[$validator.requiredText('nomeUtente'), $validator.email()]"
-              single-line
-              counter
-            />
-          </template>
-        </v-edit-dialog>
-      </template>
-
-      <template v-slot:item.ruolo="{ item, header, value }">
-        <v-edit-dialog :return-value.sync="item[header.value]" :large="$vuetify.breakpoint.xs" @save="updateRole(item)" @open="backup(item)">
-          <v-icon>{{ getRoleIcon(value) }}</v-icon>
-          <span class="ml-3">{{ value }}</span>
-          <template v-slot:input>
-            <v-select class="mb-4" v-model="item[header.value]" label="Modifica" hint="Premi invio per salvare" :items="$store.state.roles" single-line />
-          </template>
-        </v-edit-dialog>
-      </template>
-
-      <template v-slot:item.dataCreazione="{ value }">
-        <span class="ml-3">{{ new Date(value).toLocaleString() }}</span>
-      </template>
-
-      <template v-slot:item.actions="{ item }">
-        <v-icon small color="primary" class="mr-2" @click="openEditUtente(item)">mdi-pencil</v-icon>
-        <v-icon small color="error" @click="askDeleteUtente(item)">mdi-delete</v-icon>
-      </template>
-    </v-data-table>
-
-    <!-- PLUS FAB BUTTON -->
-    <v-fab-transition v-if="!isSelecting" key="plus">
-      <v-btn color="primary" @click="openCreateUtente" fab large fixed bottom right>
-        <v-icon>mdi-plus</v-icon>
-      </v-btn>
-    </v-fab-transition>
-    <!-- DELETE FAB BUTTON -->
-    <v-fab-transition v-else key="delete">
-      <v-btn color="error" @click="askDeleteSelected" fab large fixed bottom right>
-        <v-icon>mdi-delete</v-icon>
-      </v-btn>
-    </v-fab-transition>
-
-    <!-- CREATE DIALOG -->
-    <operatn-action-dialog
-      title="Nuobo utente"
-      v-model="showCreateDialog"
-      :disabled="!createBodyValid"
-      @cancel="closeCreateUtente(false)"
-      @confirm="closeCreateUtente(true)"
-    >
+  <operatn-base-resource-manager
+    title="Utenti"
+    description="Gestione degli utenti che possono accedere a questa piattaforma. Attenzione, il tuo utente non viene viene visualizzato."
+    tableTitle="Utenti"
+    :tableSelectedValues.sync="selectedValues"
+    :tableColumns="columns"
+    :tableActions="actions"
+    :tableValues="utenti"
+    tableItemKey="uid"
+    tableSortBy="nome"
+    tableShowSelect
+    tableMultiSort
+    createDialogTitle="Nuovo utente"
+    :createDialogShow.sync="showCreateDialog"
+    :createDialogDisabled="!createBodyValid"
+    editDialogTitle="Modifica utente"
+    :editDialogShow.sync="showEditDialog"
+    :editDialogDisabled="!updateBodyValid"
+    @fabCreateClick="openCreateUtente"
+    @fabDeleteClick="askDeleteSelected"
+    @createDialogConfirm="closeCreateUtente(true)"
+    @createDialogCancel="closeCreateUtente(false)"
+    @editDialogConfirm="closeEditUtente(true)"
+    @editDialogCancel="closeEditUtente(false)"
+  >
+    <template v-slot:createDialog>
       <operatn-utente-create-form v-if="showCreateDialog" v-model="createBody" :formValid.sync="createBodyValid" class="mt-6" />
-    </operatn-action-dialog>
-
-    <!-- EDIT DIALOG -->
-    <operatn-action-dialog
-      title="Modifica utente"
-      v-model="showEditDialog"
-      :disabled="!updateBodyValid"
-      @cancel="closeEditUtente(false)"
-      @confirm="closeEditUtente(true)"
-    >
+    </template>
+    <template v-slot:editDialog>
       <operatn-utente-edit-form v-if="showEditDialog" v-model="updateBody" :formValid.sync="updateBodyValid" :canChangePassword="isRoot" class="mt-6" />
-    </operatn-action-dialog>
-  </v-card>
+    </template>
+  </operatn-base-resource-manager>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import { DataTableHeader } from "vuetify";
 import { BadRequestError, InvalidBodyError, InvalidPathParamError, NotFoundError, RuoloUtente, UniqueConstraintError, UniqueRootError } from "operatn-api-client";
 import { UtentiCreateBody, UtentiReturned, UtentiUpdateBody, UtentiUpdateRuoloBody, UtentiUpdatePasswordBody } from "operatn-api-client/api/controllers/utenti/index";
 
@@ -136,12 +42,14 @@ import { ActionTypes } from "@/store";
 import { getRoleIcon } from "@/utils";
 
 import OperatnActionDialog from "@/components/gears/dialogs/OperatnActionDialog.vue";
+import OperatnBaseResourceManager, { Column, Actions } from "@/components/gears/bases/OperatnBaseResourceManager.vue";
 import OperatnUtenteEditForm from "@/components/gears/forms/OperatnUtenteEditForm.vue";
 import OperatnUtenteCreateForm from "@/components/gears/forms/OperatnUtenteCreateForm.vue";
 
 @Component({
   components: {
     OperatnActionDialog,
+    OperatnBaseResourceManager,
     OperatnUtenteEditForm,
     OperatnUtenteCreateForm,
   },
@@ -149,10 +57,8 @@ import OperatnUtenteCreateForm from "@/components/gears/forms/OperatnUtenteCreat
 export default class Utenti extends Vue {
   /* DATA */
   private utenti: UtentiReturned[] = [];
-  private search = "";
-  private aggregateBy: string | null = null;
 
-  private selectedUtenti: UtentiReturned[] = [];
+  private selectedValues: UtentiReturned[] = [];
   private backupItem: UtentiReturned | null = null;
 
   private showEditDialog = false;
@@ -165,52 +71,85 @@ export default class Utenti extends Vue {
 
   /* GETTERS AND SETTERS */
 
-  get isSelecting(): boolean {
-    return this.selectedUtenti.length > 0;
-  }
-
   get isRoot(): boolean {
     return this.$store.state.user?.ruolo === RuoloUtente.ROOT;
   }
 
-  get headers(): DataTableHeader[] {
+  get columns(): Column<UtentiReturned>[] {
     return [
       {
         text: "Nome utente",
         align: "start",
         value: "nomeUtente",
         groupable: false,
+
+        editable: true,
+        onEditSave: (item) => this.update(item),
+        onEditOpen: (item) => this.backup(item),
+        editInput: {
+          type: "text",
+          label: "Modifica",
+          hint: "Premi invio per salvare",
+          counter: true,
+          rules: [this.$validator.requiredText("Nome utente"), this.$validator.nomeUtente()],
+        },
       },
       {
         text: "Email",
         value: "email",
         groupable: false,
+
+        editable: true,
+        onEditSave: (item) => this.update(item),
+        onEditOpen: (item) => this.backup(item),
+        editInput: {
+          type: "email",
+          label: "Modifica",
+          hint: "Premi invio per salvare",
+          counter: true,
+          rules: [this.$validator.requiredText("Email"), this.$validator.email()],
+        },
       },
       {
         text: "Ruolo",
         value: "ruolo",
         groupable: true,
         filterable: false,
+
+        editable: true,
+        onEditSave: (item) => this.update(item),
+        onEditOpen: (item) => this.backup(item),
+        editInput: {
+          type: "select",
+          label: "Modifica",
+          hint: "Premi invio per salvare",
+          rules: [this.$validator.requiredText("Ruolo"), this.$validator.ruoloUtente()],
+          items: this.$store.state.roles,
+        },
+        itemText: true,
+        itemIcon: true,
+        itemIconHandler: (value: string) => getRoleIcon(value) ?? "",
       },
       {
         text: "Data creazione",
         value: "dataCreazione",
         groupable: false,
         filterable: false,
-      },
-      {
-        text: "Azioni",
-        value: "actions",
-        sortable: false,
+
+        editable: false,
+        itemTextHandler: (value: string) => new Date(value).toLocaleString(),
       },
     ];
   }
 
-  /* METHODS */
-
-  getRoleIcon(role: string): string | null {
-    return getRoleIcon(role);
+  get actions(): Actions<UtentiReturned> {
+    return {
+      onEdit: (item) => this.openEditUtente(item),
+      onDelete: (item) => this.askDeleteUtente(item),
+    };
   }
+
+  /* METHODS */
 
   backup(item: UtentiReturned): void {
     this.backupItem = { ...item };
@@ -297,12 +236,12 @@ export default class Utenti extends Vue {
       text: `Sei sicuro di voler eliminare gli utenti selezionati?`,
       callback: async (answer) => {
         if (answer) {
-          for (const utente of [...this.selectedUtenti]) {
+          for (const utente of [...this.selectedValues]) {
             try {
               await this.deleteUtente(utente.uid);
-              const index = this.selectedUtenti.findIndex((u) => u.uid === utente.uid);
+              const index = this.selectedValues.findIndex((u) => u.uid === utente.uid);
               if (index !== undefined) {
-                this.selectedUtenti.splice(index, 1);
+                this.selectedValues.splice(index, 1);
               }
             } catch (error) {}
           }
@@ -427,9 +366,3 @@ export default class Utenti extends Vue {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-.utenti {
-  height: 100%;
-}
-</style>

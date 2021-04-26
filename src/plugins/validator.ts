@@ -44,6 +44,9 @@ const validator = {
     },
     email(): InputValidationRule {
         return value => /^[^\s@]+@([^\s@.,]+\.)+[^\s@.,]{2,}$/.test(value) || `Email non valida`;
+    },
+    unique(values: string[]): InputValidationRule {
+        return value => !values.includes(value) || `Questo valore è già presente`;
     }
 };
 

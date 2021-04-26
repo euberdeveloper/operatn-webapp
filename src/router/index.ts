@@ -20,6 +20,12 @@ import RootUserInfo from '@/views/root/user-info/RootUserInfoView.vue';
 import RootUtenti from '@/views/root/utenti/RootUtentiView.vue';
 import RootTipiStanza from '@/views/root/tipi-stanza/RootTipiStanzaView.vue';
 import RootTipiFabbricato from '@/views/root/tipi-fabbricato/RootTipiFabbricatoView.vue';
+import RootQuietanzianti from '@/views/root/quietanzianti/RootQuietanziantiView.vue';
+import RootTipiStudente from '@/views/root/tipi-studente/RootTipiStudenteView.vue';
+import RootContiRicaviConsumi from '@/views/root/conti-ricavi-consumi/RootContiRicaviConsumiView.vue';
+import RootContiRicaviCanoni from '@/views/root/conti-ricavi-canoni/RootContiRicaviCanoniView.vue';
+import RootTipiTariffa from '@/views/root/tipi-tariffa/RootTipiTariffaView.vue';
+
 
 /* ADMIN */
 import Admin from '@/views/admin/AdminView.vue';
@@ -29,6 +35,11 @@ import AdminUserInfo from '@/views/admin/user-info/AdminUserInfoView.vue';
 import AdminUtenti from '@/views/admin/utenti/AdminUtentiView.vue';
 import AdminTipiStanza from '@/views/admin/tipi-stanza/AdminTipiStanzaView.vue';
 import AdminTipiFabbricato from '@/views/admin/tipi-fabbricato/AdminTipiFabbricatoView.vue';
+import AdminQuietanzianti from '@/views/admin/quietanzianti/AdminQuietanziantiView.vue';
+import AdminTipiStudente from '@/views/admin/tipi-studente/AdminTipiStudenteView.vue';
+import AdminContiRicaviConsumi from '@/views/admin/conti-ricavi-consumi/AdminContiRicaviConsumiView.vue';
+import AdminContiRicaviCanoni from '@/views/admin/conti-ricavi-canoni/AdminContiRicaviCanoniView.vue';
+import AdminTipiTariffa from '@/views/admin/tipi-tariffa/AdminTipiTariffaView.vue';
 
 Vue.use(VueRouter);
 
@@ -86,7 +97,32 @@ const routes: Array<RouteConfig> = [
         path: 'tipi-fabbricato',
         name: 'admin-tipi-fabbricato',
         component: AdminTipiFabbricato
-      }
+      },
+      {
+        path: 'quietanzianti',
+        name: 'admin-quietanzianti',
+        component: AdminQuietanzianti
+      },
+      {
+        path: 'tipi-studente',
+        name: 'admin-tipi-studente',
+        component: AdminTipiStudente
+      },
+      {
+        path: 'conti-ricavi-consumi',
+        name: 'admin-conti-ricavi-consumi',
+        component: AdminContiRicaviConsumi
+      },
+      {
+        path: 'conti-ricavi-canoni',
+        name: 'admin-conti-ricavi-canoni',
+        component: AdminContiRicaviCanoni
+      },
+      {
+        path: 'tipi-tariffa',
+        name: 'admin-tipi-tariffa',
+        component: AdminTipiTariffa
+      },
     ]
   },
   {
@@ -121,7 +157,32 @@ const routes: Array<RouteConfig> = [
         path: 'tipi-fabbricato',
         name: 'root-tipi-fabbricato',
         component: RootTipiFabbricato
-      }
+      },
+      {
+        path: 'quietanzianti',
+        name: 'root-quietanzianti',
+        component: RootQuietanzianti
+      },
+      {
+        path: 'tipi-studente',
+        name: 'root-tipi-studente',
+        component: RootTipiStudente
+      },
+      {
+        path: 'conti-ricavi-consumi',
+        name: 'root-conti-ricavi-consumi',
+        component: RootContiRicaviConsumi
+      },
+      {
+        path: 'conti-ricavi-canoni',
+        name: 'admin-conti-ricavi-canoni',
+        component: RootContiRicaviCanoni
+      },
+      {
+        path: 'tipi-tariffa',
+        name: 'root-tipi-tariffa',
+        component: RootTipiTariffa
+      },
     ]
 
   }

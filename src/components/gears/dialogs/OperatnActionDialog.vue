@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="internalShow" persistent width="50vw">
+  <v-dialog v-model="internalShow" persistent :width="$vuetify.breakpoint.smAndDown ? '80vw' : '50vw'">
       <v-card>
         <v-toolbar :color="color" dark>
           <v-toolbar-title>{{title}}</v-toolbar-title>
@@ -64,7 +64,6 @@ export default class OperatnActionDialog extends Vue {
   }
 
   confirm(): void {
-    this.internalShow = false;
     this.$emit('confirm');
   }
 }

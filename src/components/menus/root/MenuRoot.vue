@@ -5,7 +5,7 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 
-import OperatnBaseMenu, { MenuItem } from '@/components/gears/OperatnBaseMenu.vue';
+import OperatnBaseMenu, { MenuItem } from '@/components/gears/bases/OperatnBaseMenu.vue';
 
 @Component({
   components: {
@@ -30,6 +30,31 @@ export default class MenuRoot extends Vue {
       icon: "mdi-home-city",
       text: "Tipi fabbricato",
       path: "./tipi-fabbricato",
+    },
+    {
+      icon: "mdi-account-heart",
+      text: "Quietanzianti",
+      path: "./quietanzianti",
+    },
+    {
+      icon: "mdi-school",
+      text: "Tipi studente",
+      path: "./tipi-studente",
+    },
+    {
+      icon: "mdi-circle-multiple",
+      text: "Conti ricavi e consumi",
+      path: "./conti-ricavi-consumi",
+    },
+    {
+      icon: "mdi-circle-multiple-outline",
+      text: "Conti ricavi e canoni",
+      path: "./conti-ricavi-canoni",
+    },
+    {
+      icon: "mdi-calculator-variant",
+      text: "Tipi tariffa",
+      path: "./tipi-tariffa",
     }
   ];
 }

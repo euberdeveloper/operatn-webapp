@@ -1,36 +1,36 @@
 <template>
   <operatn-base-resource-manager
-    title="Tipi stanza"
-    description="Gestione dei tipi stanza dell'opera. Attenzione, eliminare un tipo di stanza elimina a cascata tutti i fabbricati ed i contratti ad esso associati."
-    tableTitle="Tipi stanza"
+    title="Tipi tariffa"
+    description="Gestione dei tipi tariffa dell'opera. Attenzione, eliminare un tipo di tariffa elimina a cascata tutti i tariffe ed i contratti ad esso associati."
+    tableTitle="Tipi tariffa"
     :tableSelectedValues.sync="selectedValues"
     :tableColumns="columns"
     :tableActions="actions"
-    :tableValues="tipiStanza"
+    :tableValues="tipiTariffa"
     tableItemKey="id"
     tableShowSelect
-    createDialogTitle="Nuovo tipo stanza"
+    createDialogTitle="Nuovo tipo tariffa"
     :createDialogShow.sync="showCreateDialog"
     :createDialogDisabled="!createBodyValid"
-    editDialogTitle="Modifica tipo stanza"
+    editDialogTitle="Modifica tipo tariffa"
     :editDialogShow.sync="showEditDialog"
     :editDialogDisabled="!updateBodyValid"
-    @fabCreateClick="openCreateTipoStanza"
+    @fabCreateClick="openCreateTipoTariffa"
     @fabDeleteClick="askDeleteSelected"
-    @createDialogConfirm="closeCreateTipoStanza(true)"
-    @createDialogCancel="closeCreateTipoStanza(false)"
-    @editDialogConfirm="closeEditTipoStanza(true)"
-    @editDialogCancel="closeEditTipoStanza(false)"
+    @createDialogConfirm="closeCreateTipoTariffa(true)"
+    @createDialogCancel="closeCreateTipoTariffa(false)"
+    @editDialogConfirm="closeEditTipoTariffa(true)"
+    @editDialogCancel="closeEditTipoTariffa(false)"
   >
     <template v-slot:createDialog>
-      <operatn-tipo-stanza-form v-if="showCreateDialog" v-model="createBody" :formValid.sync="createBodyValid" :tipiStanza="tipiStanza" class="mt-6" />
+      <operatn-tipo-tariffa-form v-if="showCreateDialog" v-model="createBody" :formValid.sync="createBodyValid" :tipiTariffa="tipiTariffa" class="mt-6" />
     </template>
     <template v-slot:editDialog>
-      <operatn-tipo-stanza-form
+      <operatn-tipo-tariffa-form
         v-if="showEditDialog"
         v-model="updateBody"
         :formValid.sync="updateBodyValid"
-        :tipiStanza="tipiStanza"
+        :tipiTariffa="tipiTariffa"
         :backupValue="backupItem"
         class="mt-6"
       />
@@ -40,41 +40,41 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import { BadRequestError, InvalidBodyError, InvalidPathParamError, NotFoundError, TipoStanza } from "operatn-api-client";
+import { BadRequestError, InvalidBodyError, InvalidPathParamError, NotFoundError, TipoTariffa } from "operatn-api-client";
 
 import { ActionTypes } from "@/store";
 
 import OperatnActionDialog from "@/components/gears/dialogs/OperatnActionDialog.vue";
 import OperatnBaseResourceManager, { Column, Actions } from "@/components/gears/bases/OperatnBaseResourceManager.vue";
-import OperatnTipoStanzaForm from "@/components/gears/forms/OperatnTipoStanzaForm.vue";
-import { TipiStanzaCreateBody, TipiStanzaReplaceBody } from "operatn-api-client/api/controllers/index";
+import OperatnTipoTariffaForm from "@/components/gears/forms/OperatnTipoTariffaForm.vue";
+import { TipiTariffaCreateBody, TipiTariffaReplaceBody } from "operatn-api-client/api/controllers/index";
 
 @Component({
   components: {
     OperatnActionDialog,
     OperatnBaseResourceManager,
-    OperatnTipoStanzaForm,
+    OperatnTipoTariffaForm,
   },
 })
-export default class TipiStanza extends Vue {
+export default class TipiTariffa extends Vue {
   /* DATA */
-  private tipiStanza: TipoStanza[] = [];
+  private tipiTariffa: TipoTariffa[] = [];
 
-  private selectedValues: TipoStanza[] = [];
-  private backupItem: TipoStanza | null = null;
+  private selectedValues: TipoTariffa[] = [];
+  private backupItem: TipoTariffa | null = null;
 
   private showEditDialog = false;
   private updateBodyValid = false;
-  private updateBody: TipiStanzaReplaceBody | null = null;
+  private updateBody: TipiTariffaReplaceBody | null = null;
   private updateId: number | null = null;
 
   private showCreateDialog = false;
   private createBodyValid = false;
-  private createBody: TipiStanzaCreateBody | null = null;
+  private createBody: TipiTariffaCreateBody | null = null;
 
   /* GETTERS AND SETTERS */
 
-  get columns(): Column<TipoStanza>[] {
+  get columns(): Column<TipoTariffa>[] {
     return [
       {
         text: "ID",
@@ -83,8 +83,8 @@ export default class TipiStanza extends Vue {
         editable: false,
       },
       {
-        text: "Tipo stanza",
-        value: "tipoStanza",
+        text: "Tipo tariffa",
+        value: "tipoTariffa",
         groupable: false,
 
         editable: true,
@@ -96,39 +96,39 @@ export default class TipiStanza extends Vue {
           hint: "Premi invio per salvare",
           counter: true,
           rules: [
-            this.$validator.requiredText("Tipo stanza")
+            this.$validator.requiredText("Tipo tariffa")
           ],
         },
       },
     ];
   }
 
-  get actions(): Actions<TipoStanza> {
+  get actions(): Actions<TipoTariffa> {
     return {
-      onEdit: (item) => this.openEditTipoStanza(item),
-      onDelete: (item) => this.askDeleteTipoStanza(item),
+      onEdit: (item) => this.openEditTipoTariffa(item),
+      onDelete: (item) => this.askDeleteTipoTariffa(item),
     };
   }
 
   /* METHODS */
 
-  backup(item: TipoStanza): void {
+  backup(item: TipoTariffa): void {
     this.backupItem = { ...item };
   }
 
-  async update(value: TipoStanza): Promise<void> {
+  async update(value: TipoTariffa): Promise<void> {
     try {
-      await this.$api.tipiStanza.replace(value.id, { tipoStanza: value.tipoStanza });
+      await this.$api.tipiTariffa.replace(value.id, { tipoTariffa: value.tipoTariffa });
     } catch (error) {
-      const index = this.tipiStanza.findIndex((t) => t.id === value.id);
-      this.tipiStanza.splice(index, 1, this.backupItem as TipoStanza);
+      const index = this.tipiTariffa.findIndex((t) => t.id === value.id);
+      this.tipiTariffa.splice(index, 1, this.backupItem as TipoTariffa);
       if (error) {
         if (error instanceof InvalidPathParamError) {
-          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, "Id tipo stanza non valido");
+          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, "Id tipo tariffa non valido");
         } else if (error instanceof InvalidBodyError) {
-          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Dati da aggiornare del tipo stanza non validi`);
+          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Dati da aggiornare del tipo tariffa non validi`);
         } else if (error instanceof NotFoundError) {
-          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Tipo stanza non trovato`);
+          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Tipo tariffa non trovato`);
         } else if (error instanceof BadRequestError) {
           this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Richiesta non valida.`);
         }
@@ -136,17 +136,17 @@ export default class TipiStanza extends Vue {
     }
   }
 
-  async deleteTipoStanza(id: number): Promise<void> {
+  async deleteTipoTariffa(id: number): Promise<void> {
     try {
-      await this.$api.tipiStanza.delete(id);
-      const index = this.tipiStanza.findIndex((t) => t.id === id);
-      this.tipiStanza.splice(index, 1);
+      await this.$api.tipiTariffa.delete(id);
+      const index = this.tipiTariffa.findIndex((t) => t.id === id);
+      this.tipiTariffa.splice(index, 1);
     } catch (error) {
       if (error) {
         if (error instanceof InvalidPathParamError) {
-          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, "Uid tipo stanza non valido");
+          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, "Uid tipo tariffa non valido");
         } else if (error instanceof NotFoundError) {
-          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Tipo stanza non trovato`);
+          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Tipo tariffa non trovato`);
         } else if (error instanceof BadRequestError) {
           this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Richiesta non valida.`);
         }
@@ -154,12 +154,12 @@ export default class TipiStanza extends Vue {
     }
   }
 
-  askDeleteTipoStanza(value: TipoStanza): void {
+  askDeleteTipoTariffa(value: TipoTariffa): void {
     this.$store.dispatch(ActionTypes.SHOW_CONFIRM_DIALOG, {
-      text: `Sei sicuro di voler eliminare il tipo stanza ${value.tipoStanza}?`,
+      text: `Sei sicuro di voler eliminare il tipo tariffa ${value.tipoTariffa}?`,
       callback: async (answer) => {
         if (answer) {
-          await this.deleteTipoStanza(value.id);
+          await this.deleteTipoTariffa(value.id);
         }
       },
     });
@@ -167,13 +167,13 @@ export default class TipiStanza extends Vue {
 
   askDeleteSelected(): void {
     this.$store.dispatch(ActionTypes.SHOW_CONFIRM_DIALOG, {
-      text: `Sei sicuro di voler eliminare i tipi di stanza selezionati?`,
+      text: `Sei sicuro di voler eliminare i tipi di tariffa selezionati?`,
       callback: async (answer) => {
         if (answer) {
-          for (const tipoStanza of [...this.selectedValues]) {
+          for (const tipoTariffa of [...this.selectedValues]) {
             try {
-              await this.deleteTipoStanza(tipoStanza.id);
-              const index = this.selectedValues.findIndex((t) => t.id === tipoStanza.id);
+              await this.deleteTipoTariffa(tipoTariffa.id);
+              const index = this.selectedValues.findIndex((t) => t.id === tipoTariffa.id);
               if (index !== undefined) {
                 this.selectedValues.splice(index, 1);
               }
@@ -184,11 +184,11 @@ export default class TipiStanza extends Vue {
     });
   }
 
-  openCreateTipoStanza(): void {
+  openCreateTipoTariffa(): void {
     this.createBodyValid = false;
     this.showCreateDialog = true;
   }
-  async closeCreateTipoStanza(save: boolean): Promise<void> {
+  async closeCreateTipoTariffa(save: boolean): Promise<void> {
     if (!save) {
       this.createBody = null;
       this.showCreateDialog = false;
@@ -197,11 +197,11 @@ export default class TipiStanza extends Vue {
 
     if (this.createBodyValid && this.createBody) {
       try {
-        const id = await this.$api.tipiStanza.create(this.createBody);
+        const id = await this.$api.tipiTariffa.create(this.createBody);
 
-        this.tipiStanza.push({
+        this.tipiTariffa.push({
           id,
-          tipoStanza: this.createBody.tipoStanza,
+          tipoTariffa: this.createBody.tipoTariffa,
         });
 
         this.createBody = null;
@@ -209,7 +209,7 @@ export default class TipiStanza extends Vue {
       } catch (error) {
         if (error) {
           if (error instanceof InvalidBodyError) {
-            this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Dati del tipo di stanza da creare non validi`);
+            this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Dati del tipo di tariffa da creare non validi`);
           } else if (error instanceof BadRequestError) {
             this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Richiesta non valida`);
           } else {
@@ -220,16 +220,16 @@ export default class TipiStanza extends Vue {
     }
   }
 
-  openEditTipoStanza(tipoStanza: TipoStanza): void {
+  openEditTipoTariffa(tipoTariffa: TipoTariffa): void {
     this.updateBody = {
-      tipoStanza: tipoStanza.tipoStanza,
+      tipoTariffa: tipoTariffa.tipoTariffa,
     };
-    this.updateId = tipoStanza.id;
+    this.updateId = tipoTariffa.id;
     this.updateBodyValid = false;
     this.showEditDialog = true;
-    this.backup(tipoStanza);
+    this.backup(tipoTariffa);
   }
-  async closeEditTipoStanza(save: boolean): Promise<void> {
+  async closeEditTipoTariffa(save: boolean): Promise<void> {
     if (!save) {
       this.updateBody = null;
       this.updateId = null;
@@ -240,14 +240,14 @@ export default class TipiStanza extends Vue {
 
     if (this.updateBodyValid && this.updateBody) {
       try {
-        await this.$api.tipiStanza.replace(this.updateId as number, {
-          tipoStanza: this.updateBody.tipoStanza,
+        await this.$api.tipiTariffa.replace(this.updateId as number, {
+          tipoTariffa: this.updateBody.tipoTariffa,
         });
 
-        const index = this.tipiStanza.findIndex((t) => t.id === this.updateId);
-        this.tipiStanza.splice(index, 1, {
+        const index = this.tipiTariffa.findIndex((t) => t.id === this.updateId);
+        this.tipiTariffa.splice(index, 1, {
           id: this.updateId as number,
-          tipoStanza: this.updateBody.tipoStanza,
+          tipoTariffa: this.updateBody.tipoTariffa,
         });
 
         this.updateBody = null;
@@ -257,7 +257,7 @@ export default class TipiStanza extends Vue {
       } catch (error) {
         if (error) {
           if (error instanceof InvalidBodyError) {
-            this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Dati del tipo di stanza da creare non validi`);
+            this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Dati del tipo di tariffa da creare non validi`);
           } else if (error instanceof BadRequestError) {
             this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Richiesta non valida`);
           } else {
@@ -272,10 +272,10 @@ export default class TipiStanza extends Vue {
 
   async mounted() {
     try {
-      this.tipiStanza = await this.$api.tipiStanza.getAll();
+      this.tipiTariffa = await this.$api.tipiTariffa.getAll();
     } catch (error) {
       if (error) {
-        this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, "Errore: impossibile caricare i tipi di stanza");
+        this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, "Errore: impossibile caricare i tipi di tariffa");
       }
     }
   }
