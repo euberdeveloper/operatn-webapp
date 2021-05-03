@@ -35,7 +35,7 @@
           <v-icon class="mr-3" v-if="column.itemIcon">{{ column.itemIconHandler ? column.itemIconHandler(value) : value }}</v-icon>
           <span v-if="column.itemText !== false">{{ column.itemTextHandler ? column.itemTextHandler(value) : value }}</span>
         </span>
-        <v-edit-dialog :return-value.sync="item[column.value]" :large="$vuetify.breakpoint.xs" @save="column.onEditSave(item)" @open="column.onEditOpen(item)" v-else>
+        <v-edit-dialog :large="$vuetify.breakpoint.xs" @cancel="column.onEditCancel(item)" @close="column.onEditClose(item)" @save="column.onEditSave(item)" @open="column.onEditOpen(item)" v-else>
           <span>
             <v-icon class="mr-3" v-if="column.itemIcon">{{ column.itemIconHandler ? column.itemIconHandler(value) : value }}</v-icon>
             <span v-if="column.itemText !== false">{{ column.itemTextHandler ? column.itemTextHandler(value) : value }}</span>
@@ -43,24 +43,24 @@
           <template v-slot:input>
             <v-select
               class="mb-4"
-              v-model="item[column.value]"
+              v-model="internalUpdateBody[column.value]"
               :label="column.editInput.label"
               :hint="column.editInput.hint"
               :rules="column.editInput.rules || []"
               :items="column.editInput.items || []"
               single-line
-              v-if="column.editInput.type == 'select'"
+              v-if="column.editInput.type == 'select' && internalUpdateBody"
             />
             <v-text-field
               class="mb-4"
-              v-model="item[column.value]"
+              v-model="internalUpdateBody[column.value]"
               :type="column.editInput.type"
               :label="column.editInput.label"
               :hint="column.editInput.hint"
               :rules="column.editInput.rules || []"
               :counter="column.editInput.counter"
               single-line
-              v-else
+              v-else-if="internalUpdateBody"
             />
           </template>
         </v-edit-dialog>
@@ -79,6 +79,8 @@ import { DataTableHeader, InputValidationRule } from "vuetify";
 
 export interface Column<T = any> extends DataTableHeader {
   editable?: boolean;
+  onEditCancel?: (value: T) => void | Promise<void>;
+  onEditClose?: (value: T) => void | Promise<void>;
   onEditSave?: (value: T) => void | Promise<void>;
   onEditOpen?: (value: T) => void | Promise<void>;
   editInput?: {
@@ -138,6 +140,9 @@ export default class OperatnBaseTable extends Vue {
   @Prop({ type: Boolean, default: false })
   private multiSort!: boolean;
 
+  @Prop({ validator: (v) => typeof v === "object" || v === null, required: true })
+  private updateBody!: any;
+
   /* DATA */
 
   private search: string | null = null;
@@ -150,6 +155,13 @@ export default class OperatnBaseTable extends Vue {
   }
   set internalSelectedValues(value: any) {
     this.$emit("selected", value);
+  }
+
+  get internalUpdateBody(): any {
+    return this.updateBody;
+  }
+  set internalUpdateBody(value: any) {
+    this.$emit("update:update-body", value);
   }
 
   get handledColumns(): (HandledColumn | Column)[] {

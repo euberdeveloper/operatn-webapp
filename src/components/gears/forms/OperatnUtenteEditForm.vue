@@ -9,7 +9,7 @@
             name="nomeUtente"
             clearable
             prepend-icon="mdi-account"
-            :rules="[$validator.requiredText('Nome utente'), $validator.nomeUtente()]"
+            :rules="[$validator.requiredText('Nome utente'), $validator.nomeUtente(), $validator.unique(utentiNomiUtente)]"
             v-model="internalValue.nomeUtente"
           />
         </v-col>
@@ -47,7 +47,7 @@
             prepend-icon="mdi-lock"
             :append-icon="passwordIcon"
             @click:append="showPassword = !showPassword"
-            :rules="[v => !!v || $validator.password()]"
+            :rules="[v => !v || $validator.password()(v)]"
             v-model="internalValue.password"
             v-if="canChangePassword"
           />
@@ -59,9 +59,9 @@
 </template>
 
 <script lang="ts">
-import { UtentiUpdateBody, UtentiUpdatePasswordBody, UtentiUpdateRuoloBody } from "operatn-api-client/api/controllers/utenti/index";
 import Vue from "vue";
 import { Component, Prop, Watch } from "vue-property-decorator";
+import { UtentiUpdateBody, UtentiUpdatePasswordBody, UtentiUpdateRuoloBody } from "operatn-api-client";
 
 @Component({
   model: {
@@ -77,6 +77,9 @@ export default class OperatnUtenteEditForm extends Vue {
 
   @Prop({ type: Boolean, default: false })
   formValid!: boolean;
+
+  @Prop({ type: Array, default: () => [] })
+  utentiNomiUtente!: string;
 
   @Prop({ type: Boolean, required: true })
   canChangePassword!: boolean;

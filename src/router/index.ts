@@ -25,6 +25,7 @@ import RootTipiStudente from '@/views/root/tipi-studente/RootTipiStudenteView.vu
 import RootContiRicaviConsumi from '@/views/root/conti-ricavi-consumi/RootContiRicaviConsumiView.vue';
 import RootContiRicaviCanoni from '@/views/root/conti-ricavi-canoni/RootContiRicaviCanoniView.vue';
 import RootTipiTariffa from '@/views/root/tipi-tariffa/RootTipiTariffaView.vue';
+import RootDipartimentiUnitn from '@/views/root/dipartimenti-unitn/RootDipartimentiUnitnView.vue';
 
 
 /* ADMIN */
@@ -40,6 +41,7 @@ import AdminTipiStudente from '@/views/admin/tipi-studente/AdminTipiStudenteView
 import AdminContiRicaviConsumi from '@/views/admin/conti-ricavi-consumi/AdminContiRicaviConsumiView.vue';
 import AdminContiRicaviCanoni from '@/views/admin/conti-ricavi-canoni/AdminContiRicaviCanoniView.vue';
 import AdminTipiTariffa from '@/views/admin/tipi-tariffa/AdminTipiTariffaView.vue';
+import AdminDipartimentiUnitn from '@/views/admin/dipartimenti-unitn/AdminDipartimentiUnitnView.vue';
 
 Vue.use(VueRouter);
 
@@ -123,6 +125,11 @@ const routes: Array<RouteConfig> = [
         name: 'admin-tipi-tariffa',
         component: AdminTipiTariffa
       },
+      {
+        path: 'dipartimenti-unitn',
+        name: 'admin-dipartimenti-unitn',
+        component: AdminDipartimentiUnitn
+      },
     ]
   },
   {
@@ -175,13 +182,18 @@ const routes: Array<RouteConfig> = [
       },
       {
         path: 'conti-ricavi-canoni',
-        name: 'admin-conti-ricavi-canoni',
+        name: 'root-conti-ricavi-canoni',
         component: RootContiRicaviCanoni
       },
       {
         path: 'tipi-tariffa',
         name: 'root-tipi-tariffa',
         component: RootTipiTariffa
+      },
+      {
+        path: 'dipartimenti-unitn',
+        name: 'root-dipartimenti-unitn',
+        component: RootDipartimentiUnitn
       },
     ]
 

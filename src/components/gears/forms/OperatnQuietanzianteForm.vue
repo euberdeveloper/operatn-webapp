@@ -21,9 +21,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { Component, Prop, Watch } from "vue-property-decorator";
-
-import { QuietanziantiCreateBody, QuietanziantiReplaceBody } from "operatn-api-client/api/controllers/quietanzianti/index";
-import { Quietanziante } from "operatn-api-client";
+import { QuietanziantiCreateBody, QuietanziantiReplaceBody } from "operatn-api-client";
 
 @Component({
   model: {
@@ -37,14 +35,11 @@ export default class OperatnQuietanzianteForm extends Vue {
   @Prop({ type: Object, default: null })
   value!: QuietanziantiCreateBody | QuietanziantiReplaceBody;
 
-  @Prop({ type: Array, default: () => [] })
-  quietanzianti!: Quietanziante[];
-
-  @Prop({ type: Object, required: false })
-  backupValue!: Quietanziante;
-
   @Prop({ type: Boolean, default: false })
   formValid!: boolean;
+
+  @Prop({ type: Array, default: () => [] })
+  quietanziantiValues!: string[];
 
   /* GETTERS AND SETTERS */
 
@@ -60,11 +55,6 @@ export default class OperatnQuietanzianteForm extends Vue {
   }
   set internalFormValid(value) {
     this.$emit("update:formValid", value);
-  }
-
-  get quietanziantiValues(): string[] {
-    const tipi = this.quietanzianti.map((q) => q.quietanziante);
-    return this.backupValue ? tipi.filter((value) => value !== this.backupValue.quietanziante) : tipi;
   }
 
   /* METHODS */

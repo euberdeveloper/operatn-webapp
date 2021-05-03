@@ -1,5 +1,5 @@
 <template>
-  <tipi-stanza />
+  <tipi-stanza :isRoot="false" />
 </template>
 
 <script lang="ts">

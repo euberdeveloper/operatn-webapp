@@ -5,6 +5,7 @@ export interface State {
     token: string | null;
     user: UtentiReturned | null;
     showMenu: boolean;
+    errorsQueue: string[];
     errorDialogText: string | null;
     successDialogText: string | null;
     confirmDialog: { text: string; callback: (answer: boolean) => void | Promise<void> } | null;
@@ -17,6 +18,7 @@ export const state: State = {
     token: null,
     user: null,
     showMenu: true,
+    errorsQueue: [],
     errorDialogText: null,
     successDialogText: null,
     confirmDialog: null,

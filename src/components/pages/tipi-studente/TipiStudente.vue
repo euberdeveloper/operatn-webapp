@@ -6,32 +6,38 @@
     :tableSelectedValues.sync="selectedValues"
     :tableColumns="columns"
     :tableActions="actions"
-    :tableValues="tipiStudente"
+    :tableValues="values"
     tableItemKey="id"
-    tableShowSelect
+    :tableShowSelect="isRoot"
+    :tableUpdateBody.sync="updateBody"
     createDialogTitle="Nuovo tipo studente"
     :createDialogShow.sync="showCreateDialog"
     :createDialogDisabled="!createBodyValid"
     editDialogTitle="Modifica tipo studente"
     :editDialogShow.sync="showEditDialog"
     :editDialogDisabled="!updateBodyValid"
-    @fabCreateClick="openCreateTipoStudente"
-    @fabDeleteClick="askDeleteSelected"
-    @createDialogConfirm="closeCreateTipoStudente(true)"
-    @createDialogCancel="closeCreateTipoStudente(false)"
-    @editDialogConfirm="closeEditTipoStudente(true)"
-    @editDialogCancel="closeEditTipoStudente(false)"
+    @fabCreateClick="openCreate"
+    @fabDeleteClick="askDeleteMultiple"
+    @createDialogConfirm="closeCreate(true)"
+    @createDialogCancel="closeCreate(false)"
+    @editDialogConfirm="closeEdit(true)"
+    @editDialogCancel="closeEdit(false)"
   >
     <template v-slot:createDialog>
-      <operatn-tipo-studente-form v-if="showCreateDialog" v-model="createBody" :formValid.sync="createBodyValid" :tipiStudente="tipiStudente" class="mt-6" />
+      <operatn-tipo-studente-form
+        v-if="showCreateDialog"
+        v-model="createBody"
+        :formValid.sync="createBodyValid"
+        :tipiStudenteValues="tipiStudenteValues"
+        class="mt-6"
+      />
     </template>
     <template v-slot:editDialog>
       <operatn-tipo-studente-form
         v-if="showEditDialog"
         v-model="updateBody"
         :formValid.sync="updateBodyValid"
-        :tipiStudente="tipiStudente"
-        :backupValue="backupItem"
+        :tipiStudenteValues="tipiStudenteValues"
         class="mt-6"
       />
     </template>
@@ -39,15 +45,16 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import { BadRequestError, InvalidBodyError, InvalidPathParamError, NotFoundError, TipoStudente } from "operatn-api-client";
+import { Component, Mixins, Prop } from "vue-property-decorator";
+import { TipoStudente, TipiStudenteCreateBody, TipiStudenteReplaceBody } from "operatn-api-client";
 
-import { ActionTypes } from "@/store";
+import { AlertType } from "@/store";
+import ResourceManagerMixin from "@/mixins/ResourceManagerMixin";
+import TipoStudenteHandlerMixin from "@/mixins/handlers/TipoStudenteHandlerMixin";
 
 import OperatnActionDialog from "@/components/gears/dialogs/OperatnActionDialog.vue";
 import OperatnBaseResourceManager, { Column, Actions } from "@/components/gears/bases/OperatnBaseResourceManager.vue";
 import OperatnTipoStudenteForm from "@/components/gears/forms/OperatnTipoStudenteForm.vue";
-import { TipiStudenteCreateBody, TipiStudenteReplaceBody } from "operatn-api-client/api/controllers/index";
 
 @Component({
   components: {
@@ -56,21 +63,18 @@ import { TipiStudenteCreateBody, TipiStudenteReplaceBody } from "operatn-api-cli
     OperatnTipoStudenteForm,
   },
 })
-export default class TipiStudente extends Vue {
+export default class TipiStudente extends Mixins<
+  ResourceManagerMixin<TipoStudente, TipiStudenteCreateBody, TipiStudenteReplaceBody, number> & TipoStudenteHandlerMixin
+>(ResourceManagerMixin, TipoStudenteHandlerMixin) {
+  /* PROPS */
+
+  @Prop({ type: Boolean, required: true })
+  isRoot!: boolean;
+
   /* DATA */
-  private tipiStudente: TipoStudente[] = [];
 
-  private selectedValues: TipoStudente[] = [];
-  private backupItem: TipoStudente | null = null;
-
-  private showEditDialog = false;
-  private updateBodyValid = false;
-  private updateBody: TipiStudenteReplaceBody | null = null;
-  private updateId: number | null = null;
-
-  private showCreateDialog = false;
-  private createBodyValid = false;
-  private createBody: TipiStudenteCreateBody | null = null;
+  protected askDeleteText = "Sei sicuro di voler eliminare questo tipo studente?";
+  protected askDeleteMultipleText = "Sei sicuro di voler eliminare i tipi studente selezionati?";
 
   /* GETTERS AND SETTERS */
 
@@ -88,196 +92,74 @@ export default class TipiStudente extends Vue {
         groupable: false,
 
         editable: true,
-        onEditSave: (item) => this.update(item),
-        onEditOpen: (item) => this.backup(item),
+        onEditCancel: () => this.sprepareUpdateBody(),
+        onEditClose: () => {},
+        onEditSave: () => this.updateValue(),
+        onEditOpen: (item) => {
+          this.prepareUpdateBody(item);
+        },
         editInput: {
           type: "text",
           label: "Modifica",
           hint: "Premi invio per salvare",
           counter: true,
-          rules: [
-            this.$validator.requiredText("Tipo studente")
-          ],
+          rules: [this.$validator.requiredText("Tipo studente"), this.$validator.unique(this.tipiStudenteValues)],
         },
       },
     ];
   }
 
+  get tipiStudenteValues(): string[] {
+    return this.getTipiStudenteValues(this.values, this.backupValue);
+  }
+
   get actions(): Actions<TipoStudente> {
     return {
-      onEdit: (item) => this.openEditTipoStudente(item),
-      onDelete: (item) => this.askDeleteTipoStudente(item),
+      onEdit: (item) => this.openEdit(item),
+      onDelete: this.isRoot ? ((item) => this.askDelete(item)) : undefined,
     };
   }
 
   /* METHODS */
 
-  backup(item: TipoStudente): void {
-    this.backupItem = { ...item };
+  getIdFromValue(value: TipoStudente): number {
+    return value.id;
   }
 
-  async update(value: TipoStudente): Promise<void> {
-    try {
-      await this.$api.tipiStudente.replace(value.id, { tipoStudente: value.tipoStudente });
-    } catch (error) {
-      const index = this.tipiStudente.findIndex((t) => t.id === value.id);
-      this.tipiStudente.splice(index, 1, this.backupItem as TipoStudente);
-      if (error) {
-        if (error instanceof InvalidPathParamError) {
-          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, "Id tipo studente non valido");
-        } else if (error instanceof InvalidBodyError) {
-          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Dati da aggiornare del tipo studente non validi`);
-        } else if (error instanceof NotFoundError) {
-          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Tipo studente non trovato`);
-        } else if (error instanceof BadRequestError) {
-          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Richiesta non valida.`);
-        }
-      }
-    }
+  async deleteHandler(id: number, isMultiple: boolean): Promise<void> {
+    await this.deleteTipoStudente(id, isMultiple ? AlertType.ERRORS_QUEUE : AlertType.ERROR_ALERT);
   }
 
-  async deleteTipoStudente(id: number): Promise<void> {
-    try {
-      await this.$api.tipiStudente.delete(id);
-      const index = this.tipiStudente.findIndex((t) => t.id === id);
-      this.tipiStudente.splice(index, 1);
-    } catch (error) {
-      if (error) {
-        if (error instanceof InvalidPathParamError) {
-          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, "Uid tipo studente non valido");
-        } else if (error instanceof NotFoundError) {
-          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Tipo studente non trovato`);
-        } else if (error instanceof BadRequestError) {
-          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Richiesta non valida.`);
-        }
-      }
-    }
+  async createHandler(value: TipiStudenteCreateBody): Promise<number> {
+    return this.createTipoStudente(value);
   }
 
-  askDeleteTipoStudente(value: TipoStudente): void {
-    this.$store.dispatch(ActionTypes.SHOW_CONFIRM_DIALOG, {
-      text: `Sei sicuro di voler eliminare il tipo studente ${value.tipoStudente}?`,
-      callback: async (answer) => {
-        if (answer) {
-          await this.deleteTipoStudente(value.id);
-        }
-      },
-    });
+  async updateHandler(id: number, value: TipiStudenteReplaceBody, isTableEdit: boolean): Promise<void> {
+    await this.updateTipoStudente(id, value, isTableEdit ? AlertType.ERRORS_QUEUE : AlertType.ERROR_ALERT);
   }
 
-  askDeleteSelected(): void {
-    this.$store.dispatch(ActionTypes.SHOW_CONFIRM_DIALOG, {
-      text: `Sei sicuro di voler eliminare i tipi di studente selezionati?`,
-      callback: async (answer) => {
-        if (answer) {
-          for (const tipoStudente of [...this.selectedValues]) {
-            try {
-              await this.deleteTipoStudente(tipoStudente.id);
-              const index = this.selectedValues.findIndex((t) => t.id === tipoStudente.id);
-              if (index !== undefined) {
-                this.selectedValues.splice(index, 1);
-              }
-            } catch (error) {}
-          }
-        }
-      },
-    });
-  }
-
-  openCreateTipoStudente(): void {
-    this.createBodyValid = false;
-    this.showCreateDialog = true;
-  }
-  async closeCreateTipoStudente(save: boolean): Promise<void> {
-    if (!save) {
-      this.createBody = null;
-      this.showCreateDialog = false;
-      return;
-    }
-
-    if (this.createBodyValid && this.createBody) {
-      try {
-        const id = await this.$api.tipiStudente.create(this.createBody);
-
-        this.tipiStudente.push({
-          id,
-          tipoStudente: this.createBody.tipoStudente,
-        });
-
-        this.createBody = null;
-        this.showCreateDialog = false;
-      } catch (error) {
-        if (error) {
-          if (error instanceof InvalidBodyError) {
-            this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Dati del tipo di studente da creare non validi`);
-          } else if (error instanceof BadRequestError) {
-            this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Richiesta non valida`);
-          } else {
-            this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Errore del server`);
-          }
-        }
-      }
-    }
-  }
-
-  openEditTipoStudente(tipoStudente: TipoStudente): void {
-    this.updateBody = {
-      tipoStudente: tipoStudente.tipoStudente,
+  updateBodyFromValue(value: TipoStudente): TipiStudenteReplaceBody {
+    return {
+      tipoStudente: value.tipoStudente,
     };
-    this.updateId = tipoStudente.id;
-    this.updateBodyValid = false;
-    this.showEditDialog = true;
-    this.backup(tipoStudente);
   }
-  async closeEditTipoStudente(save: boolean): Promise<void> {
-    if (!save) {
-      this.updateBody = null;
-      this.updateId = null;
-      this.showEditDialog = false;
-      this.backupItem = null;
-      return;
-    }
-
-    if (this.updateBodyValid && this.updateBody) {
-      try {
-        await this.$api.tipiStudente.replace(this.updateId as number, {
-          tipoStudente: this.updateBody.tipoStudente,
-        });
-
-        const index = this.tipiStudente.findIndex((t) => t.id === this.updateId);
-        this.tipiStudente.splice(index, 1, {
-          id: this.updateId as number,
-          tipoStudente: this.updateBody.tipoStudente,
-        });
-
-        this.updateBody = null;
-        this.updateId = null;
-        this.showEditDialog = false;
-        this.backupItem = null;
-      } catch (error) {
-        if (error) {
-          if (error instanceof InvalidBodyError) {
-            this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Dati del tipo di studente da creare non validi`);
-          } else if (error instanceof BadRequestError) {
-            this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Richiesta non valida`);
-          } else {
-            this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Errore del server`);
-          }
-        }
-      }
-    }
+  tupleValueFromCreateBody(id: number, body: TipiStudenteCreateBody): TipoStudente {
+    return {
+      id,
+      tipoStudente: body.tipoStudente,
+    };
+  }
+  tupleValueFromUpdateBody(id: number, body: TipiStudenteReplaceBody): TipoStudente {
+    return {
+      id,
+      tipoStudente: body.tipoStudente,
+    };
   }
 
   /* LIFE CYCLE */
 
   async mounted() {
-    try {
-      this.tipiStudente = await this.$api.tipiStudente.getAll();
-    } catch (error) {
-      if (error) {
-        this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, "Errore: impossibile caricare i tipi di studente");
-      }
-    }
+    this.values = await this.getTipiStudente();
   }
 }
 </script>

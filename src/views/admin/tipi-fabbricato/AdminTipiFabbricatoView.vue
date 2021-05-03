@@ -1,5 +1,5 @@
 <template>
-  <tipi-fabbricato />
+  <tipi-fabbricato :isRoot="false" />
 </template>
 
 <script lang="ts">

@@ -4,6 +4,7 @@
     <router-view name="menu" />
     <router-view />
     <operatn-error-dialog v-model="showErrorDialog" :text="errorDialogText" />
+    <operatn-errors-queue v-model="errorsQueue" />
     <operatn-success-dialog v-model="showSuccessDialog" :text="successDialogText" />
     <operatn-confirm-dialog v-if="showConfirmDialog" v-model="showConfirmDialog" :text="confirmDialog.text" :callback="confirmDialog.callback" />
   </v-app>
@@ -12,6 +13,7 @@
 <script lang="ts">
 import { Component, Vue, Watch } from "vue-property-decorator";
 import OperatnErrorDialog from "@/components/gears/dialogs/OperatnErrorDialog.vue";
+import OperatnErrorsQueue from "@/components/gears/dialogs/OperatnErrorsQueue.vue";
 import OperatnSuccessDialog from "@/components/gears/dialogs/OperatnSuccessDialog.vue";
 import OperatnConfirmDialog from "@/components/gears/dialogs/OperatnConfirmDialog.vue";
 
@@ -20,6 +22,7 @@ import { ActionTypes } from "@/store";
 @Component({
   components: {
     OperatnErrorDialog,
+    OperatnErrorsQueue,
     OperatnSuccessDialog,
     OperatnConfirmDialog,
   },
@@ -62,6 +65,13 @@ export default class App extends Vue {
     if (!value) {
       this.$store.dispatch(ActionTypes.HIDE_CONFIRM_DIALOG);
     }
+  }
+
+  get errorsQueue(): string[] {
+    return this.$store.state.errorsQueue;
+  }
+  set errorsQueue(value: string[]) {
+    this.$store.dispatch(ActionTypes.SET_ERRORS_QUEUE, value);
   }
 
   get isDarkTheme(): boolean {

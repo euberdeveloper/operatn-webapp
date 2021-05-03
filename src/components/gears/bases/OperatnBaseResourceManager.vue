@@ -16,6 +16,7 @@
       :sortBy="tableSortBy"
       :showSelect="tableShowSelect"
       :multiSort="tableMultiSort"
+      :updateBody.sync="internalTableUpdateBody"
     />
 
     <!-- PLUS FAB BUTTON -->
@@ -34,6 +35,8 @@
     <!-- CREATE DIALOG -->
     <operatn-action-dialog
       :title="createDialogTitle"
+      :width="dialogWidth"
+      :widthMobile="dialogWidthMobile"
       v-model="internalCreateDialogShow"
       :disabled="createDialogDisabled"
       @cancel="createDialogCancel"
@@ -45,6 +48,8 @@
     <!-- EDIT DIALOG -->
     <operatn-action-dialog
       :title="editDialogTitle"
+      :width="dialogWidth"
+      :widthMobile="dialogWidthMobile"
       v-model="internalEditDialogShow"
       :disabled="editDialogDisabled"
       @cancel="editDialogCancel"
@@ -105,6 +110,9 @@ export default class OperatnBaseResourceManager extends Vue {
   @Prop({ type: Boolean, default: false })
   private tableMultiSort!: boolean;
 
+  @Prop({ validator: (v) => typeof v === "object" || v === null, required: true })
+  private tableUpdateBody!: any;
+
   @Prop({ type: String, required: true })
   private createDialogTitle!: string;
 
@@ -123,6 +131,12 @@ export default class OperatnBaseResourceManager extends Vue {
   @Prop({ type: Boolean, required: true })
   private editDialogDisabled!: boolean;
 
+  @Prop({ type: String, required: false })
+  dialogWidth?: string;
+
+  @Prop({ type: String, required: false })
+  dialogWidthMobile?: string;
+
   /* GETTERS AND SETTERS */
 
   get internalTableSelectedValues(): any[] {
@@ -130,6 +144,13 @@ export default class OperatnBaseResourceManager extends Vue {
   }
   set internalTableSelectedValues(value: any[]) {
     this.$emit("update:tableSelectedValues", value);
+  }
+
+  get internalTableUpdateBody(): any {
+    return this.tableUpdateBody;
+  }
+  set internalTableUpdateBody(value: any) {
+    this.$emit("update:table-update-body", value);
   }
 
   get internalCreateDialogShow(): boolean {

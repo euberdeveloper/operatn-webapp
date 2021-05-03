@@ -1,5 +1,5 @@
 <template>
-  <tipi-studente />
+  <tipi-studente isRoot />
 </template>
 
 <script lang="ts">

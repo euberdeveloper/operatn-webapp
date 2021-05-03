@@ -1,5 +1,5 @@
 <template>
-  <conti-ricavi-consumi />
+  <conti-ricavi-consumi isRoot />
 </template>
 
 <script lang="ts">

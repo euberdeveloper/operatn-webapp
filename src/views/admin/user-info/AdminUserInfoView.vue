@@ -1,5 +1,5 @@
 <template>
-    <user-info />
+    <user-info :isRoot="false" />
 </template>
 
 <script lang="ts">

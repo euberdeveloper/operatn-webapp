@@ -9,7 +9,7 @@
             name="nomeUtente"
             clearable
             prepend-icon="mdi-account"
-            :rules="[$validator.requiredText('Nome utente'), $validator.nomeUtente()]"
+            :rules="[$validator.requiredText('Nome utente'), $validator.nomeUtente(), $validator.unique(utentiNomiUtente)]"
             v-model="internalValue.nomeUtente"
           />
         </v-col>
@@ -56,9 +56,9 @@
 </template>
 
 <script lang="ts">
-import { UtentiCreateBody } from "operatn-api-client/api/controllers/utenti/index";
 import Vue from "vue";
 import { Component, Prop, Watch } from "vue-property-decorator";
+import { UtentiCreateBody } from "operatn-api-client";
 
 @Component({
   model: {
@@ -74,6 +74,9 @@ export default class OperatnUtenteCreateForm extends Vue {
 
   @Prop({ type: Boolean, default: false })
   formValid!: boolean;
+
+  @Prop({ type: Array, default: () => [] })
+  utentiNomiUtente!: string;
 
   /* DATA */
 

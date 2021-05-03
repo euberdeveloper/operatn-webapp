@@ -50,6 +50,11 @@ export default class MenuAdmin extends Vue {
       icon: "mdi-calculator-variant",
       text: "Tipi tariffa",
       path: "./tipi-tariffa",
+    },
+    {
+      icon: "mdi-office-building-outline",
+      text: "Dipartimenti UNITN",
+      path: "./dipartimenti-unitn",
     }
   ];
 }

@@ -21,9 +21,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { Component, Prop, Watch } from "vue-property-decorator";
-
-import { TipiTariffaCreateBody, TipiTariffaReplaceBody } from "operatn-api-client/api/controllers/tipi-tariffa/index";
-import { TipoTariffa } from "operatn-api-client";
+import { TipiTariffaCreateBody, TipiTariffaReplaceBody } from "operatn-api-client";
 
 @Component({
   model: {
@@ -37,14 +35,11 @@ export default class OperatnTipoTariffaForm extends Vue {
   @Prop({ type: Object, default: null })
   value!: TipiTariffaCreateBody | TipiTariffaReplaceBody;
 
-  @Prop({ type: Array, default: () => [] })
-  tipiTariffa!: TipoTariffa[];
-
-  @Prop({ type: Object, required: false })
-  backupValue!: TipoTariffa;
-
   @Prop({ type: Boolean, default: false })
   formValid!: boolean;
+
+  @Prop({ type: Array, default: () => [] })
+  tipiTariffaValues!: string[];
 
   /* GETTERS AND SETTERS */
 
@@ -60,11 +55,6 @@ export default class OperatnTipoTariffaForm extends Vue {
   }
   set internalFormValid(value) {
     this.$emit("update:formValid", value);
-  }
-
-  get tipiTariffaValues(): string[] {
-    const tipi = this.tipiTariffa.map((t) => t.tipoTariffa);
-    return this.backupValue ? tipi.filter((value) => value !== this.backupValue.tipoTariffa) : tipi;
   }
 
   /* METHODS */

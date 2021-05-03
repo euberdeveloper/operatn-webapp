@@ -21,9 +21,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { Component, Prop, Watch } from "vue-property-decorator";
-
-import { TipiStanzaCreateBody, TipiStanzaReplaceBody } from "operatn-api-client/api/controllers/tipi-stanza/index";
-import { TipoStanza } from "operatn-api-client";
+import { TipiStanzaCreateBody, TipiStanzaReplaceBody } from "operatn-api-client";
 
 @Component({
   model: {
@@ -37,14 +35,11 @@ export default class OperatnTipoStanzaForm extends Vue {
   @Prop({ type: Object, default: null })
   value!: TipiStanzaCreateBody | TipiStanzaReplaceBody;
 
-  @Prop({ type: Array, default: () => [] })
-  tipiStanza!: TipoStanza[];
-
-  @Prop({ type: Object, required: false })
-  backupValue!: TipoStanza;
-
   @Prop({ type: Boolean, default: false })
   formValid!: boolean;
+
+  @Prop({ type: Array, default: () => [] })
+  tipiStanzaValues!: string[];
 
   /* GETTERS AND SETTERS */
 
@@ -60,11 +55,6 @@ export default class OperatnTipoStanzaForm extends Vue {
   }
   set internalFormValid(value) {
     this.$emit("update:formValid", value);
-  }
-
-  get tipiStanzaValues(): string[] {
-    const tipi = this.tipiStanza.map((t) => t.tipoStanza);
-    return this.backupValue ? tipi.filter((value) => value !== this.backupValue.tipoStanza) : tipi;
   }
 
   /* METHODS */

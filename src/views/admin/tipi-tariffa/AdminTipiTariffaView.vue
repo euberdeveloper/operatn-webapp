@@ -1,5 +1,5 @@
 <template>
-  <tipi-tariffa />
+  <tipi-tariffa :isRoot="false" />
 </template>
 
 <script lang="ts">

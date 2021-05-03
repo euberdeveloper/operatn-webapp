@@ -21,9 +21,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { Component, Prop, Watch } from "vue-property-decorator";
-
-import { TipiStudenteCreateBody, TipiStudenteReplaceBody } from "operatn-api-client/api/controllers/tipi-studente/index";
-import { TipoStudente } from "operatn-api-client";
+import { TipiStudenteCreateBody, TipiStudenteReplaceBody } from "operatn-api-client";
 
 @Component({
   model: {
@@ -37,14 +35,11 @@ export default class OperatnTipoStudenteForm extends Vue {
   @Prop({ type: Object, default: null })
   value!: TipiStudenteCreateBody | TipiStudenteReplaceBody;
 
-  @Prop({ type: Array, default: () => [] })
-  tipiStudente!: TipoStudente[];
-
-  @Prop({ type: Object, required: false })
-  backupValue!: TipoStudente;
-
   @Prop({ type: Boolean, default: false })
   formValid!: boolean;
+
+  @Prop({ type: Array, default: () => [] })
+  tipiStudenteValues!: string[];
 
   /* GETTERS AND SETTERS */
 
@@ -60,11 +55,6 @@ export default class OperatnTipoStudenteForm extends Vue {
   }
   set internalFormValid(value) {
     this.$emit("update:formValid", value);
-  }
-
-  get tipiStudenteValues(): string[] {
-    const tipi = this.tipiStudente.map((t) => t.tipoStudente);
-    return this.backupValue ? tipi.filter((value) => value !== this.backupValue.tipoStudente) : tipi;
   }
 
   /* METHODS */

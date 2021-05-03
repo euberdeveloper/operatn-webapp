@@ -1,5 +1,5 @@
 <template>
-    <quietanzianti />
+    <quietanzianti :isRoot="false" />
 </template>
 
 <script lang="ts">

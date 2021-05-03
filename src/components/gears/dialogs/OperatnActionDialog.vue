@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="internalShow" persistent :width="$vuetify.breakpoint.smAndDown ? '80vw' : '50vw'">
+  <v-dialog v-model="internalShow" persistent :width="$vuetify.breakpoint.smAndDown ? widthMobile : width">
       <v-card>
         <v-toolbar :color="color" dark>
           <v-toolbar-title>{{title}}</v-toolbar-title>
@@ -46,6 +46,12 @@ export default class OperatnActionDialog extends Vue {
 
   @Prop({ type: Boolean, required: true })
   disabled!: boolean;
+
+  @Prop({ type: String, default: '50vw' })
+  width!: string;
+
+  @Prop({ type: String, default: '80vw' })
+  widthMobile!: string;
 
   /* GETTERS AND SETTERS */
 

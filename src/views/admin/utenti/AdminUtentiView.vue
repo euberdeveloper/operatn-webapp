@@ -1,5 +1,5 @@
 <template>
-    <utenti />
+    <utenti :isRoot="false" />
 </template>
 
 <script lang="ts">

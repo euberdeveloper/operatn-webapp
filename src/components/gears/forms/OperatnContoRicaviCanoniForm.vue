@@ -34,9 +34,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { Component, Prop, Watch } from "vue-property-decorator";
-
-import { ContiRicaviCanoniCreateBody, ContiRicaviCanoniReplaceBody } from "operatn-api-client/api/controllers/conti-ricavi-canoni/index";
-import { ContoRicaviCanoni } from "operatn-api-client";
+import { ContiRicaviCanoniCreateBody, ContiRicaviCanoniReplaceBody } from "operatn-api-client";
 
 @Component({
   model: {
@@ -50,14 +48,14 @@ export default class OperatnContoRicaviCanoniForm extends Vue {
   @Prop({ type: Object, default: null })
   value!: ContiRicaviCanoniCreateBody | ContiRicaviCanoniReplaceBody;
 
-  @Prop({ type: Array, default: () => [] })
-  contiRicaviCanoni!: ContoRicaviCanoni[];
-
-  @Prop({ type: Object, required: false })
-  backupValue!: ContoRicaviCanoni;
-
   @Prop({ type: Boolean, default: false })
   formValid!: boolean;
+
+  @Prop({ type: Array, default: () => [] })
+  contiRicaviCanoniCodici!: string[];
+
+  @Prop({ type: Array, default: () => [] })
+  contiRicaviCanoniValues!: string[];
 
   /* GETTERS AND SETTERS */
 
@@ -73,15 +71,6 @@ export default class OperatnContoRicaviCanoniForm extends Vue {
   }
   set internalFormValid(value) {
     this.$emit("update:formValid", value);
-  }
-
-  get contiRicaviCanoniCodici(): string[] {
-    const codici = this.contiRicaviCanoni.map((q) => q.codice);
-    return this.backupValue ? codici.filter((value) => value !== this.backupValue.codice) : codici;
-  }
-  get contiRicaviCanoniValues(): string[] {
-    const values = this.contiRicaviCanoni.map((q) => q.contoRicaviCanoni);
-    return this.backupValue ? values.filter((value) => value !== this.backupValue.contoRicaviCanoni) : values;
   }
 
   /* METHODS */

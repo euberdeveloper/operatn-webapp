@@ -6,32 +6,38 @@
     :tableSelectedValues.sync="selectedValues"
     :tableColumns="columns"
     :tableActions="actions"
-    :tableValues="tipiStanza"
+    :tableValues="values"
     tableItemKey="id"
-    tableShowSelect
+    :tableShowSelect="isRoot"
+    :tableUpdateBody.sync="updateBody"
     createDialogTitle="Nuovo tipo stanza"
     :createDialogShow.sync="showCreateDialog"
     :createDialogDisabled="!createBodyValid"
     editDialogTitle="Modifica tipo stanza"
     :editDialogShow.sync="showEditDialog"
     :editDialogDisabled="!updateBodyValid"
-    @fabCreateClick="openCreateTipoStanza"
-    @fabDeleteClick="askDeleteSelected"
-    @createDialogConfirm="closeCreateTipoStanza(true)"
-    @createDialogCancel="closeCreateTipoStanza(false)"
-    @editDialogConfirm="closeEditTipoStanza(true)"
-    @editDialogCancel="closeEditTipoStanza(false)"
+    @fabCreateClick="openCreate"
+    @fabDeleteClick="askDeleteMultiple"
+    @createDialogConfirm="closeCreate(true)"
+    @createDialogCancel="closeCreate(false)"
+    @editDialogConfirm="closeEdit(true)"
+    @editDialogCancel="closeEdit(false)"
   >
     <template v-slot:createDialog>
-      <operatn-tipo-stanza-form v-if="showCreateDialog" v-model="createBody" :formValid.sync="createBodyValid" :tipiStanza="tipiStanza" class="mt-6" />
+      <operatn-tipo-stanza-form
+        v-if="showCreateDialog"
+        v-model="createBody"
+        :formValid.sync="createBodyValid"
+        :tipiStanzaValues="tipiStanzaValues"
+        class="mt-6"
+      />
     </template>
     <template v-slot:editDialog>
       <operatn-tipo-stanza-form
         v-if="showEditDialog"
         v-model="updateBody"
         :formValid.sync="updateBodyValid"
-        :tipiStanza="tipiStanza"
-        :backupValue="backupItem"
+        :tipiStanzaValues="tipiStanzaValues"
         class="mt-6"
       />
     </template>
@@ -39,15 +45,16 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import { BadRequestError, InvalidBodyError, InvalidPathParamError, NotFoundError, TipoStanza } from "operatn-api-client";
+import { Component, Mixins, Prop } from "vue-property-decorator";
+import { TipoStanza, TipiStanzaCreateBody, TipiStanzaReplaceBody } from "operatn-api-client";
 
-import { ActionTypes } from "@/store";
+import { AlertType } from "@/store";
+import ResourceManagerMixin from "@/mixins/ResourceManagerMixin";
+import TipoStanzaHandlerMixin from "@/mixins/handlers/TipoStanzaHandlerMixin";
 
 import OperatnActionDialog from "@/components/gears/dialogs/OperatnActionDialog.vue";
 import OperatnBaseResourceManager, { Column, Actions } from "@/components/gears/bases/OperatnBaseResourceManager.vue";
 import OperatnTipoStanzaForm from "@/components/gears/forms/OperatnTipoStanzaForm.vue";
-import { TipiStanzaCreateBody, TipiStanzaReplaceBody } from "operatn-api-client/api/controllers/index";
 
 @Component({
   components: {
@@ -56,21 +63,18 @@ import { TipiStanzaCreateBody, TipiStanzaReplaceBody } from "operatn-api-client/
     OperatnTipoStanzaForm,
   },
 })
-export default class TipiStanza extends Vue {
+export default class TipiStanza extends Mixins<
+  ResourceManagerMixin<TipoStanza, TipiStanzaCreateBody, TipiStanzaReplaceBody, number> & TipoStanzaHandlerMixin
+>(ResourceManagerMixin, TipoStanzaHandlerMixin) {
+  /* PROPS */
+
+  @Prop({ type: Boolean, required: true })
+  isRoot!: boolean;
+
   /* DATA */
-  private tipiStanza: TipoStanza[] = [];
 
-  private selectedValues: TipoStanza[] = [];
-  private backupItem: TipoStanza | null = null;
-
-  private showEditDialog = false;
-  private updateBodyValid = false;
-  private updateBody: TipiStanzaReplaceBody | null = null;
-  private updateId: number | null = null;
-
-  private showCreateDialog = false;
-  private createBodyValid = false;
-  private createBody: TipiStanzaCreateBody | null = null;
+  protected askDeleteText = "Sei sicuro di voler eliminare questo tipo stanza?";
+  protected askDeleteMultipleText = "Sei sicuro di voler eliminare i tipi stanza selezionati?";
 
   /* GETTERS AND SETTERS */
 
@@ -88,196 +92,74 @@ export default class TipiStanza extends Vue {
         groupable: false,
 
         editable: true,
-        onEditSave: (item) => this.update(item),
-        onEditOpen: (item) => this.backup(item),
+        onEditCancel: () => this.sprepareUpdateBody(),
+        onEditClose: () => {},
+        onEditSave: () => this.updateValue(),
+        onEditOpen: (item) => {
+          this.prepareUpdateBody(item);
+        },
         editInput: {
           type: "text",
           label: "Modifica",
           hint: "Premi invio per salvare",
           counter: true,
-          rules: [
-            this.$validator.requiredText("Tipo stanza")
-          ],
+          rules: [this.$validator.requiredText("Tipo stanza"), this.$validator.unique(this.tipiStanzaValues)],
         },
       },
     ];
   }
 
+  get tipiStanzaValues(): string[] {
+    return this.getTipiStanzaValues(this.values, this.backupValue);
+  }
+
   get actions(): Actions<TipoStanza> {
     return {
-      onEdit: (item) => this.openEditTipoStanza(item),
-      onDelete: (item) => this.askDeleteTipoStanza(item),
+      onEdit: (item) => this.openEdit(item),
+      onDelete: this.isRoot ? ((item) => this.askDelete(item)) : undefined,
     };
   }
 
   /* METHODS */
 
-  backup(item: TipoStanza): void {
-    this.backupItem = { ...item };
+  getIdFromValue(value: TipoStanza): number {
+    return value.id;
   }
 
-  async update(value: TipoStanza): Promise<void> {
-    try {
-      await this.$api.tipiStanza.replace(value.id, { tipoStanza: value.tipoStanza });
-    } catch (error) {
-      const index = this.tipiStanza.findIndex((t) => t.id === value.id);
-      this.tipiStanza.splice(index, 1, this.backupItem as TipoStanza);
-      if (error) {
-        if (error instanceof InvalidPathParamError) {
-          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, "Id tipo stanza non valido");
-        } else if (error instanceof InvalidBodyError) {
-          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Dati da aggiornare del tipo stanza non validi`);
-        } else if (error instanceof NotFoundError) {
-          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Tipo stanza non trovato`);
-        } else if (error instanceof BadRequestError) {
-          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Richiesta non valida.`);
-        }
-      }
-    }
+  async deleteHandler(id: number, isMultiple: boolean): Promise<void> {
+    await this.deleteTipoStanza(id, isMultiple ? AlertType.ERRORS_QUEUE : AlertType.ERROR_ALERT);
   }
 
-  async deleteTipoStanza(id: number): Promise<void> {
-    try {
-      await this.$api.tipiStanza.delete(id);
-      const index = this.tipiStanza.findIndex((t) => t.id === id);
-      this.tipiStanza.splice(index, 1);
-    } catch (error) {
-      if (error) {
-        if (error instanceof InvalidPathParamError) {
-          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, "Uid tipo stanza non valido");
-        } else if (error instanceof NotFoundError) {
-          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Tipo stanza non trovato`);
-        } else if (error instanceof BadRequestError) {
-          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Richiesta non valida.`);
-        }
-      }
-    }
+  async createHandler(value: TipiStanzaCreateBody): Promise<number> {
+    return this.createTipoStanza(value);
   }
 
-  askDeleteTipoStanza(value: TipoStanza): void {
-    this.$store.dispatch(ActionTypes.SHOW_CONFIRM_DIALOG, {
-      text: `Sei sicuro di voler eliminare il tipo stanza ${value.tipoStanza}?`,
-      callback: async (answer) => {
-        if (answer) {
-          await this.deleteTipoStanza(value.id);
-        }
-      },
-    });
+  async updateHandler(id: number, value: TipiStanzaReplaceBody, isTableEdit: boolean): Promise<void> {
+    await this.updateTipoStanza(id, value, isTableEdit ? AlertType.ERRORS_QUEUE : AlertType.ERROR_ALERT);
   }
 
-  askDeleteSelected(): void {
-    this.$store.dispatch(ActionTypes.SHOW_CONFIRM_DIALOG, {
-      text: `Sei sicuro di voler eliminare i tipi di stanza selezionati?`,
-      callback: async (answer) => {
-        if (answer) {
-          for (const tipoStanza of [...this.selectedValues]) {
-            try {
-              await this.deleteTipoStanza(tipoStanza.id);
-              const index = this.selectedValues.findIndex((t) => t.id === tipoStanza.id);
-              if (index !== undefined) {
-                this.selectedValues.splice(index, 1);
-              }
-            } catch (error) {}
-          }
-        }
-      },
-    });
-  }
-
-  openCreateTipoStanza(): void {
-    this.createBodyValid = false;
-    this.showCreateDialog = true;
-  }
-  async closeCreateTipoStanza(save: boolean): Promise<void> {
-    if (!save) {
-      this.createBody = null;
-      this.showCreateDialog = false;
-      return;
-    }
-
-    if (this.createBodyValid && this.createBody) {
-      try {
-        const id = await this.$api.tipiStanza.create(this.createBody);
-
-        this.tipiStanza.push({
-          id,
-          tipoStanza: this.createBody.tipoStanza,
-        });
-
-        this.createBody = null;
-        this.showCreateDialog = false;
-      } catch (error) {
-        if (error) {
-          if (error instanceof InvalidBodyError) {
-            this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Dati del tipo di stanza da creare non validi`);
-          } else if (error instanceof BadRequestError) {
-            this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Richiesta non valida`);
-          } else {
-            this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Errore del server`);
-          }
-        }
-      }
-    }
-  }
-
-  openEditTipoStanza(tipoStanza: TipoStanza): void {
-    this.updateBody = {
-      tipoStanza: tipoStanza.tipoStanza,
+  updateBodyFromValue(value: TipoStanza): TipiStanzaReplaceBody {
+    return {
+      tipoStanza: value.tipoStanza,
     };
-    this.updateId = tipoStanza.id;
-    this.updateBodyValid = false;
-    this.showEditDialog = true;
-    this.backup(tipoStanza);
   }
-  async closeEditTipoStanza(save: boolean): Promise<void> {
-    if (!save) {
-      this.updateBody = null;
-      this.updateId = null;
-      this.showEditDialog = false;
-      this.backupItem = null;
-      return;
-    }
-
-    if (this.updateBodyValid && this.updateBody) {
-      try {
-        await this.$api.tipiStanza.replace(this.updateId as number, {
-          tipoStanza: this.updateBody.tipoStanza,
-        });
-
-        const index = this.tipiStanza.findIndex((t) => t.id === this.updateId);
-        this.tipiStanza.splice(index, 1, {
-          id: this.updateId as number,
-          tipoStanza: this.updateBody.tipoStanza,
-        });
-
-        this.updateBody = null;
-        this.updateId = null;
-        this.showEditDialog = false;
-        this.backupItem = null;
-      } catch (error) {
-        if (error) {
-          if (error instanceof InvalidBodyError) {
-            this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Dati del tipo di stanza da creare non validi`);
-          } else if (error instanceof BadRequestError) {
-            this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Richiesta non valida`);
-          } else {
-            this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Errore del server`);
-          }
-        }
-      }
-    }
+  tupleValueFromCreateBody(id: number, body: TipiStanzaCreateBody): TipoStanza {
+    return {
+      id,
+      tipoStanza: body.tipoStanza,
+    };
+  }
+  tupleValueFromUpdateBody(id: number, body: TipiStanzaReplaceBody): TipoStanza {
+    return {
+      id,
+      tipoStanza: body.tipoStanza,
+    };
   }
 
   /* LIFE CYCLE */
 
   async mounted() {
-    try {
-      this.tipiStanza = await this.$api.tipiStanza.getAll();
-    } catch (error) {
-      if (error) {
-        this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, "Errore: impossibile caricare i tipi di stanza");
-      }
-    }
+    this.values = await this.getTipiStanza();
   }
 }
 </script>

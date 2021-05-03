@@ -8,6 +8,9 @@ import { State } from './state'
 import { Mutations, MutationTypes } from './mutations'
 
 export enum ActionTypes {
+    ALERT = 'ALERT',
+    ADD_ERROR_TO_QUEUE = 'ADD_ERROR_TO_QUEUE',
+    SET_ERRORS_QUEUE = 'SET_ERRORS_QUEUE',
     HIDE_ERROR_DIALOG = 'HIDE_ERROR_DIALOG',
     SHOW_ERROR_DIALOG = 'SHOW_ERROR_DIALOG',
     HIDE_SUCCESS_DIALOG = 'HIDE_SUCCESS_DIALOG',
@@ -35,6 +38,9 @@ type AugmentedActionContext = {
 } & Omit<ActionContext<State, State>, 'commit'>
 
 export interface Actions {
+    [ActionTypes.ALERT]({ dispatch }: AugmentedActionContext, payload: { message: string, alertType?: AlertType }): void;
+    [ActionTypes.ADD_ERROR_TO_QUEUE]({ commit }: AugmentedActionContext, text: string): void;
+    [ActionTypes.SET_ERRORS_QUEUE]({ commit }: AugmentedActionContext, queue: string[]): void;
     [ActionTypes.HIDE_ERROR_DIALOG]({ commit }: AugmentedActionContext): void;
     [ActionTypes.SHOW_ERROR_DIALOG]({ commit }: AugmentedActionContext, text: string): void;
     [ActionTypes.HIDE_SUCCESS_DIALOG]({ commit }: AugmentedActionContext): void;
@@ -46,7 +52,7 @@ export interface Actions {
     [ActionTypes.LOGIN]({ commit }: AugmentedActionContext, body: AuthLoginBody): Promise<void>;
     [ActionTypes.LOGOUT]({ commit }: AugmentedActionContext): void;
     [ActionTypes.TOGGLE_MENU]({ commit }: AugmentedActionContext): void;
-    [ActionTypes.HANDLE_API_ERROR]({ commit }: AugmentedActionContext, error: Error): void;
+    [ActionTypes.HANDLE_API_ERROR]({ commit }: AugmentedActionContext, error: { error: Error, config: any }): void;
     [ActionTypes.TOGGLE_DARK_THEME]({ commit }: AugmentedActionContext): void;
     [ActionTypes.CHANGE_PRIMARY_COLOUR]({ commit }: AugmentedActionContext, colour: string | null): void;
     [ActionTypes.RETRIEVE_DARK_THEME]({ commit }: AugmentedActionContext): void;
@@ -54,7 +60,31 @@ export interface Actions {
     [ActionTypes.STARTUP]({ commit }: AugmentedActionContext): Promise<void>;
 }
 
+export enum AlertType {
+    NONE,
+    ERROR_ALERT,
+    ERRORS_QUEUE,
+}
+
 export const actions: ActionTree<State, State> & Actions = {
+    [ActionTypes.ALERT]({ dispatch }, { message, alertType }) {
+        switch (alertType) {
+            case AlertType.ERROR_ALERT:
+                dispatch(ActionTypes.SHOW_ERROR_DIALOG, message);
+                break;
+            case AlertType.ERRORS_QUEUE:
+                dispatch(ActionTypes.ADD_ERROR_TO_QUEUE, message);
+                break;
+            default:
+                break;
+        }
+    },
+    [ActionTypes.ADD_ERROR_TO_QUEUE]({ commit }, text) {
+        commit(MutationTypes.ADD_ERROR_TO_QUEUE, text);
+    },
+    [ActionTypes.SET_ERRORS_QUEUE]({ commit }, queue) {
+        commit(MutationTypes.SET_ERRORS_QUEUE, queue);
+    },
     [ActionTypes.HIDE_ERROR_DIALOG]({ commit }) {
         commit(MutationTypes.SET_ERROR_DIALOG_TEXT, null);
     },
@@ -111,36 +141,45 @@ export const actions: ActionTree<State, State> & Actions = {
     [ActionTypes.TOGGLE_MENU]({ commit, state }) {
         commit(MutationTypes.SET_SHOW_MENU, !state.showMenu);
     },
-    [ActionTypes.HANDLE_API_ERROR]({ dispatch }, error) {
-        console.error(error);
-        if (error instanceof ApiError) {
-            if (error.code === 401 && !(error instanceof InvalidCredentialsError)) {
-                dispatch(ActionTypes.SHOW_ERROR_DIALOG, 'Utente non autenticato');
-                throw null;
+    [ActionTypes.HANDLE_API_ERROR]({ dispatch }, err) {
+        const { error, config } = err;
+
+        if (!config.noLog) {
+            console.error(error);
+        }
+
+        if (!config.noHandle) {
+            const alertType = config.alertType ?? AlertType.ERROR_ALERT;
+            if (error instanceof ApiError) {
+                if (error.code === 401 && !(error instanceof InvalidCredentialsError)) {
+                    dispatch(ActionTypes.ALERT, { message: 'Utente non autenticato', alertType });
+                    throw null;
+                }
+                else if (error.code === 403) {
+                    dispatch(ActionTypes.ALERT, { message: `L'utente non ha i permessi per eseguire l'azione`, alertType });
+                    throw null;
+                }
+                else if (error instanceof UnknownApiError) {
+                    dispatch(ActionTypes.ALERT, { message: `Errore generico del server`, alertType });
+                    throw null;
+                }
+                else {
+                    throw error;
+                }
             }
-            else if (error.code === 403) {
-                dispatch(ActionTypes.SHOW_ERROR_DIALOG, `L'utente non ha i permessi per eseguire l'azione`);
-                throw null;
+            else if (error instanceof RequestError) {
+                dispatch(ActionTypes.ALERT, { message: `Il server non risponde, controllare di essere connessi al WI-FI`, alertType });
+                throw null
             }
-            else if (error instanceof UnknownApiError) {
-                dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Errore generico del server`);
-                throw null;
+            else if (error instanceof ClientError) {
+                dispatch(ActionTypes.ALERT, { message: `Errore generico del client`, alertType });
+                throw null
             }
             else {
                 throw error;
             }
         }
-        else if (error instanceof RequestError) {
-            dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Il server non risponde, controllare di essere connessi al WI-FI`);
-            throw null
-        }
-        else if (error instanceof ClientError) {
-            dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Errore generico del client`);
-            throw null
-        }
-        else {
-            throw error;
-        }
+
     },
     [ActionTypes.TOGGLE_DARK_THEME]({ commit, state }) {
         if (state.darkTheme) {

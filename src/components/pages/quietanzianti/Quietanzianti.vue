@@ -1,37 +1,43 @@
 <template>
   <operatn-base-resource-manager
     title="Quietanzianti"
-    description="Gestione dei quietanzianti dell'opera. Attenzione, eliminare un quietanziante elimina a cascata tutti i contratti ad esso associati."
+    description="Gestione dei quietanzianti dell'opera. Attenzione, eliminare un quietanziante elimina a cascata tutti i fabbricati ed i contratti ad esso associati."
     tableTitle="Quietanzianti"
     :tableSelectedValues.sync="selectedValues"
     :tableColumns="columns"
     :tableActions="actions"
-    :tableValues="quietanzianti"
+    :tableValues="values"
     tableItemKey="id"
-    tableShowSelect
+    :tableShowSelect="isRoot"
+    :tableUpdateBody.sync="updateBody"
     createDialogTitle="Nuovo quietanziante"
     :createDialogShow.sync="showCreateDialog"
     :createDialogDisabled="!createBodyValid"
     editDialogTitle="Modifica quietanziante"
     :editDialogShow.sync="showEditDialog"
     :editDialogDisabled="!updateBodyValid"
-    @fabCreateClick="openCreateQuietanziante"
-    @fabDeleteClick="askDeleteSelected"
-    @createDialogConfirm="closeCreateQuietanziante(true)"
-    @createDialogCancel="closeCreateQuietanziante(false)"
-    @editDialogConfirm="closeEditQuietanziante(true)"
-    @editDialogCancel="closeEditQuietanziante(false)"
+    @fabCreateClick="openCreate"
+    @fabDeleteClick="askDeleteMultiple"
+    @createDialogConfirm="closeCreate(true)"
+    @createDialogCancel="closeCreate(false)"
+    @editDialogConfirm="closeEdit(true)"
+    @editDialogCancel="closeEdit(false)"
   >
     <template v-slot:createDialog>
-      <operatn-quietanziante-form v-if="showCreateDialog" v-model="createBody" :formValid.sync="createBodyValid" :quietanzianti="quietanzianti" class="mt-6" />
+      <operatn-quietanziante-form
+        v-if="showCreateDialog"
+        v-model="createBody"
+        :formValid.sync="createBodyValid"
+        :quietanziantiValues="quietanziantiValues"
+        class="mt-6"
+      />
     </template>
     <template v-slot:editDialog>
       <operatn-quietanziante-form
         v-if="showEditDialog"
         v-model="updateBody"
         :formValid.sync="updateBodyValid"
-        :quietanzianti="quietanzianti"
-        :backupValue="backupItem"
+        :quietanziantiValues="quietanziantiValues"
         class="mt-6"
       />
     </template>
@@ -39,15 +45,16 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import { BadRequestError, InvalidBodyError, InvalidPathParamError, NotFoundError, Quietanziante } from "operatn-api-client";
+import { Component, Mixins, Prop } from "vue-property-decorator";
+import { Quietanziante, QuietanziantiCreateBody, QuietanziantiReplaceBody } from "operatn-api-client";
 
-import { ActionTypes } from "@/store";
+import { AlertType } from "@/store";
+import ResourceManagerMixin from "@/mixins/ResourceManagerMixin";
+import QuietanzianteHandlerMixin from "@/mixins/handlers/QuietanzianteHandlerMixin";
 
 import OperatnActionDialog from "@/components/gears/dialogs/OperatnActionDialog.vue";
 import OperatnBaseResourceManager, { Column, Actions } from "@/components/gears/bases/OperatnBaseResourceManager.vue";
 import OperatnQuietanzianteForm from "@/components/gears/forms/OperatnQuietanzianteForm.vue";
-import { QuietanziantiCreateBody, QuietanziantiReplaceBody } from "operatn-api-client/api/controllers/index";
 
 @Component({
   components: {
@@ -56,21 +63,18 @@ import { QuietanziantiCreateBody, QuietanziantiReplaceBody } from "operatn-api-c
     OperatnQuietanzianteForm,
   },
 })
-export default class Quietanzianti extends Vue {
+export default class Quietanzianti extends Mixins<
+  ResourceManagerMixin<Quietanziante, QuietanziantiCreateBody, QuietanziantiReplaceBody, number> & QuietanzianteHandlerMixin
+>(ResourceManagerMixin, QuietanzianteHandlerMixin) {
+  /* PROPS */
+
+  @Prop({ type: Boolean, required: true })
+  isRoot!: boolean;
+
   /* DATA */
-  private quietanzianti: Quietanziante[] = [];
 
-  private selectedValues: Quietanziante[] = [];
-  private backupItem: Quietanziante | null = null;
-
-  private showEditDialog = false;
-  private updateBodyValid = false;
-  private updateBody: QuietanziantiReplaceBody | null = null;
-  private updateId: number | null = null;
-
-  private showCreateDialog = false;
-  private createBodyValid = false;
-  private createBody: QuietanziantiCreateBody | null = null;
+  protected askDeleteText = "Sei sicuro di voler eliminare questo quietanziante?";
+  protected askDeleteMultipleText = "Sei sicuro di voler eliminare i quietanzianti selezionati?";
 
   /* GETTERS AND SETTERS */
 
@@ -88,196 +92,74 @@ export default class Quietanzianti extends Vue {
         groupable: false,
 
         editable: true,
-        onEditSave: (item) => this.update(item),
-        onEditOpen: (item) => this.backup(item),
+        onEditCancel: () => this.sprepareUpdateBody(),
+        onEditClose: () => {},
+        onEditSave: () => this.updateValue(),
+        onEditOpen: (item) => {
+          this.prepareUpdateBody(item);
+        },
         editInput: {
           type: "text",
           label: "Modifica",
           hint: "Premi invio per salvare",
           counter: true,
-          rules: [
-            this.$validator.requiredText("Quietanziante")
-          ],
+          rules: [this.$validator.requiredText("Quietanziante"), this.$validator.unique(this.quietanziantiValues)],
         },
       },
     ];
   }
 
+  get quietanziantiValues(): string[] {
+    return this.getQuietanziantiValues(this.values, this.backupValue);
+  }
+
   get actions(): Actions<Quietanziante> {
     return {
-      onEdit: (item) => this.openEditQuietanziante(item),
-      onDelete: (item) => this.askDeleteQuietanziante(item),
+      onEdit: (item) => this.openEdit(item),
+      onDelete: this.isRoot ? ((item) => this.askDelete(item)) : undefined,
     };
   }
 
   /* METHODS */
 
-  backup(item: Quietanziante): void {
-    this.backupItem = { ...item };
+  getIdFromValue(value: Quietanziante): number {
+    return value.id;
   }
 
-  async update(value: Quietanziante): Promise<void> {
-    try {
-      await this.$api.quietanzianti.replace(value.id, { quietanziante: value.quietanziante });
-    } catch (error) {
-      const index = this.quietanzianti.findIndex((t) => t.id === value.id);
-      this.quietanzianti.splice(index, 1, this.backupItem as Quietanziante);
-      if (error) {
-        if (error instanceof InvalidPathParamError) {
-          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, "Id quietanziante non valido");
-        } else if (error instanceof InvalidBodyError) {
-          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Dati da aggiornare del quietanziante non validi`);
-        } else if (error instanceof NotFoundError) {
-          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Quietanziante non trovato`);
-        } else if (error instanceof BadRequestError) {
-          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Richiesta non valida.`);
-        }
-      }
-    }
+  async deleteHandler(id: number, isMultiple: boolean): Promise<void> {
+    await this.deleteQuietanziante(id, isMultiple ? AlertType.ERRORS_QUEUE : AlertType.ERROR_ALERT);
   }
 
-  async deleteQuietanziante(id: number): Promise<void> {
-    try {
-      await this.$api.quietanzianti.delete(id);
-      const index = this.quietanzianti.findIndex((t) => t.id === id);
-      this.quietanzianti.splice(index, 1);
-    } catch (error) {
-      if (error) {
-        if (error instanceof InvalidPathParamError) {
-          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, "Uid quietanziante non valido");
-        } else if (error instanceof NotFoundError) {
-          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Quietanziante non trovato`);
-        } else if (error instanceof BadRequestError) {
-          this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Richiesta non valida.`);
-        }
-      }
-    }
+  async createHandler(value: QuietanziantiCreateBody): Promise<number> {
+    return this.createQuietanziante(value);
   }
 
-  askDeleteQuietanziante(value: Quietanziante): void {
-    this.$store.dispatch(ActionTypes.SHOW_CONFIRM_DIALOG, {
-      text: `Sei sicuro di voler eliminare il quietanziante ${value.quietanziante}?`,
-      callback: async (answer) => {
-        if (answer) {
-          await this.deleteQuietanziante(value.id);
-        }
-      },
-    });
+  async updateHandler(id: number, value: QuietanziantiReplaceBody, isTableEdit: boolean): Promise<void> {
+    await this.updateQuietanziante(id, value, isTableEdit ? AlertType.ERRORS_QUEUE : AlertType.ERROR_ALERT);
   }
 
-  askDeleteSelected(): void {
-    this.$store.dispatch(ActionTypes.SHOW_CONFIRM_DIALOG, {
-      text: `Sei sicuro di voler eliminare i quietanzianti selezionati?`,
-      callback: async (answer) => {
-        if (answer) {
-          for (const quietanziante of [...this.selectedValues]) {
-            try {
-              await this.deleteQuietanziante(quietanziante.id);
-              const index = this.selectedValues.findIndex((t) => t.id === quietanziante.id);
-              if (index !== undefined) {
-                this.selectedValues.splice(index, 1);
-              }
-            } catch (error) {}
-          }
-        }
-      },
-    });
-  }
-
-  openCreateQuietanziante(): void {
-    this.createBodyValid = false;
-    this.showCreateDialog = true;
-  }
-  async closeCreateQuietanziante(save: boolean): Promise<void> {
-    if (!save) {
-      this.createBody = null;
-      this.showCreateDialog = false;
-      return;
-    }
-
-    if (this.createBodyValid && this.createBody) {
-      try {
-        const id = await this.$api.quietanzianti.create(this.createBody);
-
-        this.quietanzianti.push({
-          id,
-          quietanziante: this.createBody.quietanziante,
-        });
-
-        this.createBody = null;
-        this.showCreateDialog = false;
-      } catch (error) {
-        if (error) {
-          if (error instanceof InvalidBodyError) {
-            this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Dati del quietanziante da creare non validi`);
-          } else if (error instanceof BadRequestError) {
-            this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Richiesta non valida`);
-          } else {
-            this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Errore del server`);
-          }
-        }
-      }
-    }
-  }
-
-  openEditQuietanziante(quietanziante: Quietanziante): void {
-    this.updateBody = {
-      quietanziante: quietanziante.quietanziante,
+  updateBodyFromValue(value: Quietanziante): QuietanziantiReplaceBody {
+    return {
+      quietanziante: value.quietanziante,
     };
-    this.updateId = quietanziante.id;
-    this.updateBodyValid = false;
-    this.showEditDialog = true;
-    this.backup(quietanziante);
   }
-  async closeEditQuietanziante(save: boolean): Promise<void> {
-    if (!save) {
-      this.updateBody = null;
-      this.updateId = null;
-      this.showEditDialog = false;
-      this.backupItem = null;
-      return;
-    }
-
-    if (this.updateBodyValid && this.updateBody) {
-      try {
-        await this.$api.quietanzianti.replace(this.updateId as number, {
-          quietanziante: this.updateBody.quietanziante,
-        });
-
-        const index = this.quietanzianti.findIndex((t) => t.id === this.updateId);
-        this.quietanzianti.splice(index, 1, {
-          id: this.updateId as number,
-          quietanziante: this.updateBody.quietanziante,
-        });
-
-        this.updateBody = null;
-        this.updateId = null;
-        this.showEditDialog = false;
-        this.backupItem = null;
-      } catch (error) {
-        if (error) {
-          if (error instanceof InvalidBodyError) {
-            this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Dati del quietanziante da creare non validi`);
-          } else if (error instanceof BadRequestError) {
-            this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Richiesta non valida`);
-          } else {
-            this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `Errore del server`);
-          }
-        }
-      }
-    }
+  tupleValueFromCreateBody(id: number, body: QuietanziantiCreateBody): Quietanziante {
+    return {
+      id,
+      quietanziante: body.quietanziante,
+    };
+  }
+  tupleValueFromUpdateBody(id: number, body: QuietanziantiReplaceBody): Quietanziante {
+    return {
+      id,
+      quietanziante: body.quietanziante,
+    };
   }
 
   /* LIFE CYCLE */
 
   async mounted() {
-    try {
-      this.quietanzianti = await this.$api.quietanzianti.getAll();
-    } catch (error) {
-      if (error) {
-        this.$store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, "Errore: impossibile caricare i quietanzianti");
-      }
-    }
+    this.values = await this.getQuietanzianti();
   }
 }
 </script>

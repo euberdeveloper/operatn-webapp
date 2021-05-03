@@ -1,5 +1,5 @@
 <template>
-  <tipi-studente />
+  <tipi-studente :isRoot="false" />
 </template>
 
 <script lang="ts">

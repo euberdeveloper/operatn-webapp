@@ -21,9 +21,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { Component, Prop, Watch } from "vue-property-decorator";
-
-import { TipiFabbricatoCreateBody, TipiFabbricatoReplaceBody } from "operatn-api-client/api/controllers/tipi-fabbricato/index";
-import { TipoFabbricato } from "operatn-api-client";
+import { TipiFabbricatoCreateBody, TipiFabbricatoReplaceBody, TipoFabbricato } from "operatn-api-client";
 
 @Component({
   model: {
@@ -37,14 +35,11 @@ export default class OperatnTipoFabbricatoForm extends Vue {
   @Prop({ type: Object, default: null })
   value!: TipiFabbricatoCreateBody | TipiFabbricatoReplaceBody;
 
-  @Prop({ type: Array, default: () => [] })
-  tipiFabbricato!: TipoFabbricato[];
-
-  @Prop({ type: Object, required: false })
-  backupValue!: TipoFabbricato;
-
   @Prop({ type: Boolean, default: false })
   formValid!: boolean;
+
+  @Prop({ type: Array, default: () => [] })
+  tipiFabbricatoValues!: TipoFabbricato[];
 
   /* GETTERS AND SETTERS */
 
@@ -60,11 +55,6 @@ export default class OperatnTipoFabbricatoForm extends Vue {
   }
   set internalFormValid(value) {
     this.$emit("update:formValid", value);
-  }
-
-  get tipiFabbricatoValues(): string[] {
-    const tipi = this.tipiFabbricato.map((t) => t.tipoFabbricato);
-    return this.backupValue ? tipi.filter((value) => value !== this.backupValue.tipoFabbricato) : tipi;
   }
 
   /* METHODS */

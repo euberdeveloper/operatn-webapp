@@ -47,6 +47,18 @@ const validator = {
     },
     unique(values: string[]): InputValidationRule {
         return value => !values.includes(value) || `Questo valore è già presente`;
+    },
+    max(n: number): InputValidationRule {
+        return value => value.length <= n || `La lunghezza massima è ${n}`
+    },
+    min(n: number): InputValidationRule {
+        return value => value.length >= n || `La lunghezza minima è ${n}`
+    },
+    length(n: number): InputValidationRule {
+        return value => value.length === n || `La lunghezza deve essere ${n}`
+    },
+    numeric(): InputValidationRule {
+        return value => /^\d+$/.test(value) || `Sono ammessi solo numeri`
     }
 };
 

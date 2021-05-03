@@ -4,6 +4,8 @@ import { UtentiReturned } from 'operatn-api-client/api/controllers/index';
 import { State } from './state'
 
 export enum MutationTypes {
+    ADD_ERROR_TO_QUEUE = 'ADD_ERROR_TO_QUEUE',
+    SET_ERRORS_QUEUE = 'SET_ERRORS_QUEUE',
     SET_ERROR_DIALOG_TEXT = 'SET_ERROR_DIALOG_TEXT',
     SET_SUCCESS_DIALOG_TEXT = 'SET_SUCCESS_DIALOG_TEXT',
     SET_CONFIRM_DIALOG = 'SET_CONFIRM_DIALOG',
@@ -15,6 +17,8 @@ export enum MutationTypes {
 }
 
 export interface Mutations<S = State> {
+    [MutationTypes.ADD_ERROR_TO_QUEUE](state: S, text: string): void;
+    [MutationTypes.SET_ERRORS_QUEUE](state: S, queue: string[]): void;
     [MutationTypes.SET_ERROR_DIALOG_TEXT](state: S, text: string | null): void;
     [MutationTypes.SET_SUCCESS_DIALOG_TEXT](state: S, text: string | null): void;
     [MutationTypes.SET_CONFIRM_DIALOG](state: S, value: { text: string; callback: (answer: boolean) => void | Promise<void> } | null): void;
@@ -26,6 +30,12 @@ export interface Mutations<S = State> {
 }
 
 export const mutations: MutationTree<State> & Mutations = {
+    [MutationTypes.ADD_ERROR_TO_QUEUE](state, text) {
+        state.errorsQueue.push(text);
+    },
+    [MutationTypes.SET_ERRORS_QUEUE](state, queue) {
+        state.errorsQueue = queue;
+    },
     [MutationTypes.SET_ERROR_DIALOG_TEXT](state, text) {
         state.errorDialogText = text;
     },

@@ -1,5 +1,5 @@
 <template>
-    <utenti />
+    <utenti isRoot />
 </template>
 
 <script lang="ts">

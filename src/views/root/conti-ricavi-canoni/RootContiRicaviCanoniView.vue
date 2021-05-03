@@ -1,5 +1,5 @@
 <template>
-  <conti-ricavi-canoni />
+  <conti-ricavi-canoni isRoot />
 </template>
 
 <script lang="ts">
