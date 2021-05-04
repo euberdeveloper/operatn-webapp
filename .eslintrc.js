@@ -12,9 +12,11 @@ module.exports = {
     ecmaVersion: 2020
   },
   rules: {
+    'no-empty': 'off',
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
-    'no-empty': 'off'
+    '@typescript-eslint/no-empty-function': 'off',
+    'vue/valid-v-slot': 'off'
   }
 }
