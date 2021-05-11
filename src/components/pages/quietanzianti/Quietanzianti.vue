@@ -106,6 +106,13 @@ export default class Quietanzianti extends Mixins<
           rules: [this.$validator.requiredText("Quietanziante"), this.$validator.unique(this.quietanziantiValues)],
         },
       },
+      {
+        text: "Denominazione",
+        value: "denominazione",
+        groupable: false,
+        editable: false,
+        itemTextHandler: value => value ?? '[NULL]'
+      },
     ];
   }
 
@@ -141,18 +148,51 @@ export default class Quietanzianti extends Mixins<
   updateBodyFromValue(value: Quietanziante): QuietanziantiReplaceBody {
     return {
       quietanziante: value.quietanziante,
+      denominazione: value.denominazione,
+      sesso: value.sesso,
+      dataNascita: value.dataNascita,
+      comuneNascita: value.comuneNascita,
+      indirizzo: value.indirizzo,
+      cap: value.cap,
+      citta: value.citta,
+      siglaProvincia: value.siglaProvincia,
+      codiceFiscale: value.codiceFiscale,
+      numeroTelefono: value.numeroTelefono,
+      email: value.email
     };
   }
   tupleValueFromCreateBody(id: number, body: QuietanziantiCreateBody): Quietanziante {
     return {
       id,
       quietanziante: body.quietanziante,
+      denominazione: body.denominazione,
+      sesso: body.sesso,
+      dataNascita: body.dataNascita,
+      comuneNascita: body.comuneNascita,
+      indirizzo: body.indirizzo,
+      cap: body.cap,
+      citta: body.citta,
+      siglaProvincia: body.siglaProvincia,
+      codiceFiscale: body.codiceFiscale,
+      numeroTelefono: body.numeroTelefono,
+      email: body.email
     };
   }
   tupleValueFromUpdateBody(id: number, body: QuietanziantiReplaceBody): Quietanziante {
     return {
       id,
       quietanziante: body.quietanziante,
+      denominazione: body.denominazione,
+      sesso: body.sesso,
+      dataNascita: body.dataNascita,
+      comuneNascita: body.comuneNascita,
+      indirizzo: body.indirizzo,
+      cap: body.cap,
+      citta: body.citta,
+      siglaProvincia: body.siglaProvincia,
+      codiceFiscale: body.codiceFiscale,
+      numeroTelefono: body.numeroTelefono,
+      email: body.email
     };
   }
 

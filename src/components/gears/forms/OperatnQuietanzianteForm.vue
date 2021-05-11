@@ -2,16 +2,65 @@
   <v-form v-model="internalFormValid" @submit.prevent v-if="internalValue">
     <v-container fluid>
       <v-row align="center" justify="center">
-        <v-col cols="12">
+        <v-col cols="6">
           <v-text-field
             type="text"
             label="Quietanziante"
             name="quietanziante"
             clearable
-            prepend-icon="mdi-account-heart"
             :rules="[$validator.requiredText('Quietanziante'), $validator.unique(quietanziantiValues)]"
             v-model="internalValue.quietanziante"
           />
+        </v-col>
+        <v-col cols="6">
+          <v-text-field type="text" label="Denominazione" name="denominazione" clearable v-model="internalValue.denominazione" />
+        </v-col>
+      </v-row>
+      <v-row align="center" justify="center">
+        <v-col cols="6">
+          <v-select type="text" label="Sesso" name="quietanziante" :items="['M', 'F']" clearable v-model="internalValue.sesso" />
+        </v-col>
+        <v-col cols="6">
+          <operatn-date-input label="Data nascita" name="dataNascita" v-model="internalValue.dataNascita" />
+        </v-col>
+      </v-row>
+      <v-row align="center" justify="center">
+        <v-col cols="6">
+          <v-text-field type="text" label="Comune di nascita" name="comuneNascita" clearable v-model="internalValue.comuneNascita" />
+        </v-col>
+        <v-col cols="6">
+          <v-text-field type="text" label="Indirizzo" name="indirizzo" clearable v-model="internalValue.indirizzo" />
+        </v-col>
+      </v-row>
+      <v-row align="center" justify="center">
+        <v-col cols="6">
+          <v-text-field
+            type="text"
+            label="CAP"
+            name="cap"
+            clearable
+            :rules="[$validator.requiredText('CAP'), $validator.length(5), $validator.numeric()]"
+            v-model="internalValue.cap"
+          />
+        </v-col>
+        <v-col cols="6">
+          <v-text-field type="text" label="Citta" name="citta" clearable v-model="internalValue.citta" />
+        </v-col>
+      </v-row>
+      <v-row align="center" justify="center">
+        <v-col cols="6">
+          <v-text-field type="text" label="Sigla provincia" name="siglaProvincia" clearable v-model="internalValue.siglaProvincia" />
+        </v-col>
+        <v-col cols="6">
+          <v-text-field type="text" label="Codice fiscale" name="codiceFiscale" clearable v-model="internalValue.codiceFiscale" />
+        </v-col>
+      </v-row>
+      <v-row align="center" justify="center">
+        <v-col cols="6">
+          <v-text-field type="text" label="Numero di telefono" name="numeroTelefono" clearable v-model="internalValue.numeroTelefono" />
+        </v-col>
+        <v-col cols="6">
+          <v-text-field type="text" label="Email" name="email" clearable v-model="internalValue.email" />
         </v-col>
       </v-row>
     </v-container>
@@ -23,7 +72,12 @@ import Vue from "vue";
 import { Component, Prop, Watch } from "vue-property-decorator";
 import { QuietanziantiCreateBody, QuietanziantiReplaceBody } from "operatn-api-client";
 
+import OperatnDateInput from '@/components/gears/inputs/OperatnDateInput.vue';
+
 @Component({
+  components: {
+    OperatnDateInput
+  },
   model: {
     prop: "value",
     event: "save",
@@ -62,6 +116,17 @@ export default class OperatnQuietanzianteForm extends Vue {
   getEmptyValue(): QuietanziantiCreateBody | QuietanziantiReplaceBody {
     return {
       quietanziante: "",
+      denominazione: null,
+      sesso: null,
+      dataNascita: null,
+      comuneNascita: null,
+      indirizzo: null,
+      cap: null,
+      citta: null,
+      siglaProvincia: null,
+      codiceFiscale: null,
+      numeroTelefono: null,
+      email: null,
     };
   }
 

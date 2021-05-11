@@ -40,7 +40,20 @@ export default class QuietanzianteHandlerMixin extends Vue {
 
   async updateQuietanziante(id: number, body: QuietanziantiReplaceBody, alertType = AlertType.ERROR_ALERT): Promise<void> {
     try {
-      await this.$api.quietanzianti.replace(id, { quietanziante: body.quietanziante }, { alertType });
+      await this.$api.quietanzianti.replace(id, {
+        quietanziante: body.quietanziante,
+        denominazione: body.denominazione,
+        sesso: body.sesso,
+        dataNascita: body.dataNascita,
+        comuneNascita: body.comuneNascita,
+        indirizzo: body.indirizzo,
+        cap: body.cap,
+        citta: body.citta,
+        siglaProvincia: body.siglaProvincia,
+        codiceFiscale: body.codiceFiscale,
+        numeroTelefono: body.numeroTelefono,
+        email: body.email
+      }, { alertType });
     } catch (error) {
       if (error) {
         if (error instanceof InvalidPathParamError) {

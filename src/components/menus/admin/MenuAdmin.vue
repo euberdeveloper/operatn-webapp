@@ -43,8 +43,8 @@ export default class MenuAdmin extends Vue {
     },
     {
       icon: "mdi-circle-multiple",
-      text: "Conti ricavi e consumi",
-      path: "./conti-ricavi-consumi",
+      text: "Conti ricavi",
+      path: "./conti-ricavi",
     },
     {
       icon: "mdi-calculator-variant",

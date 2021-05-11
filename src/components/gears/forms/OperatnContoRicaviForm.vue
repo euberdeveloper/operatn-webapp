@@ -2,28 +2,46 @@
   <v-form v-model="internalFormValid" @submit.prevent v-if="internalValue">
     <v-container fluid>
       <v-row align="center" justify="center">
-        <v-col cols="12">
+        <v-col cols="6">
           <v-text-field
             type="text"
             label="Codice"
             name="codice"
             clearable
-            prepend-icon="mdi-barcode"
-            :rules="[$validator.requiredText('Codice'), $validator.unique(contiRicaviConsumiCodici)]"
+            :rules="[$validator.requiredText('Codice'), $validator.unique(contiRicaviCodici), $validator.length(3)]"
             v-model="internalValue.codice"
+          />
+        </v-col>
+        <v-col cols="6">
+          <v-text-field
+            type="number"
+            label="Prg"
+            name="prg"
+            clearable
+            :rules="[$validator.requiredText('Prg'), $validator.number()]"
+            v-model="internalValue.prg"
           />
         </v-col>
       </v-row>
       <v-row align="center" justify="center">
-        <v-col cols="12">
+        <v-col cols="6">
           <v-text-field
             type="text"
-            label="Conto ricavi e consumi"
-            name="contoRicaviConsumi"
+            label="Conto ricavi"
+            name="conto"
             clearable
-            prepend-icon="mdi-circle-multiple"
-            :rules="[$validator.requiredText('Conto ricavi e consumi'), $validator.unique(contiRicaviConsumiValues)]"
-            v-model="internalValue.contoRicaviConsumi"
+            :rules="[$validator.requiredText('Conto ricavi'), $validator.unique(contiRicaviValues)]"
+            v-model="internalValue.conto"
+          />
+        </v-col>
+        <v-col cols="6">
+          <v-text-field
+            type="text"
+            label="Descrizione"
+            name="descrizione"
+            clearable
+            :rules="[$validator.requiredText('Descrizione')]"
+            v-model="internalValue.descrizione"
           />
         </v-col>
       </v-row>
@@ -34,7 +52,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { Component, Prop, Watch } from "vue-property-decorator";
-import { ContiRicaviConsumiCreateBody, ContiRicaviConsumiReplaceBody } from "operatn-api-client";
+import { ContiRicaviCreateBody, ContiRicaviReplaceBody } from "operatn-api-client";
 
 @Component({
   model: {
@@ -42,20 +60,20 @@ import { ContiRicaviConsumiCreateBody, ContiRicaviConsumiReplaceBody } from "ope
     event: "save",
   },
 })
-export default class OperatnContoRicaviConsumiForm extends Vue {
+export default class OperatnContoRicaviForm extends Vue {
   /* PROPS */
 
   @Prop({ type: Object, default: null })
-  value!: ContiRicaviConsumiCreateBody | ContiRicaviConsumiReplaceBody;
+  value!: Partial<ContiRicaviCreateBody> | Partial<ContiRicaviReplaceBody>;
 
   @Prop({ type: Boolean, default: false })
   formValid!: boolean;
 
   @Prop({ type: Array, default: () => [] })
-  contiRicaviConsumiCodici!: string[];
+  contiRicaviCodici!: string[];
 
   @Prop({ type: Array, default: () => [] })
-  contiRicaviConsumiValues!: string[];
+  contiRicaviValues!: string[];
 
   /* GETTERS AND SETTERS */
 
@@ -75,10 +93,12 @@ export default class OperatnContoRicaviConsumiForm extends Vue {
 
   /* METHODS */
 
-  getEmptyValue(): ContiRicaviConsumiCreateBody | ContiRicaviConsumiReplaceBody {
+  getEmptyValue(): Partial<ContiRicaviCreateBody> | Partial<ContiRicaviReplaceBody> {
     return {
-      codice: '',
-      contoRicaviConsumi: "",
+      codice: undefined,
+      prg: undefined,
+      conto: undefined,
+      descrizione: undefined
     };
   }
 

@@ -22,8 +22,7 @@ import RootTipiStanza from '@/views/root/tipi-stanza/RootTipiStanzaView.vue';
 import RootTipiFabbricato from '@/views/root/tipi-fabbricato/RootTipiFabbricatoView.vue';
 import RootQuietanzianti from '@/views/root/quietanzianti/RootQuietanziantiView.vue';
 import RootTipiStudente from '@/views/root/tipi-studente/RootTipiStudenteView.vue';
-import RootContiRicaviConsumi from '@/views/root/conti-ricavi-consumi/RootContiRicaviConsumiView.vue';
-import RootContiRicaviCanoni from '@/views/root/conti-ricavi-canoni/RootContiRicaviCanoniView.vue';
+import RootContiRicavi from '@/views/root/conti-ricavi/RootContiRicaviView.vue';
 import RootTipiTariffa from '@/views/root/tipi-tariffa/RootTipiTariffaView.vue';
 import RootDipartimentiUnitn from '@/views/root/dipartimenti-unitn/RootDipartimentiUnitnView.vue';
 
@@ -38,8 +37,7 @@ import AdminTipiStanza from '@/views/admin/tipi-stanza/AdminTipiStanzaView.vue';
 import AdminTipiFabbricato from '@/views/admin/tipi-fabbricato/AdminTipiFabbricatoView.vue';
 import AdminQuietanzianti from '@/views/admin/quietanzianti/AdminQuietanziantiView.vue';
 import AdminTipiStudente from '@/views/admin/tipi-studente/AdminTipiStudenteView.vue';
-import AdminContiRicaviConsumi from '@/views/admin/conti-ricavi-consumi/AdminContiRicaviConsumiView.vue';
-import AdminContiRicaviCanoni from '@/views/admin/conti-ricavi-canoni/AdminContiRicaviCanoniView.vue';
+import AdminContiRicavi from '@/views/admin/conti-ricavi/AdminContiRicaviView.vue';
 import AdminTipiTariffa from '@/views/admin/tipi-tariffa/AdminTipiTariffaView.vue';
 import AdminDipartimentiUnitn from '@/views/admin/dipartimenti-unitn/AdminDipartimentiUnitnView.vue';
 
@@ -111,14 +109,9 @@ const routes: Array<RouteConfig> = [
         component: AdminTipiStudente
       },
       {
-        path: 'conti-ricavi-consumi',
-        name: 'admin-conti-ricavi-consumi',
-        component: AdminContiRicaviConsumi
-      },
-      {
-        path: 'conti-ricavi-canoni',
-        name: 'admin-conti-ricavi-canoni',
-        component: AdminContiRicaviCanoni
+        path: 'conti-ricavi',
+        name: 'admin-conti-ricavi',
+        component: AdminContiRicavi
       },
       {
         path: 'tipi-tariffa',
@@ -176,14 +169,9 @@ const routes: Array<RouteConfig> = [
         component: RootTipiStudente
       },
       {
-        path: 'conti-ricavi-consumi',
-        name: 'root-conti-ricavi-consumi',
-        component: RootContiRicaviConsumi
-      },
-      {
-        path: 'conti-ricavi-canoni',
-        name: 'root-conti-ricavi-canoni',
-        component: RootContiRicaviCanoni
+        path: 'conti-ricavi',
+        name: 'root-conti-ricavi',
+        component: RootContiRicavi
       },
       {
         path: 'tipi-tariffa',

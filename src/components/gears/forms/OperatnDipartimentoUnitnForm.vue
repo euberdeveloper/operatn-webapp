@@ -108,11 +108,12 @@ import { Component, Prop, Watch } from "vue-property-decorator";
 import { Comune, DipartimentiUnitnCreateBody, DipartimentiUnitnUpdateBody, Provincia } from "operatn-api-client";
 import { ActionTypes, AlertType } from "@/store";
 
+
 @Component({
   model: {
     prop: "value",
     event: "save",
-  },
+  }
 })
 export default class OperatnDipartimentoUnitnForm extends Vue {
   /* PROPS */

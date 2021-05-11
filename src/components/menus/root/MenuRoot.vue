@@ -43,13 +43,8 @@ export default class MenuRoot extends Vue {
     },
     {
       icon: "mdi-circle-multiple",
-      text: "Conti ricavi e consumi",
-      path: "./conti-ricavi-consumi",
-    },
-    {
-      icon: "mdi-circle-multiple-outline",
-      text: "Conti ricavi e canoni",
-      path: "./conti-ricavi-canoni",
+      text: "Conti ricavi",
+      path: "./conti-ricavi",
     },
     {
       icon: "mdi-calculator-variant",

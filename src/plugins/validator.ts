@@ -49,16 +49,19 @@ const validator = {
         return value => !values.includes(value) || `Questo valore è già presente`;
     },
     max(n: number): InputValidationRule {
-        return value => value.length <= n || `La lunghezza massima è ${n}`
+        return value => (value && value.length <= n) || `La lunghezza massima è ${n}`
     },
     min(n: number): InputValidationRule {
-        return value => value.length >= n || `La lunghezza minima è ${n}`
+        return value => (value && value.length >= n) || `La lunghezza minima è ${n}`
     },
     length(n: number): InputValidationRule {
-        return value => value.length === n || `La lunghezza deve essere ${n}`
+        return value => (value && value.length === n) || `La lunghezza deve essere ${n}`
     },
     numeric(): InputValidationRule {
         return value => /^\d+$/.test(value) || `Sono ammessi solo numeri`
+    },
+    number(): InputValidationRule {
+        return value => !isNaN(+value) || `Devi inserire un numero valido`
     }
 };
 
