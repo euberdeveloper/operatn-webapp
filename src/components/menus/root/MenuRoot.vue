@@ -70,7 +70,12 @@ export default class MenuRoot extends Vue {
       icon: "mdi-office-building-outline",
       text: "Dipartimenti UNITN",
       path: "./dipartimenti-unitn",
-    }
+    },
+    {
+      icon: "mdi-currency-usd",
+      text: "Tariffe",
+      path: "./tariffe",
+    },
   ];
 }
 </script>
