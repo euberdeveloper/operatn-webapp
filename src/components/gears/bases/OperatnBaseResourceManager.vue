@@ -11,6 +11,7 @@
       v-model="internalTableSelectedValues"
       :columns="tableColumns"
       :actions="tableActions"
+      :groupHeaders="tableGroupHeaders"
       :values="tableValues"
       :itemKey="tableItemKey"
       :sortBy="tableSortBy"
@@ -64,7 +65,7 @@
 import { Component, Prop, Vue } from "vue-property-decorator";
 
 import OperatnActionDialog from "@/components/gears/dialogs/OperatnActionDialog.vue";
-import OperatnBaseTable, { Actions, Column } from "@/components/gears/bases/OperatnBaseTable.vue";
+import OperatnBaseTable, { Actions, Column, GroupHeaders } from "@/components/gears/bases/OperatnBaseTable.vue";
 
 export { Actions, Column } from "@/components/gears/bases/OperatnBaseTable.vue";
 
@@ -91,6 +92,9 @@ export default class OperatnBaseResourceManager extends Vue {
 
   @Prop({ type: Object, required: true })
   private tableActions!: Actions;
+
+  @Prop({ type: Object, required: false })
+  private tableGroupHeaders?: GroupHeaders;
 
   @Prop({ type: Array, required: true })
   private tableSelectedValues!: any[];

@@ -29,13 +29,33 @@
       </span>
     </template>
 
+    <template v-slot:group.header="{ group, groupBy, isOpen, headers, toggle, remove }">
+      <td :colspan="headers.length">
+        <v-btn @click="toggle" icon>
+          <v-icon>{{ isOpen ? "mdi-minus" : "mdi-plus" }}</v-icon>
+        </v-btn>
+        <span class="mr-2">{{ groupHeaders && groupHeaders.keyHandler ? groupHeaders.keyHandler(groupBy[0]) : groupBy[0] }}:</span>
+        <span>{{ groupHeaders && groupHeaders.valueHandler ? groupHeaders.valueHandler(group) : group }}</span>
+        <v-btn @click="remove" icon>
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </td>
+    </template>
+
     <template v-for="column of handledColumns" v-slot:[getItemSlotName(column.value)]="{ item, value, index }">
       <span :key="`item-${column.value}-${index}`" v-if="column.value !== '_actions'">
         <span v-if="!column.editable">
           <v-icon class="mr-3" v-if="column.itemIcon">{{ column.itemIconHandler ? column.itemIconHandler(value) : value }}</v-icon>
           <span v-if="column.itemText !== false">{{ column.itemTextHandler ? column.itemTextHandler(value) : value }}</span>
         </span>
-        <v-edit-dialog :large="$vuetify.breakpoint.xs" @cancel="column.onEditCancel(item)" @close="column.onEditClose(item)" @save="column.onEditSave(item)" @open="column.onEditOpen(item)" v-else>
+        <v-edit-dialog
+          :large="$vuetify.breakpoint.xs"
+          @cancel="column.onEditCancel(item)"
+          @close="column.onEditClose(item)"
+          @save="column.onEditSave(item)"
+          @open="column.onEditOpen(item)"
+          v-else
+        >
           <span>
             <v-icon class="mr-3" v-if="column.itemIcon">{{ column.itemIconHandler ? column.itemIconHandler(value) : value }}</v-icon>
             <span v-if="column.itemText !== false">{{ column.itemTextHandler ? column.itemTextHandler(value) : value }}</span>
@@ -106,6 +126,11 @@ export interface Actions<T = any> {
   onDelete?: (value: T) => void | Promise<void>;
 }
 
+export interface GroupHeaders {
+  keyHandler?: (value: string) => string;
+  valueHandler?: (value: string) => string;
+}
+
 type HandledColumn<T = any> = Column<T> & { actions: Actions<T> };
 
 @Component({
@@ -125,6 +150,9 @@ export default class OperatnBaseTable extends Vue {
 
   @Prop({ type: Object, required: false })
   private actions?: Actions;
+
+  @Prop({ type: Object, required: false })
+  private groupHeaders?: GroupHeaders;
 
   @Prop({ type: Array, required: true })
   private selectedValues!: any[];

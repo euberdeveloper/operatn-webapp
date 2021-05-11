@@ -57,6 +57,11 @@ export default class MenuRoot extends Vue {
       path: "./tipi-ospite",
     },
     {
+      icon: "mdi-note-text-outline",
+      text: "Tipi contratto",
+      path: "./tipi-contratto",
+    },
+    {
       icon: "mdi-office-building-outline",
       text: "Dipartimenti UNITN",
       path: "./dipartimenti-unitn",
