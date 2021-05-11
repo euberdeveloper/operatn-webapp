@@ -11,6 +11,7 @@
     :tableShowSelect="isRoot"
     :tableUpdateBody.sync="updateBody"
     tableSortBy="codice"
+    tableMultiSort
     createDialogTitle="Nuovo conto ricavi"
     :createDialogShow.sync="showCreateDialog"
     :createDialogDisabled="!createBodyValid"

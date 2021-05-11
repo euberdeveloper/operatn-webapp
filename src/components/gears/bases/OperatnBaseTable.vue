@@ -48,6 +48,8 @@
               :hint="column.editInput.hint"
               :rules="column.editInput.rules || []"
               :items="column.editInput.items || []"
+              :item-text="column.editInput.itemText"
+              :item-value="column.editInput.itemValue"
               single-line
               v-if="column.editInput.type == 'select' && internalUpdateBody"
             />
@@ -88,7 +90,9 @@ export interface Column<T = any> extends DataTableHeader {
     label?: string;
     hint?: string;
     counter?: boolean;
-    items?: string[];
+    items?: any[];
+    itemText?: string;
+    itemValue?: string;
     rules?: InputValidationRule[];
   };
   itemText?: boolean;

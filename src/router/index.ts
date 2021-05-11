@@ -24,6 +24,7 @@ import RootQuietanzianti from '@/views/root/quietanzianti/RootQuietanziantiView.
 import RootTipiStudente from '@/views/root/tipi-studente/RootTipiStudenteView.vue';
 import RootContiRicavi from '@/views/root/conti-ricavi/RootContiRicaviView.vue';
 import RootTipiTariffa from '@/views/root/tipi-tariffa/RootTipiTariffaView.vue';
+import RootTipiOspite from '@/views/root/tipi-ospite/RootTipiOspiteView.vue';
 import RootDipartimentiUnitn from '@/views/root/dipartimenti-unitn/RootDipartimentiUnitnView.vue';
 
 
@@ -39,6 +40,7 @@ import AdminQuietanzianti from '@/views/admin/quietanzianti/AdminQuietanziantiVi
 import AdminTipiStudente from '@/views/admin/tipi-studente/AdminTipiStudenteView.vue';
 import AdminContiRicavi from '@/views/admin/conti-ricavi/AdminContiRicaviView.vue';
 import AdminTipiTariffa from '@/views/admin/tipi-tariffa/AdminTipiTariffaView.vue';
+import AdminTipiOspite from '@/views/admin/tipi-ospite/AdminTipiOspiteView.vue';
 import AdminDipartimentiUnitn from '@/views/admin/dipartimenti-unitn/AdminDipartimentiUnitnView.vue';
 
 Vue.use(VueRouter);
@@ -119,6 +121,11 @@ const routes: Array<RouteConfig> = [
         component: AdminTipiTariffa
       },
       {
+        path: 'tipi-ospite',
+        name: 'admin-tipi-ospite',
+        component: AdminTipiOspite
+      },
+      {
         path: 'dipartimenti-unitn',
         name: 'admin-dipartimenti-unitn',
         component: AdminDipartimentiUnitn
@@ -172,6 +179,11 @@ const routes: Array<RouteConfig> = [
         path: 'conti-ricavi',
         name: 'root-conti-ricavi',
         component: RootContiRicavi
+      },
+      {
+        path: 'tipi-ospite',
+        name: 'admin-tipi-ospite',
+        component: RootTipiOspite
       },
       {
         path: 'tipi-tariffa',

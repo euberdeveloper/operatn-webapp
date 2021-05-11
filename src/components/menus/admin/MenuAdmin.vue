@@ -52,6 +52,11 @@ export default class MenuAdmin extends Vue {
       path: "./tipi-tariffa",
     },
     {
+      icon: "mdi-account-box-multiple",
+      text: "Tipi ospite",
+      path: "./tipi-ospite",
+    },
+    {
       icon: "mdi-office-building-outline",
       text: "Dipartimenti UNITN",
       path: "./dipartimenti-unitn",
