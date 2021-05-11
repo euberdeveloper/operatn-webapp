@@ -70,6 +70,7 @@
               :items="column.editInput.items || []"
               :item-text="column.editInput.itemText"
               :item-value="column.editInput.itemValue"
+              :clearable="column.editInput.clearable"
               single-line
               v-if="column.editInput.type == 'select' && internalUpdateBody"
             />
@@ -81,6 +82,7 @@
               :hint="column.editInput.hint"
               :rules="column.editInput.rules || []"
               :counter="column.editInput.counter"
+              :clearable="column.editInput.clearable"
               single-line
               v-else-if="internalUpdateBody"
             />
@@ -110,6 +112,7 @@ export interface Column<T = any> extends DataTableHeader {
     label?: string;
     hint?: string;
     counter?: boolean;
+    clearable?: boolean;
     items?: any[];
     itemText?: string;
     itemValue?: string;

@@ -26,6 +26,7 @@ import RootContiRicavi from '@/views/root/conti-ricavi/RootContiRicaviView.vue';
 import RootTipiTariffa from '@/views/root/tipi-tariffa/RootTipiTariffaView.vue';
 import RootTipiOspite from '@/views/root/tipi-ospite/RootTipiOspiteView.vue';
 import RootTipiContratto from '@/views/root/tipi-contratto/RootTipiContrattoView.vue';
+import RootTipiBolletta from '@/views/root/tipi-bolletta/RootTipiBollettaView.vue';
 import RootDipartimentiUnitn from '@/views/root/dipartimenti-unitn/RootDipartimentiUnitnView.vue';
 
 
@@ -43,6 +44,7 @@ import AdminContiRicavi from '@/views/admin/conti-ricavi/AdminContiRicaviView.vu
 import AdminTipiTariffa from '@/views/admin/tipi-tariffa/AdminTipiTariffaView.vue';
 import AdminTipiOspite from '@/views/admin/tipi-ospite/AdminTipiOspiteView.vue';
 import AdminTipiContratto from '@/views/admin/tipi-contratto/AdminTipiContrattoView.vue';
+import AdminTipiBolletta from '@/views/admin/tipi-bolletta/AdminTipiBollettaView.vue';
 import AdminDipartimentiUnitn from '@/views/admin/dipartimenti-unitn/AdminDipartimentiUnitnView.vue';
 
 Vue.use(VueRouter);
@@ -133,6 +135,11 @@ const routes: Array<RouteConfig> = [
         component: AdminTipiContratto
       },
       {
+        path: 'tipi-bolletta',
+        name: 'admin-tipi-bolletta',
+        component: AdminTipiBolletta
+      },
+      {
         path: 'dipartimenti-unitn',
         name: 'admin-dipartimenti-unitn',
         component: AdminDipartimentiUnitn
@@ -201,6 +208,11 @@ const routes: Array<RouteConfig> = [
         path: 'tipi-contratto',
         name: 'root-tipi-contratto',
         component: RootTipiContratto
+      },
+      {
+        path: 'tipi-bolletta',
+        name: 'root-tipi-bolletta',
+        component: RootTipiBolletta
       },
       {
         path: 'dipartimenti-unitn',

@@ -37,31 +37,47 @@ const validator = {
         }
     },
     passwordsCoincide(pwd: string): InputValidationRule {
-        return value => { console.log(pwd); return value === pwd || 'Le password devono coincidere' };
+        return value => (!value || value === pwd )|| 'Le password devono coincidere';
     },
     ruoloUtente(): InputValidationRule {
-        return value => Object.values(RuoloUtente).includes(value) || `Ruolo utente non valido`;
+        return value => (!value || Object.values(RuoloUtente).includes(value)) || `Ruolo utente non valido`;
     },
     email(): InputValidationRule {
-        return value => /^[^\s@]+@([^\s@.,]+\.)+[^\s@.,]{2,}$/.test(value) || `Email non valida`;
+        return value => (!value || /^[^\s@]+@([^\s@.,]+\.)+[^\s@.,]{2,}$/.test(value)) || `Email non valida`;
     },
     unique(values: string[]): InputValidationRule {
-        return value => !values.includes(value) || `Questo valore è già presente`;
+        return value => (!value || !values.includes(value)) || `Questo valore è già presente`;
     },
     max(n: number): InputValidationRule {
-        return value => (value && value.length <= n) || `La lunghezza massima è ${n}`
+        return value => (!value || value.length <= n) || `La lunghezza massima è ${n}`
     },
     min(n: number): InputValidationRule {
-        return value => (value && value.length >= n) || `La lunghezza minima è ${n}`
+        return value => (!value || value.length >= n) || `La lunghezza minima è ${n}`
     },
     length(n: number): InputValidationRule {
-        return value => (value && value.length === n) || `La lunghezza deve essere ${n}`
+        return value => (!value || value.length === n) || `La lunghezza deve essere ${n}`
     },
     numeric(): InputValidationRule {
-        return value => /^\d+$/.test(value) || `Sono ammessi solo numeri`
+        return value => (!value || /^\d+$/.test(value)) || `Sono ammessi solo numeri`
     },
     number(): InputValidationRule {
-        return value => !isNaN(+value) || `Devi inserire un numero valido`
+        return value => (!value || !isNaN(+value)) || `Devi inserire un numero valido`
+    },
+    price(): InputValidationRule {
+        return value => {
+            const n = +value;
+            if (!value) {
+                return true;
+            }
+            if (isNaN(n)) {
+                return 'Devi inserire un numero valido';
+            }
+            const parts = n.toString().split('.');
+            if (parts.length === 2 && parts[1].length > 2) {
+                return 'Devi inserire un prezzo valido';
+            }
+            return true;
+        }
     }
 };
 
