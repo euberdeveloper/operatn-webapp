@@ -1,6 +1,6 @@
 
 import { Component, Vue } from "vue-property-decorator";
-import { BadRequestError, InvalidBodyError, InvalidPathParamError, NotFoundError, Fabbricato, FabbricatiCreateBody, FabbricatiReplaceBody, FabbricatiIncludeParams } from "operatn-api-client";
+import { BadRequestError, InvalidBodyError, InvalidPathParamError, NotFoundError, Fabbricato, FabbricatiCreateBody, FabbricatiReplaceBody, FabbricatiIncludeParams, FabbricatiReturned } from "operatn-api-client";
 
 import { ActionTypes, AlertType } from "@/store";
 
@@ -15,6 +15,21 @@ export default class FabbricatoHandlerMixin extends Vue {
     } catch (error) {
       if (error) {
         this.$store.dispatch(ActionTypes.ALERT, { message: `Impossibile caricare i fabbricati`, alertType });
+      }
+      throw error;
+    }
+  }
+
+  async getFabbricatoByCodice(codice: string, params: FabbricatiIncludeParams = {}, alertType = AlertType.ERROR_ALERT): Promise<FabbricatiReturned> {
+    try {
+      return await this.$api.fabbricati.getByCodice(codice, params, { alertType });
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        this.$store.dispatch(ActionTypes.ALERT, { message: `Fabbricato non trovato`, alertType });
+      } else if (error instanceof BadRequestError) {
+        this.$store.dispatch(ActionTypes.ALERT, { message: `Richiesta non valida`, alertType });
+      } else {
+        this.$store.dispatch(ActionTypes.ALERT, { message: `Errore del server`, alertType });
       }
       throw error;
     }

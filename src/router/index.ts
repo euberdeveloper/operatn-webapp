@@ -29,6 +29,7 @@ import RootTipiContratto from '@/views/root/tipi-contratto/RootTipiContrattoView
 import RootTipiBolletta from '@/views/root/tipi-bolletta/RootTipiBollettaView.vue';
 import RootTariffe from '@/views/root/tariffe/RootTariffeView.vue';
 import RootFabbricati from '@/views/root/fabbricati/RootFabbricatiView.vue';
+import RootFabbricatiCodice from '@/views/root/fabbricati/codice/RootFabbricatiCodiceView.vue';
 import RootDipartimentiUnitn from '@/views/root/dipartimenti-unitn/RootDipartimentiUnitnView.vue';
 
 
@@ -49,6 +50,7 @@ import AdminTipiContratto from '@/views/admin/tipi-contratto/AdminTipiContrattoV
 import AdminTipiBolletta from '@/views/admin/tipi-bolletta/AdminTipiBollettaView.vue';
 import AdminTariffe from '@/views/admin/tariffe/AdminTariffeView.vue';
 import AdminFabbricati from '@/views/admin/fabbricati/AdminFabbricatiView.vue';
+import AdminFabbricatiCodice from '@/views/admin/fabbricati/codice/AdminFabbricatiCodiceView.vue';
 import AdminDipartimentiUnitn from '@/views/admin/dipartimenti-unitn/AdminDipartimentiUnitnView.vue';
 
 Vue.use(VueRouter);
@@ -158,6 +160,12 @@ const routes: Array<RouteConfig> = [
         name: 'admin-fabbricati',
         component: AdminFabbricati
       },
+      {
+        path: 'fabbricati/:codice',
+        name: 'admin-fabbricati-codice',
+        component: AdminFabbricatiCodice,
+        props: true
+      },
     ]
   },
   {
@@ -242,6 +250,12 @@ const routes: Array<RouteConfig> = [
         path: 'fabbricati',
         name: 'root-fabbricati',
         component: RootFabbricati
+      },
+      {
+        path: 'fabbricati/:codice',
+        name: 'root-fabbricati-codice',
+        component: RootFabbricatiCodice,
+        props: true
       },
     ]
 

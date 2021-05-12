@@ -2,7 +2,9 @@
   <v-card>
     <v-card-title class="headline primary white--text">{{ title }}</v-card-title>
     <v-card-text>
-      <v-subheader class="px-0 mt-md-4 mb-md-0 mt-8 mb-4 text-subtitle-1" v-if="description">{{ description }}</v-subheader>
+      <slot name="description">
+        <v-subheader class="px-0 mt-md-4 mb-md-0 mt-8 mb-4 text-subtitle-1" v-if="description">{{ description }}</v-subheader>
+      </slot>
     </v-card-text>
 
     <!-- TABLE -->
@@ -18,6 +20,7 @@
       :showSelect="tableShowSelect"
       :multiSort="tableMultiSort"
       :updateBody.sync="internalTableUpdateBody"
+      v-if="showTable"
     />
 
     <!-- PLUS FAB BUTTON -->
@@ -83,6 +86,9 @@ export default class OperatnBaseResourceManager extends Vue {
 
   @Prop({ type: String, required: false })
   private description?: string;
+
+  @Prop({ type: Boolean, default: true })
+  private showTable!: boolean;
 
   @Prop({ type: String, required: true })
   private tableTitle!: string;

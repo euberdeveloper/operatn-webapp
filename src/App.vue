@@ -3,6 +3,7 @@
     <router-view name="bar" />
     <router-view name="menu" />
     <router-view />
+    <v-snackbar v-if="toast" v-model="toast"  :color="toast.color">{{toast.message}}</v-snackbar>
     <operatn-error-dialog v-model="showErrorDialog" :text="errorDialogText" />
     <operatn-errors-queue v-model="errorsQueue" />
     <operatn-success-dialog v-model="showSuccessDialog" :text="successDialogText" />
@@ -29,6 +30,13 @@ import { ActionTypes } from "@/store";
 })
 export default class App extends Vue {
   /* COMPUTED */
+
+  get toast(): { message: string, color: string } | null {
+    return this.$store.state.toast;
+  }
+  set toast(value: { message: string, color: string } | null) {
+    this.$store.dispatch(ActionTypes.SET_TOAST, value);
+  }
 
   get errorDialogText(): string | null {
     return this.$store.state.errorDialogText;

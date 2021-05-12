@@ -5,6 +5,7 @@ export interface State {
     token: string | null;
     user: UtentiReturned | null;
     showMenu: boolean;
+    toast: { message: string, color: string } | null;
     errorsQueue: string[];
     errorDialogText: string | null;
     successDialogText: string | null;
@@ -18,6 +19,7 @@ export const state: State = {
     token: null,
     user: null,
     showMenu: true,
+    toast: null,
     errorsQueue: [],
     errorDialogText: null,
     successDialogText: null,

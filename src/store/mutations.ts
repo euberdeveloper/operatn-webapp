@@ -4,6 +4,7 @@ import { UtentiReturned } from 'operatn-api-client/api/controllers/index';
 import { State } from './state'
 
 export enum MutationTypes {
+    SET_TOAST = 'SET_TOAST',
     ADD_ERROR_TO_QUEUE = 'ADD_ERROR_TO_QUEUE',
     SET_ERRORS_QUEUE = 'SET_ERRORS_QUEUE',
     SET_ERROR_DIALOG_TEXT = 'SET_ERROR_DIALOG_TEXT',
@@ -17,6 +18,7 @@ export enum MutationTypes {
 }
 
 export interface Mutations<S = State> {
+    [MutationTypes.SET_TOAST](state: S, text: { message: string, color: string } | null): void;
     [MutationTypes.ADD_ERROR_TO_QUEUE](state: S, text: string): void;
     [MutationTypes.SET_ERRORS_QUEUE](state: S, queue: string[]): void;
     [MutationTypes.SET_ERROR_DIALOG_TEXT](state: S, text: string | null): void;
@@ -30,6 +32,9 @@ export interface Mutations<S = State> {
 }
 
 export const mutations: MutationTree<State> & Mutations = {
+    [MutationTypes.SET_TOAST](state, text) {
+        state.toast = text;
+    },
     [MutationTypes.ADD_ERROR_TO_QUEUE](state, text) {
         state.errorsQueue.push(text);
     },

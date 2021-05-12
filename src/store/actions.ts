@@ -9,6 +9,7 @@ import { Mutations, MutationTypes } from './mutations'
 
 export enum ActionTypes {
     ALERT = 'ALERT',
+    SET_TOAST = 'SET_TOAST',
     ADD_ERROR_TO_QUEUE = 'ADD_ERROR_TO_QUEUE',
     SET_ERRORS_QUEUE = 'SET_ERRORS_QUEUE',
     HIDE_ERROR_DIALOG = 'HIDE_ERROR_DIALOG',
@@ -38,6 +39,7 @@ type AugmentedActionContext = {
 } & Omit<ActionContext<State, State>, 'commit'>
 
 export interface Actions {
+    [ActionTypes.SET_TOAST]({ commit }: AugmentedActionContext, payload: { message: string, color: string } | null): void;
     [ActionTypes.ALERT]({ dispatch }: AugmentedActionContext, payload: { message: string, alertType?: AlertType }): void;
     [ActionTypes.ADD_ERROR_TO_QUEUE]({ commit }: AugmentedActionContext, text: string): void;
     [ActionTypes.SET_ERRORS_QUEUE]({ commit }: AugmentedActionContext, queue: string[]): void;
@@ -67,6 +69,9 @@ export enum AlertType {
 }
 
 export const actions: ActionTree<State, State> & Actions = {
+    [ActionTypes.SET_TOAST]({ commit }, payload) {
+        commit(MutationTypes.SET_TOAST, payload);
+    },
     [ActionTypes.ALERT]({ dispatch }, { message, alertType }) {
         switch (alertType) {
             case AlertType.ERROR_ALERT:

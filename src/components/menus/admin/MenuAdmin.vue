@@ -19,67 +19,67 @@ export default class MenuAdmin extends Vue {
     {
       icon: "mdi-account-multiple",
       text: "Utenti",
-      path: "./utenti",
+      path: "/admin/utenti",
     },
     {
       icon: "mdi-home-group",
       text: "Tipi stanza",
-      path: "./tipi-stanza",
+      path: "/admin/tipi-stanza",
     },
     {
       icon: "mdi-home-city",
       text: "Tipi fabbricato",
-      path: "./tipi-fabbricato",
+      path: "/admin/tipi-fabbricato",
     },
     {
       icon: "mdi-account-heart",
       text: "Quietanzianti",
-      path: "./quietanzianti",
+      path: "/admin/quietanzianti",
     },
     {
       icon: "mdi-school",
       text: "Tipi studente",
-      path: "./tipi-studente",
+      path: "/admin/tipi-studente",
     },
     {
       icon: "mdi-circle-multiple",
       text: "Conti ricavi",
-      path: "./conti-ricavi",
+      path: "/admin/conti-ricavi",
     },
     {
       icon: "mdi-calculator-variant",
       text: "Tipi tariffa",
-      path: "./tipi-tariffa",
+      path: "/admin/tipi-tariffa",
     },
     {
       icon: "mdi-account-box-multiple",
       text: "Tipi ospite",
-      path: "./tipi-ospite",
+      path: "/admin/tipi-ospite",
     },
     {
       icon: "mdi-note-text-outline",
       text: "Tipi contratto",
-      path: "./tipi-contratto",
+      path: "/admin/tipi-contratto",
     },
     {
       icon: "mdi-cash-multiple",
       text: "Tipi bolletta",
-      path: "./tipi-bolletta",
+      path: "/admin/tipi-bolletta",
     },
     {
       icon: "mdi-office-building-outline",
       text: "Dipartimenti UNITN",
-      path: "./dipartimenti-unitn",
+      path: "/admin/dipartimenti-unitn",
     },
     {
       icon: "mdi-currency-usd",
       text: "Tariffe",
-      path: "./tariffe",
+      path: "/admin/tariffe",
     },
     {
       icon: "mdi-home-city",
       text: "Fabbricati",
-      path: "./fabbricati",
+      path: "/admin/fabbricati",
     },
   ];
 }
