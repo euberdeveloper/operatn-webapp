@@ -76,6 +76,11 @@ export default class MenuAdmin extends Vue {
       text: "Tariffe",
       path: "./tariffe",
     },
+    {
+      icon: "mdi-home-city",
+      text: "Fabbricati",
+      path: "./fabbricati",
+    },
   ];
 }
 </script>

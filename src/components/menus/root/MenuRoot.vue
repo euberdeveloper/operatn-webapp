@@ -76,6 +76,11 @@ export default class MenuRoot extends Vue {
       text: "Tariffe",
       path: "./tariffe",
     },
+    {
+      icon: "mdi-home-city",
+      text: "Fabbricati",
+      path: "./fabbricati",
+    },
   ];
 }
 </script>

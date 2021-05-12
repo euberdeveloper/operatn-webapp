@@ -35,7 +35,7 @@
           <v-icon>{{ isOpen ? "mdi-minus" : "mdi-plus" }}</v-icon>
         </v-btn>
         <span class="mr-2">{{ groupHeaders && groupHeaders.keyHandler ? groupHeaders.keyHandler(groupBy[0]) : groupBy[0] }}:</span>
-        <span>{{ groupHeaders && groupHeaders.valueHandler ? groupHeaders.valueHandler(group) : group }}</span>
+        <span>{{ groupHeaders && groupHeaders.valueHandler ? groupHeaders.valueHandler(group, groupBy[0]) : group }}</span>
         <v-btn @click="remove" icon>
           <v-icon>mdi-close</v-icon>
         </v-btn>
@@ -130,8 +130,8 @@ export interface Actions<T = any> {
 }
 
 export interface GroupHeaders {
-  keyHandler?: (value: string) => string;
-  valueHandler?: (value: string) => string;
+  keyHandler?: (key: string) => string;
+  valueHandler?: (value: string, key: string) => string;
 }
 
 type HandledColumn<T = any> = Column<T> & { actions: Actions<T> };
