@@ -5,6 +5,19 @@
         <v-col cols="6" class="py-0 px-2">
           <v-text-field
             type="text"
+            label="Id"
+            name="id"
+            dense
+            append-icon="mdi-content-copy"
+            @click:append="copyText(value.id)"
+            outlined
+            readonly
+            :value="value.id"
+          />
+        </v-col>
+        <v-col cols="6" class="py-0 px-2">
+          <v-text-field
+            type="text"
             label="Codice"
             name="codice"
             dense
@@ -15,6 +28,9 @@
             :value="value.codice"
           />
         </v-col>
+        
+      </v-row>
+      <v-row align="center" justify="center">
         <v-col cols="6" class="py-0 px-2">
           <v-text-field
             type="text"
@@ -28,8 +44,6 @@
             :value="value.nome"
           />
         </v-col>
-      </v-row>
-      <v-row align="center" justify="center">
         <v-col cols="6" class="py-0 px-2">
           <v-text-field
             type="text"
@@ -43,6 +57,9 @@
             :value="tipoFabbricato"
           />
         </v-col>
+        
+      </v-row>
+      <v-row align="center" justify="center">
         <v-col cols="6" class="py-0 px-2">
           <v-text-field
             type="text"
@@ -56,8 +73,6 @@
             :value="value.provincia"
           />
         </v-col>
-      </v-row>
-      <v-row align="center" justify="center">
         <v-col cols="6" class="py-0 px-2">
           <v-text-field
             type="text"
@@ -71,6 +86,9 @@
             :value="value.comune"
           />
         </v-col>
+        
+      </v-row>
+      <v-row align="center" justify="center">
         <v-col cols="6" class="py-0 px-2">
           <v-text-field
             type="text"
@@ -84,8 +102,6 @@
             :value="value.cap"
           />
         </v-col>
-      </v-row>
-      <v-row align="center" justify="center">
         <v-col cols="6" class="py-0 px-2">
           <v-text-field
             type="text"
@@ -93,23 +109,10 @@
             name="indirizzo"
             dense
             append-icon="mdi-content-copy"
-            @click:append="copyText(value.indirizzo)"
+            @click:append="copyText(indirizzo)"
             outlined
             readonly
-            :value="value.indirizzo"
-          />
-        </v-col>
-        <v-col cols="6" class="py-0 px-2">
-          <v-text-field
-            type="text"
-            label="Numero civico"
-            name="nCivico"
-            dense
-            append-icon="mdi-content-copy"
-            @click:append="copyText(value.nCivico)"
-            outlined
-            readonly
-            :value="value.nCivico"
+            :value="indirizzo"
           />
         </v-col>
       </v-row>
@@ -135,6 +138,11 @@ export default class OperatnFabbricatoInfo extends Vue {
 
   get tipoFabbricato(): string {
     return this.value.tipoFabbricato?.tipoFabbricato ?? "NON TROVATO";
+  }
+
+  get indirizzo(): string {
+    const nCivico = this.value.nCivico ?? '';
+    return `${this.value.indirizzo} ${nCivico}`;
   }
 
   /* METHODS */

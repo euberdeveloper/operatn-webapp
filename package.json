@@ -12,7 +12,7 @@
     "core-js": "^3.6.5",
     "i": "^0.3.6",
     "npm": "^7.12.1",
-    "operatn-api-client": "^0.10.8",
+    "operatn-api-client": "^0.10.10",
     "register-service-worker": "^1.7.1",
     "v-snackbars": "^3.2.3",
     "vue": "^2.6.11",

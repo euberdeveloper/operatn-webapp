@@ -3,7 +3,7 @@
     :title="title"
     description="FABBRICATO NON TROVATO"
     :showTable="showTable"
-    tableTitle="Fabbricati"
+    tableTitle="Stanze"
     :tableSelectedValues.sync="selectedValues"
     :tableColumns="columns"
     :tableActions="actions"
@@ -12,12 +12,11 @@
     :tableShowSelect="isRoot"
     :tableUpdateBody.sync="updateBody"
     tableMultiSort
-    tableSortBy="codice"
     :tableGroupHeaders="groupHeaders"
-    createDialogTitle="Nuovo fabbricato"
+    createDialogTitle="Nuova stanza"
     :createDialogShow.sync="showCreateDialog"
     :createDialogDisabled="!createBodyValid"
-    editDialogTitle="Modifica fabbricato"
+    editDialogTitle="Modifica stanza"
     :editDialogShow.sync="showEditDialog"
     :editDialogDisabled="!updateBodyValid"
     @fabCreateClick="openCreate"
@@ -28,44 +27,52 @@
     @editDialogCancel="closeEdit(false)"
   >
     <template v-slot:description>
-      <operatn-fabbricato-info v-if="fabbricato" :value="fabbricato" class="mt-11" />
+      <v-expansion-panels v-if="fabbricato" v-model="detailsExpanded" class="mt-4">
+        <v-expansion-panel>
+          <v-expansion-panel-header> 
+            <span class="text-h6">Dettagli fabbricato</span>
+          </v-expansion-panel-header>
+          <v-expansion-panel-content>
+            <operatn-fabbricato-info :value="fabbricato" />
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </v-expansion-panels>
     </template>
 
-    <!-- <template v-slot:createDialog>
-      <operatn-fabbricato-form
+    <template v-slot:createDialog>
+      <operatn-stanza-form
         v-if="showCreateDialog"
         v-model="createBody"
         :formValid.sync="createBodyValid"
-        :fabbricatiNomi="fabbricatiNomi"
-        :fabbricatiCodici="fabbricatiCodici"
         class="mt-6"
       />
     </template>
     <template v-slot:editDialog>
-      <operatn-fabbricato-form
+      <operatn-stanza-form
         v-if="showEditDialog"
         v-model="updateBody"
         :formValid.sync="updateBodyValid"
-        :fabbricatiNomi="fabbricatiNomi"
-        :fabbricatiCodici="fabbricatiCodici"
         class="mt-6"
       />
-    </template> -->
+    </template>
   </operatn-base-resource-manager>
 </template>
 
 <script lang="ts">
 import { Component, Mixins, Prop } from "vue-property-decorator";
-import { Fabbricato, FabbricatiCreateBody, FabbricatiReplaceBody, TipoFabbricato } from "operatn-api-client";
+import { Fabbricato, Stanza, TipoStanza } from "operatn-api-client";
+import { StanzeCreateBody, StanzeReplaceBody } from "operatn-api-client/api/controllers/fabbricati/stanze/index";
 
 import { AlertType } from "@/store";
 import ResourceManagerMixin from "@/mixins/ResourceManagerMixin";
 import FabbricatoHandlerMixin from "@/mixins/handlers/FabbricatoHandlerMixin";
-import TipoFabbricatoHandlerMixin from "@/mixins/handlers/TipoFabbricatoHandlerMixin";
+import StanzaHandlerMixin from "@/mixins/handlers/StanzaHandlerMixin";
+import TipoStanzaHandlerMixin from "@/mixins/handlers/TipoStanzaHandlerMixin";
 
 import OperatnActionDialog from "@/components/gears/dialogs/OperatnActionDialog.vue";
 import OperatnBaseResourceManager, { Column, Actions } from "@/components/gears/bases/OperatnBaseResourceManager.vue";
 import OperatnFabbricatoInfo from "@/components/gears/infos/OperatnFabbricatoInfo.vue";
+import OperatnStanzaForm from "@/components/gears/forms/OperatnStanzaForm.vue";
 import { GroupHeaders } from "@/components/gears/bases/OperatnBaseTable.vue";
 
 @Component({
@@ -73,11 +80,12 @@ import { GroupHeaders } from "@/components/gears/bases/OperatnBaseTable.vue";
     OperatnActionDialog,
     OperatnBaseResourceManager,
     OperatnFabbricatoInfo,
+    OperatnStanzaForm
   },
 })
 export default class FabbricatiCodice extends Mixins<
-  ResourceManagerMixin<Fabbricato, FabbricatiCreateBody, FabbricatiReplaceBody, number> & FabbricatoHandlerMixin & TipoFabbricatoHandlerMixin
->(ResourceManagerMixin, FabbricatoHandlerMixin, TipoFabbricatoHandlerMixin) {
+  ResourceManagerMixin<Stanza, StanzeCreateBody, StanzeReplaceBody, number> & FabbricatoHandlerMixin & StanzaHandlerMixin & TipoStanzaHandlerMixin
+>(ResourceManagerMixin, FabbricatoHandlerMixin, StanzaHandlerMixin, TipoStanzaHandlerMixin) {
   /* PROPS */
 
   @Prop({ type: Boolean, required: true })
@@ -88,11 +96,12 @@ export default class FabbricatiCodice extends Mixins<
 
   /* DATA */
 
-  protected askDeleteText = "Sei sicuro di voler eliminare questo fabbricato?";
-  protected askDeleteMultipleText = "Sei sicuro di voler eliminare i fabbricati selezionati?";
+  protected askDeleteText = "Sei sicuro di voler eliminare questa stanza?";
+  protected askDeleteMultipleText = "Sei sicuro di voler eliminare le stanze selezionate?";
 
   private fabbricato: Fabbricato | null = null;
-  private tipiFabbricato: TipoFabbricato[] = [];
+  private tipiStanza: TipoStanza[] = [];
+  private detailsExpanded = 0;
 
   /* GETTERS AND SETTERS */
 
@@ -104,7 +113,11 @@ export default class FabbricatiCodice extends Mixins<
     return this.fabbricato !== null;
   }
 
-  get columns(): Column<Fabbricato>[] {
+  get fid(): number {
+    return this.fabbricato?.id as number;
+  }
+
+  get columns(): Column<Stanza>[] {
     return [
       {
         text: "ID",
@@ -113,8 +126,29 @@ export default class FabbricatiCodice extends Mixins<
         editable: false,
       },
       {
-        text: "Codice",
-        value: "codice",
+        text: "Unità immobiliare",
+        value: "unitaImmobiliare",
+        groupable: true,
+
+        editable: true,
+        onEditCancel: () => this.sprepareUpdateBody(),
+        onEditClose: () => {},
+        onEditSave: () => this.updateValue(),
+        onEditOpen: (item) => {
+          this.prepareUpdateBody(item);
+        },
+        editInput: {
+          type: "text",
+          label: "Modifica",
+          hint: "Premi invio per salvare",
+          clearable: true,
+          counter: true,
+          rules: [this.$validator.requiredText("Unità immobiliare")],
+        },
+      },
+      {
+        text: "Numero stanza",
+        value: "numeroStanza",
         groupable: false,
 
         editable: true,
@@ -130,33 +164,12 @@ export default class FabbricatiCodice extends Mixins<
           hint: "Premi invio per salvare",
           clearable: true,
           counter: true,
-          rules: [this.$validator.requiredText("Codice"), this.$validator.unique(this.fabbricatiCodici)],
+          rules: [this.$validator.requiredText("Numero stanza")],
         },
       },
       {
-        text: "Nome",
-        value: "nome",
-        groupable: false,
-
-        editable: true,
-        onEditCancel: () => this.sprepareUpdateBody(),
-        onEditClose: () => {},
-        onEditSave: () => this.updateValue(),
-        onEditOpen: (item) => {
-          this.prepareUpdateBody(item);
-        },
-        editInput: {
-          type: "text",
-          label: "Modifica",
-          hint: "Premi invio per salvare",
-          clearable: true,
-          counter: true,
-          rules: [this.$validator.requiredText("Nome"), this.$validator.unique(this.fabbricatiNomi)],
-        },
-      },
-      {
-        text: "Tipo fabbricato",
-        value: "idTipoFabbricato",
+        text: "Tipo stanza",
+        value: "idTipoStanza",
         groupable: true,
 
         editable: true,
@@ -170,28 +183,81 @@ export default class FabbricatiCodice extends Mixins<
           type: "select",
           label: "Modifica",
           hint: "Premi invio per salvare",
-          items: this.tipiFabbricato,
-          itemText: "tipoFabbricato",
+          items: this.tipiStanza,
+          itemText: "tipoStanza",
           itemValue: "id",
-          rules: [this.$validator.requiredText("Tipo fabbricato")],
+          rules: [this.$validator.requiredText("Tipo stanza")],
         },
 
-        itemTextHandler: (id) => this.tipiFabbricato.find((v) => v.id === id)?.tipoFabbricato ?? "NON TROVATO",
+        itemTextHandler: (id) => this.tipiStanza.find((v) => v.id === id)?.tipoStanza ?? "NON TROVATO",
       },
       {
-        text: "Provincia",
-        value: "provincia",
-        groupable: false,
-      },
-      {
-        text: "Comune",
-        value: "comune",
+        text: "Piano",
+        value: "piano",
         groupable: true,
+
+        editable: true,
+        onEditCancel: () => this.sprepareUpdateBody(),
+        onEditClose: () => {},
+        onEditSave: () => this.updateValue(),
+        onEditOpen: (item) => {
+          this.prepareUpdateBody(item);
+        },
+        editInput: {
+          type: "select",
+          label: "Modifica",
+          hint: "Premi invio per salvare",
+          items: this.piani,
+          itemText: "label",
+          itemValue: "piano",
+          rules: [this.$validator.requiredText("Piano")],
+        },
+
+        itemTextHandler: (piano) => this.piani.find((v) => v.piano === piano)?.label ?? "NON TROVATO",
+      },
+      {
+        text: "Centro di costo",
+        value: "centroDiCosto",
+        groupable: false,
+
+        editable: true,
+        onEditCancel: () => this.sprepareUpdateBody(),
+        onEditClose: () => {},
+        onEditSave: () => this.updateValue(),
+        onEditOpen: (item) => {
+          this.prepareUpdateBody(item);
+        },
+        editInput: {
+          type: "text",
+          label: "Modifica",
+          hint: "Premi invio per salvare",
+          clearable: true,
+          counter: true,
+          rules: [this.$validator.requiredText("Centro di costo")],
+        },
+      },
+      {
+        text: "Bagno",
+        value: "bagno",
+        groupable: true,
+        editable: false,
+        itemText: false,
+        itemIcon: true,
+        itemIconHandler: (value) => (value ? "mdi-toilet" : "mdi-close"),
+      },
+      {
+        text: "Handicap",
+        value: "handicap",
+        groupable: true,
+        editable: false,
+        itemText: false,
+        itemIcon: true,
+        itemIconHandler: (value) => (value ? "mdi-wheelchair-accessibility" : "mdi-close"),
       },
     ];
   }
 
-  get actions(): Actions<Fabbricato> {
+  get actions(): Actions<Stanza> {
     return {
       onEdit: (item) => this.openEdit(item),
       onDelete: this.isRoot ? (item) => this.askDelete(item) : undefined,
@@ -200,75 +266,76 @@ export default class FabbricatiCodice extends Mixins<
 
   get groupHeaders(): GroupHeaders {
     return {
-      keyHandler: (key) => (key === "idTipoFabbricato" ? "TIPO FABBRICATO" : key),
-      valueHandler: (value, key) => (key === "idTipoFabbricato" ? this.tipiFabbricato.find((v) => v.id === +value)?.tipoFabbricato ?? "NON TROVATO" : value),
+      keyHandler: (key) => (key === "idTipoStanza" ? "TIPO STANZA" : key),
+      valueHandler: (value, key) => (key === "idTipoStanza" ? this.tipiStanza.find((v) => v.id === +value)?.tipoStanza ?? "NON TROVATO" : value),
     };
   }
 
-  get fabbricatiCodici(): string[] {
-    return this.getFabbricatiCodici(this.values, this.backupValue);
-  }
-
-  get fabbricatiNomi(): string[] {
-    return this.getFabbricatiNomi(this.values, this.backupValue);
+  get piani() {
+    return this.$store.state.piani;
   }
 
   /* METHODS */
 
-  getIdFromValue(value: Fabbricato): number {
+  getIdFromValue(value: Stanza): number {
     return value.id;
   }
 
   async deleteHandler(id: number, isMultiple: boolean): Promise<void> {
-    await this.deleteFabbricato(id, isMultiple ? AlertType.ERRORS_QUEUE : AlertType.ERROR_ALERT);
+    await this.deleteStanza(this.fid, id, isMultiple ? AlertType.ERRORS_QUEUE : AlertType.ERROR_ALERT);
   }
 
-  async createHandler(value: FabbricatiCreateBody): Promise<number> {
-    return this.createFabbricato(value);
+  async createHandler(value: StanzeCreateBody): Promise<number> {
+    return this.createStanza(this.fid, value);
   }
 
-  async updateHandler(id: number, value: FabbricatiReplaceBody, isTableEdit: boolean): Promise<void> {
-    await this.updateFabbricato(id, value, isTableEdit ? AlertType.ERRORS_QUEUE : AlertType.ERROR_ALERT);
+  async updateHandler(id: number, value: StanzeReplaceBody, isTableEdit: boolean): Promise<void> {
+    await this.updateStanza(this.fid, id, value, isTableEdit ? AlertType.ERRORS_QUEUE : AlertType.ERROR_ALERT);
   }
 
-  updateBodyFromValue(value: Fabbricato): FabbricatiReplaceBody {
+  updateBodyFromValue(value: Stanza): StanzeReplaceBody {
     return {
-      codice: value.codice,
-      nome: value.nome,
-      idTipoFabbricato: value.idTipoFabbricato,
-      provincia: value.provincia,
-      comune: value.comune,
-      cap: value.cap,
-      indirizzo: value.indirizzo,
-      nCivico: value.nCivico,
+      unitaImmobiliare: value.unitaImmobiliare,
+      numeroStanza: value.numeroStanza,
+      piano: value.piano,
+      bagno: value.bagno,
+      centroDiCosto: value.centroDiCosto,
+      gestioneDiretta: value.gestioneDiretta,
+      handicap: value.handicap,
+      note: value.note,
+      idTipoStanza: value.idTipoStanza,
     };
   }
-  tupleValueFromCreateBody(id: number, body: FabbricatiCreateBody): Fabbricato {
+  tupleValueFromCreateBody(id: number, body: StanzeCreateBody): Stanza {
     return {
       id,
-      codice: body.codice,
-      nome: body.nome,
-      idTipoFabbricato: body.idTipoFabbricato,
-      provincia: body.provincia,
-      comune: body.comune,
-      cap: body.cap,
-      indirizzo: body.indirizzo,
-      nCivico: body.nCivico,
+      idFabbricato: this.fid,
+      unitaImmobiliare: body.unitaImmobiliare,
+      numeroStanza: body.numeroStanza,
+      piano: body.piano,
+      bagno: body.bagno,
+      centroDiCosto: body.centroDiCosto,
+      gestioneDiretta: body.gestioneDiretta,
+      handicap: body.handicap,
+      note: body.note,
+      idTipoStanza: body.idTipoStanza,
       dataCreazione: this.backupValue?.dataCreazione ?? new Date(),
       eliminato: null,
     };
   }
-  tupleValueFromUpdateBody(id: number, body: FabbricatiReplaceBody): Fabbricato {
+  tupleValueFromUpdateBody(id: number, body: StanzeReplaceBody): Stanza {
     return {
       id,
-      codice: body.codice,
-      nome: body.nome,
-      idTipoFabbricato: body.idTipoFabbricato,
-      provincia: body.provincia,
-      comune: body.comune,
-      cap: body.cap,
-      indirizzo: body.indirizzo,
-      nCivico: body.nCivico,
+      idFabbricato: this.fid,
+      unitaImmobiliare: body.unitaImmobiliare,
+      numeroStanza: body.numeroStanza,
+      piano: body.piano,
+      bagno: body.bagno,
+      centroDiCosto: body.centroDiCosto,
+      gestioneDiretta: body.gestioneDiretta,
+      handicap: body.handicap,
+      note: body.note,
+      idTipoStanza: body.idTipoStanza,
       dataCreazione: this.backupValue?.dataCreazione ?? new Date(),
       eliminato: null,
     };
@@ -278,8 +345,8 @@ export default class FabbricatiCodice extends Mixins<
 
   async mounted() {
     this.fabbricato = await this.getFabbricatoByCodice(this.codice, { tipoFabbricato: true });
-    this.values = await this.getFabbricati();
-    this.tipiFabbricato = await this.getTipiFabbricato();
+    this.values = await this.getStanze(this.fabbricato.id);
+    this.tipiStanza = await this.getTipiStanza();
   }
 }
 </script>

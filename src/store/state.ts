@@ -1,4 +1,4 @@
-import { RuoloUtente } from "operatn-api-client"
+import { Piano, RuoloUtente } from "operatn-api-client"
 import { UtentiReturned } from "operatn-api-client/api/controllers/index"
 
 export interface State {
@@ -13,6 +13,7 @@ export interface State {
     darkTheme: boolean;
     primaryColour: string | null;
     roles: RuoloUtente[];
+    piani: { piano: Piano, label: string }[];
 }
 
 export const state: State = {
@@ -26,5 +27,43 @@ export const state: State = {
     confirmDialog: null,
     darkTheme: false,
     primaryColour: null,
-    roles: Object.values(RuoloUtente)
+    roles: Object.values(RuoloUtente),
+    piani: [
+        {
+            piano: Piano.MANSARDA,
+            label: 'MANSARDA'
+        },
+        {
+            piano: Piano.PIANO_RIALZATO,
+            label: 'PIANO RIALZATO'
+        },
+        {
+            piano: Piano.PRIMO_PIANO,
+            label: 'PRIMO PIANO'
+        },
+        {
+            piano: Piano.SECONDO_PIANO,
+            label: 'SECONDO PIANO'
+        },
+        {
+            piano: Piano.TERZO_PIANO,
+            label: 'TERZO PIANO'
+        },
+        {
+            piano: Piano.QUARTO_PIANO,
+            label: 'QUARTO PIANO'
+        },
+        {
+            piano: Piano.QUINTO_PIANO,
+            label: 'QUINTO PIANO'
+        },
+        {
+            piano: Piano.SESTO_PIANO,
+            label: 'SESTO PIANO'
+        },
+        {
+            piano: Piano.SETTIMO_PIANO,
+            label: 'SETTIMO PIANO'
+        }
+    ]
 }
