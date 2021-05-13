@@ -24,13 +24,13 @@
     />
 
     <!-- PLUS FAB BUTTON -->
-    <v-fab-transition v-if="!isSelecting" key="plus">
+    <v-fab-transition v-if="showActionButton && !isSelecting" key="plus">
       <v-btn color="primary" @click="fabCreateClick" fab large fixed bottom right>
         <v-icon>mdi-plus</v-icon>
       </v-btn>
     </v-fab-transition>
     <!-- DELETE FAB BUTTON -->
-    <v-fab-transition v-else key="delete">
+    <v-fab-transition v-else-if="showActionButton" key="delete">
       <v-btn color="error" @click="fabDeleteClick" fab large fixed bottom right>
         <v-icon>mdi-delete</v-icon>
       </v-btn>
@@ -140,6 +140,9 @@ export default class OperatnBaseResourceManager extends Vue {
 
   @Prop({ type: Boolean, required: true })
   private editDialogDisabled!: boolean;
+
+  @Prop({ type: Boolean, default: true })
+  private showActionButton!: boolean;
 
   @Prop({ type: String, required: false })
   dialogWidth?: string;

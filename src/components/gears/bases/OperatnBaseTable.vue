@@ -90,6 +90,7 @@
         </v-edit-dialog>
       </span>
       <span :key="`item-${column.value}-${index}`" v-else>
+        <v-icon small color="success" class="mx-1" @click="column.actions.onView(item)" v-if="column.actions && column.actions.onView">mdi-eye</v-icon>
         <v-icon small color="primary" class="mx-1" @click="column.actions.onEdit(item)" v-if="column.actions && column.actions.onEdit">mdi-pencil</v-icon>
         <v-icon small color="error" class="mx-1" @click="column.actions.onDelete(item)" v-if="column.actions && column.actions.onDelete">mdi-delete</v-icon>
       </span>
@@ -127,6 +128,7 @@ export interface Column<T = any> extends DataTableHeader {
 export interface Actions<T = any> {
   onEdit?: (value: T) => void | Promise<void>;
   onDelete?: (value: T) => void | Promise<void>;
+  onView?: (value: T) => void | Promise<void>;
 }
 
 export interface GroupHeaders {
@@ -211,6 +213,7 @@ export default class OperatnBaseTable extends Vue {
               actions: {
                 onEdit: this.actions.onEdit,
                 onDelete: this.actions.onDelete,
+                onView: this.actions.onView
               },
             },
           ]

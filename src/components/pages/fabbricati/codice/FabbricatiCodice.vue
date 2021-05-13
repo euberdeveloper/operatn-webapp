@@ -2,7 +2,7 @@
   <operatn-base-resource-manager
     :title="title"
     description="FABBRICATO NON TROVATO"
-    :showTable="showTable"
+    :showTable="showTableAndActionButton"
     tableTitle="Stanze"
     :tableSelectedValues.sync="selectedValues"
     :tableColumns="columns"
@@ -19,6 +19,7 @@
     editDialogTitle="Modifica stanza"
     :editDialogShow.sync="showEditDialog"
     :editDialogDisabled="!updateBodyValid"
+    :showActionButton="showTableAndActionButton"
     @fabCreateClick="openCreate"
     @fabDeleteClick="askDeleteMultiple"
     @createDialogConfirm="closeCreate(true)"
@@ -109,7 +110,7 @@ export default class FabbricatiCodice extends Mixins<
     return this.fabbricato ? `Fabbricato: ${this.fabbricato.nome}` : `Fabbricato: ${this.codice}`;
   }
 
-  get showTable(): boolean {
+  get showTableAndActionButton(): boolean {
     return this.fabbricato !== null;
   }
 
@@ -260,7 +261,7 @@ export default class FabbricatiCodice extends Mixins<
   get actions(): Actions<Stanza> {
     return {
       onEdit: (item) => this.openEdit(item),
-      onDelete: this.isRoot ? (item) => this.askDelete(item) : undefined,
+      onDelete: this.isRoot ? (item) => this.askDelete(item) : undefined
     };
   }
 
