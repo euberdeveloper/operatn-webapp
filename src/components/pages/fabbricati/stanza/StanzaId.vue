@@ -191,7 +191,7 @@ export default class StanzaId extends Mixins<
   /* LIFE CYCLE */
 
   async mounted() {
-    this.stanza = await this.getStanza(this.fid, this.sid, { tipoStanza: true, postiLetto: true, manutenzioni: true });
+    this.stanza = await this.getStanza(this.fid, this.sid, { tipoStanza: true, postiLetto: true, manutenzioni: true, fabbricato: true as any });
     this.values = await this.getPostiLetto(this.fid, this.sid);
   }
 }
