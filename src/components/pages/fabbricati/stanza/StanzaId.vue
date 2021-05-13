@@ -28,12 +28,35 @@
   >
     <template v-slot:description>
       <v-expansion-panels v-if="stanza" v-model="detailsExpanded" class="mt-4">
+        <!-- STANZA INFO -->
         <v-expansion-panel>
           <v-expansion-panel-header>
             <span class="text-h6">Dettagli stanza</span>
           </v-expansion-panel-header>
           <v-expansion-panel-content>
             <operatn-stanza-info :value="stanza" />
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+
+        <!-- MANUTENZIONI -->
+        <v-expansion-panel>
+          <v-expansion-panel-header>
+            <span class="text-h6">Gestisci manutenzioni</span>
+          </v-expansion-panel-header>
+          <v-expansion-panel-content>
+            <operatn-base-table
+              title="Manutenzioni"
+              :columns="manutenzioniColumns"
+              :actions="manutenzioniActions"
+              :values="manutenzioni"
+              itemKey="id"
+              sortBy="dataCreazione"
+            >
+              <template v-slot:header>
+                <v-spacer />
+                <v-btn color="primary" @click="addManutenzione">Aggiungi</v-btn>
+              </template>
+            </operatn-base-table>
           </v-expansion-panel-content>
         </v-expansion-panel>
       </v-expansion-panels>
@@ -50,16 +73,18 @@
 
 <script lang="ts">
 import { Component, Mixins, Prop } from "vue-property-decorator";
-import { PostiLettoCreateBody, PostiLettoReplaceBody, PostiLettoReturned, StanzeReturned } from "operatn-api-client";
+import { Manutenzione, PostiLettoCreateBody, PostiLettoReplaceBody, PostiLettoReturned, StanzeReturned } from "operatn-api-client";
 
 import { AlertType } from "@/store";
 import ResourceManagerMixin from "@/mixins/ResourceManagerMixin";
 import StanzaHandlerMixin from "@/mixins/handlers/StanzaHandlerMixin";
 import PostoLettoHandlerMixin from "@/mixins/handlers/PostoLettoHandlerMixin";
+import ManutenzioneHandlerMixin from "@/mixins/handlers/ManutenzioneHandlerMixin";
 import TipoStanzaHandlerMixin from "@/mixins/handlers/TipoStanzaHandlerMixin";
 
 import OperatnActionDialog from "@/components/gears/dialogs/OperatnActionDialog.vue";
 import OperatnBaseResourceManager, { Column, Actions } from "@/components/gears/bases/OperatnBaseResourceManager.vue";
+import OperatnBaseTable from "@/components/gears/bases/OperatnBaseTable.vue";
 import OperatnStanzaInfo from "@/components/gears/infos/OperatnStanzaInfo.vue";
 import OperatnPostoLettoForm from "@/components/gears/forms/OperatnPostoLettoForm.vue";
 
@@ -67,13 +92,18 @@ import OperatnPostoLettoForm from "@/components/gears/forms/OperatnPostoLettoFor
   components: {
     OperatnActionDialog,
     OperatnBaseResourceManager,
+    OperatnBaseTable,
     OperatnStanzaInfo,
     OperatnPostoLettoForm,
   },
 })
 export default class StanzaId extends Mixins<
-  ResourceManagerMixin<PostiLettoReturned, PostiLettoCreateBody, PostiLettoReplaceBody, number> & PostoLettoHandlerMixin & StanzaHandlerMixin & TipoStanzaHandlerMixin
->(ResourceManagerMixin, PostoLettoHandlerMixin, StanzaHandlerMixin, TipoStanzaHandlerMixin) {
+  ResourceManagerMixin<PostiLettoReturned, PostiLettoCreateBody, PostiLettoReplaceBody, number> &
+    PostoLettoHandlerMixin &
+    StanzaHandlerMixin &
+    TipoStanzaHandlerMixin &
+    ManutenzioneHandlerMixin
+>(ResourceManagerMixin, PostoLettoHandlerMixin, StanzaHandlerMixin, TipoStanzaHandlerMixin, ManutenzioneHandlerMixin) {
   /* PROPS */
 
   @Prop({ type: Boolean, required: true })
@@ -91,6 +121,7 @@ export default class StanzaId extends Mixins<
   protected askDeleteMultipleText = "Sei sicuro di voler eliminare i posti letto selezionati?";
 
   private stanza: StanzeReturned | null = null;
+  private manutenzioni: Manutenzione[] = [];
   private detailsExpanded = 0;
 
   /* GETTERS AND SETTERS */
@@ -135,10 +166,46 @@ export default class StanzaId extends Mixins<
     ];
   }
 
+  get manutenzioniColumns(): Column<PostiLettoReturned>[] {
+    return [
+      {
+        text: "ID",
+        value: "id",
+        groupable: false,
+        editable: false,
+      },
+      {
+        text: "Data creazione",
+        value: "dataCreazione",
+        groupable: false,
+        editable: false,
+        itemTextHandler: (value) => new Date(value).toLocaleDateString(),
+      },
+      {
+        text: "Eliminato",
+        value: "eliminato",
+        groupable: false,
+        editable: false,
+        itemText: true,
+        itemIcon: true,
+        itemIconHandler: (value) => (value ? "mdi-close" : "mdi-leaf"),
+        itemTextHandler: (value) => (value ? new Date(value).toLocaleDateString() : ""),
+        itemIconColour: (value) => (value === null ? "success" : "error"),
+      },
+    ];
+  }
+
   get actions(): Actions<PostiLettoReturned> {
     return {
       onEdit: (item) => this.openEdit(item),
       onDelete: this.isRoot ? (item) => this.askDelete(item) : undefined,
+    };
+  }
+
+  get manutenzioniActions(): Actions<PostiLettoReturned> {
+    return {
+      onDelete: this.isRoot ? async (item) => this.removeManutenzione(item) : undefined,
+      showDelete: (item) => !item.eliminato,
     };
   }
 
@@ -188,11 +255,30 @@ export default class StanzaId extends Mixins<
     };
   }
 
+  async addManutenzione(): Promise<void> {
+    const id = await this.createManutenzione(this.fid, this.sid);
+    this.manutenzioni.push({
+      id,
+      idStanza: this.sid,
+      dataCreazione: new Date(),
+      eliminato: null,
+    });
+  }
+
+  async removeManutenzione(item: Manutenzione): Promise<void> {
+    await this.deleteManutenzione(this.fid, this.sid, item.id);
+    const index = this.manutenzioni.findIndex((m) => m.id === item.id);
+    if (index) {
+      this.manutenzioni.splice(index, 1, { ...item, eliminato: new Date() });
+    }
+  }
+
   /* LIFE CYCLE */
 
   async mounted() {
-    this.stanza = await this.getStanza(this.fid, this.sid, { tipoStanza: true, postiLetto: true, manutenzioni: true, fabbricato: true as any });
+    this.stanza = await this.getStanza(this.fid, this.sid, { tipoStanza: true, postiLetto: true, fabbricato: true as any });
     this.values = await this.getPostiLetto(this.fid, this.sid);
+    this.manutenzioni = await this.getManutenzioni(this.fid, this.sid, { includeSoftDeleted: true });
   }
 }
 </script>

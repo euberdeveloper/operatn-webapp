@@ -15,7 +15,9 @@
       <v-toolbar flat>
         <v-container class="pa-0 fill-height fluid d-flex" fluid>
           <v-toolbar-title class="mr-4" v-if="$vuetify.breakpoint.mdAndUp">{{ title }}</v-toolbar-title>
-          <v-text-field class="flex" v-model="search" label="Cerca" dense solo outlined clearable hide-details prepend-inner-icon="mdi-magnify" />
+          <slot name="header">
+            <v-text-field class="flex" v-model="search" label="Cerca" dense solo outlined clearable hide-details prepend-inner-icon="mdi-magnify" />
+          </slot>
         </v-container>
       </v-toolbar>
     </template>
@@ -45,7 +47,7 @@
     <template v-for="column of handledColumns" v-slot:[getItemSlotName(column.value)]="{ item, value, index }">
       <span :key="`item-${column.value}-${index}`" v-if="column.value !== '_actions'">
         <span v-if="!column.editable">
-          <v-icon class="mr-3" v-if="column.itemIcon">{{ column.itemIconHandler ? column.itemIconHandler(value) : value }}</v-icon>
+          <v-icon class="mr-3" :color="column.itemIconColour ? column.itemIconColour(value) : ''" v-if="column.itemIcon">{{ column.itemIconHandler ? column.itemIconHandler(value) : value }}</v-icon>
           <span v-if="column.itemText !== false">{{ column.itemTextHandler ? column.itemTextHandler(value) : value }}</span>
         </span>
         <v-edit-dialog
@@ -90,9 +92,15 @@
         </v-edit-dialog>
       </span>
       <span :key="`item-${column.value}-${index}`" v-else>
-        <v-icon small color="success" class="mx-1" @click="column.actions.onView(item)" v-if="column.actions && column.actions.onView">mdi-eye</v-icon>
-        <v-icon small color="primary" class="mx-1" @click="column.actions.onEdit(item)" v-if="column.actions && column.actions.onEdit">mdi-pencil</v-icon>
-        <v-icon small color="error" class="mx-1" @click="column.actions.onDelete(item)" v-if="column.actions && column.actions.onDelete">mdi-delete</v-icon>
+        <v-icon small color="success" class="mx-1" @click="column.actions.onView(item)" v-if="column.actions && column.actions.onView && column.actions.showView(item)"
+          >mdi-eye</v-icon
+        >
+        <v-icon small color="primary" class="mx-1" @click="column.actions.onEdit(item)" v-if="column.actions && column.actions.onEdit && column.actions.showEdit(item)"
+          >mdi-pencil</v-icon
+        >
+        <v-icon small color="error" class="mx-1" @click="column.actions.onDelete(item)" v-if="column.actions && column.actions.onDelete && column.actions.showDelete(item)"
+          >mdi-delete</v-icon
+        >
       </span>
     </template>
   </v-data-table>
@@ -123,12 +131,17 @@ export interface Column<T = any> extends DataTableHeader {
   itemIcon?: boolean;
   itemTextHandler?: (value: any) => string;
   itemIconHandler?: (value: any) => string;
+  itemIconColour?: (value: any) => string;
 }
 
 export interface Actions<T = any> {
   onEdit?: (value: T) => void | Promise<void>;
   onDelete?: (value: T) => void | Promise<void>;
   onView?: (value: T) => void | Promise<void>;
+
+  showEdit?: (value: T) => boolean;
+  showDelete?: (value: T) => boolean;
+  showView?: (value: T) => boolean;
 }
 
 export interface GroupHeaders {
@@ -159,7 +172,7 @@ export default class OperatnBaseTable extends Vue {
   @Prop({ type: Object, required: false })
   private groupHeaders?: GroupHeaders;
 
-  @Prop({ type: Array, required: true })
+  @Prop({ type: Array, default: () => [] })
   private selectedValues!: any[];
 
   @Prop({ type: Array, required: true })
@@ -177,8 +190,8 @@ export default class OperatnBaseTable extends Vue {
   @Prop({ type: Boolean, default: false })
   private multiSort!: boolean;
 
-  @Prop({ validator: (v) => typeof v === "object" || v === null, required: true })
-  private updateBody!: any;
+  @Prop({ validator: (v) => typeof v === "object" || v === null, required: false })
+  private updateBody?: any;
 
   /* DATA */
 
@@ -213,7 +226,10 @@ export default class OperatnBaseTable extends Vue {
               actions: {
                 onEdit: this.actions.onEdit,
                 onDelete: this.actions.onDelete,
-                onView: this.actions.onView
+                onView: this.actions.onView,
+                showEdit: this.actions.showEdit ?? (() => !!this.actions?.onEdit),
+                showDelete: this.actions.showDelete ?? (() => !!this.actions?.onDelete),
+                showView: this.actions.showView ?? (() => !!this.actions?.onView),
               },
             },
           ]
