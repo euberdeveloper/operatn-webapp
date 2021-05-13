@@ -20,9 +20,9 @@ export default class FabbricatoHandlerMixin extends Vue {
     }
   }
 
-  async getFabbricatoByCodice(codice: string, params: FabbricatiIncludeParams = {}, alertType = AlertType.ERROR_ALERT): Promise<FabbricatiReturned> {
+  async getFabbricato(id: number, params: FabbricatiIncludeParams = {}, alertType = AlertType.ERROR_ALERT): Promise<FabbricatiReturned> {
     try {
-      return await this.$api.fabbricati.getByCodice(codice, params, { alertType });
+      return await this.$api.fabbricati.get(id, params, { alertType });
     } catch (error) {
       if (error instanceof NotFoundError) {
         this.$store.dispatch(ActionTypes.ALERT, { message: `Fabbricato non trovato`, alertType });

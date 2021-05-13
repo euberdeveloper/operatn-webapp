@@ -178,7 +178,7 @@ export default class Fabbricati extends Mixins<
     return {
       onEdit: (item) => this.openEdit(item),
       onDelete: this.isRoot ? (item) => this.askDelete(item) : undefined,
-      onView: (item) => this.$router.push(`fabbricati/${item.codice}`)
+      onView: (item) => { this.$router.push(`fabbricati/${item.id}`) }
     };
   }
 

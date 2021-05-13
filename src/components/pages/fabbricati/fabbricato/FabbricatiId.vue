@@ -84,7 +84,7 @@ import { GroupHeaders } from "@/components/gears/bases/OperatnBaseTable.vue";
     OperatnStanzaForm
   },
 })
-export default class FabbricatiCodice extends Mixins<
+export default class FabbricatiId extends Mixins<
   ResourceManagerMixin<Stanza, StanzeCreateBody, StanzeReplaceBody, number> & FabbricatoHandlerMixin & StanzaHandlerMixin & TipoStanzaHandlerMixin
 >(ResourceManagerMixin, FabbricatoHandlerMixin, StanzaHandlerMixin, TipoStanzaHandlerMixin) {
   /* PROPS */
@@ -92,8 +92,8 @@ export default class FabbricatiCodice extends Mixins<
   @Prop({ type: Boolean, required: true })
   isRoot!: boolean;
 
-  @Prop({ type: String, required: true })
-  codice!: string;
+  @Prop({ type: Number, required: true })
+  fid!: number;
 
   /* DATA */
 
@@ -107,15 +107,11 @@ export default class FabbricatiCodice extends Mixins<
   /* GETTERS AND SETTERS */
 
   get title(): string {
-    return this.fabbricato ? `Fabbricato: ${this.fabbricato.nome}` : `Fabbricato: ${this.codice}`;
+    return this.fabbricato ? `Fabbricato: ${this.fabbricato.nome}` : `Fabbricato: ${this.fid}`;
   }
 
   get showTableAndActionButton(): boolean {
     return this.fabbricato !== null;
-  }
-
-  get fid(): number {
-    return this.fabbricato?.id as number;
   }
 
   get columns(): Column<Stanza>[] {
@@ -261,7 +257,8 @@ export default class FabbricatiCodice extends Mixins<
   get actions(): Actions<Stanza> {
     return {
       onEdit: (item) => this.openEdit(item),
-      onDelete: this.isRoot ? (item) => this.askDelete(item) : undefined
+      onDelete: this.isRoot ? (item) => this.askDelete(item) : undefined,
+      onView: (item) => { this.$router.push(`${this.fid}/stanze/${item.id}`)}
     };
   }
 
@@ -345,8 +342,8 @@ export default class FabbricatiCodice extends Mixins<
   /* LIFE CYCLE */
 
   async mounted() {
-    this.fabbricato = await this.getFabbricatoByCodice(this.codice, { tipoFabbricato: true });
-    this.values = await this.getStanze(this.fabbricato.id);
+    this.fabbricato = await this.getFabbricato(this.fid, { tipoFabbricato: true });
+    this.values = await this.getStanze(this.fid);
     this.tipiStanza = await this.getTipiStanza();
   }
 }
