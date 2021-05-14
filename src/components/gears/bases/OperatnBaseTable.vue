@@ -9,7 +9,7 @@
     :search="search"
     :group-by.sync="aggregateBy"
     :multi-sort="multiSort"
-    class="elevation-1"
+    :class="['operatn-base-table', elevationClass]"
   >
     <template v-slot:top>
       <v-toolbar flat>
@@ -47,7 +47,9 @@
     <template v-for="column of handledColumns" v-slot:[getItemSlotName(column.value)]="{ item, value, index }">
       <span :key="`item-${column.value}-${index}`" v-if="column.value !== '_actions'">
         <span v-if="!column.editable">
-          <v-icon class="mr-3" :color="column.itemIconColour ? column.itemIconColour(value) : ''" v-if="column.itemIcon">{{ column.itemIconHandler ? column.itemIconHandler(value) : value }}</v-icon>
+          <v-icon class="mr-3" :color="column.itemIconColour ? column.itemIconColour(value) : ''" v-if="column.itemIcon">{{
+            column.itemIconHandler ? column.itemIconHandler(value) : value
+          }}</v-icon>
           <span v-if="column.itemText !== false">{{ column.itemTextHandler ? column.itemTextHandler(value) : value }}</span>
         </span>
         <v-edit-dialog
@@ -98,7 +100,12 @@
         <v-icon small color="primary" class="mx-1" @click="column.actions.onEdit(item)" v-if="column.actions && column.actions.onEdit && column.actions.showEdit(item)"
           >mdi-pencil</v-icon
         >
-        <v-icon small color="error" class="mx-1" @click="column.actions.onDelete(item)" v-if="column.actions && column.actions.onDelete && column.actions.showDelete(item)"
+        <v-icon
+          small
+          color="error"
+          class="mx-1"
+          @click="column.actions.onDelete(item)"
+          v-if="column.actions && column.actions.onDelete && column.actions.showDelete(item)"
           >mdi-delete</v-icon
         >
       </span>
@@ -193,12 +200,19 @@ export default class OperatnBaseTable extends Vue {
   @Prop({ validator: (v) => typeof v === "object" || v === null, required: false })
   private updateBody?: any;
 
+  @Prop({ type: Number, default: 1 })
+  private elevation!: number;
+
   /* DATA */
 
   private search: string | null = null;
   private aggregateBy: string | null = null;
 
   /* COMPUTED */
+
+  get elevationClass(): string {
+    return `elevation-${this.elevation}`;
+  }
 
   get internalSelectedValues(): any {
     return this.selectedValues;
@@ -247,3 +261,11 @@ export default class OperatnBaseTable extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.operatn-base-table ::v-deep {
+  th {
+    white-space: nowrap;
+  }
+}
+</style>

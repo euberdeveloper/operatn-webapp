@@ -8,6 +8,7 @@
         persistent-hint
         :prepend-icon="icon"
         v-bind="attrs"
+        :rules="rules"
         @blur="internalValue = parseDate(dateFormatted)"
         @keypress.enter="enterClicked"
         v-on="on"
@@ -38,6 +39,9 @@ export default class OperatnDateInput extends Vue {
 
   @Prop({ type: String, required: false })
   icon?: string;
+
+  @Prop({ type: Array, default: () => [] })
+  rules!: any[];
 
   /* DATA */
 
