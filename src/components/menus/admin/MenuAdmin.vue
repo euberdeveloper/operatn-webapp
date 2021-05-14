@@ -86,6 +86,11 @@ export default class MenuAdmin extends Vue {
       text: "Tabellone",
       path: "/admin/tabellone",
     },
+    {
+      icon: "mdi-account-cash",
+      text: "Contabilità",
+      path: "/admin/contabilita",
+    },
   ];
 }
 </script>

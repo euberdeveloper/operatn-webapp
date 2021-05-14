@@ -86,6 +86,11 @@ export default class MenuRoot extends Vue {
       text: "Tabellone",
       path: "/root/tabellone",
     },
+    {
+      icon: "mdi-account-cash",
+      text: "Contabilità",
+      path: "/root/contabilita",
+    },
   ];
 }
 </script>

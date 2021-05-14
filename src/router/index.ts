@@ -35,6 +35,7 @@ import RootDipartimentiUnitn from '@/views/root/dipartimenti-unitn/RootDipartime
 import RootTabellone from '@/views/root/tabellone/RootTabelloneView.vue';
 import RootTabelloneEsporta from '@/views/root/tabellone/esporta/RootTabelloneEsportaView.vue';
 import RootTabelloneCronologia from '@/views/root/tabellone/cronologia/RootTabelloneCronologiaView.vue';
+import RootContabilita from '@/views/root/contabilita/RootContabilitaView.vue';
 
 
 /* ADMIN */
@@ -60,6 +61,7 @@ import AdminDipartimentiUnitn from '@/views/admin/dipartimenti-unitn/AdminDipart
 import AdminTabellone from '@/views/admin/tabellone/AdminTabelloneView.vue';
 import AdminTabelloneEsporta from '@/views/admin/tabellone/esporta/AdminTabelloneEsportaView.vue';
 import AdminTabelloneCronologia from '@/views/admin/tabellone/cronologia/AdminTabelloneCronologiaView.vue';
+import AdminContabilita from '@/views/admin/contabilita/AdminContabilitaView.vue';
 
 Vue.use(VueRouter);
 
@@ -200,6 +202,11 @@ const routes: Array<RouteConfig> = [
           }
         ]
       },
+      {
+        path: 'contabilita',
+        name: 'admin-contabilita',
+        component: AdminContabilita
+      },
     ]
   },
   {
@@ -316,6 +323,11 @@ const routes: Array<RouteConfig> = [
             component: RootTabelloneCronologia
           }
         ]
+      },
+      {
+        path: 'contabilita',
+        name: 'root-contabilita',
+        component: RootContabilita
       },
     ]
 
