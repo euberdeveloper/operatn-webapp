@@ -55,7 +55,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Mixins } from "vue-property-decorator";
+import { Component, Mixins, Watch } from "vue-property-decorator";
 import { Tabellone, TabelloneQueryParams } from "operatn-api-client";
 
 import TabelloneHandlerMixin from "@/mixins/handlers/TabelloneHandlerMixin";
@@ -67,7 +67,7 @@ import OperatnBaseTable, { Column } from "@/components/gears/bases/OperatnBaseTa
 @Component({
   components: {
     OperatnDateInput,
-    OperatnBaseTable
+    OperatnBaseTable,
   },
 })
 export default class TabelloneEsporta extends Mixins(TabelloneHandlerMixin) {
@@ -185,6 +185,12 @@ export default class TabelloneEsporta extends Mixins(TabelloneHandlerMixin) {
     return !this.formValid || Object.keys(this.loading).some((k) => this.loading[k]);
   }
 
+  /* WATCH */
+
+  @Watch("formValue", { deep: true })
+  watchFormValue() {
+    this.tabellone = [];
+  }
 
   /* METHODS */
 
@@ -232,7 +238,6 @@ export default class TabelloneEsporta extends Mixins(TabelloneHandlerMixin) {
       }
     }
   }
-  
 }
 </script>
 
