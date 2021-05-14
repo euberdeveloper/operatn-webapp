@@ -6,7 +6,7 @@
     </v-toolbar>
 
     <!-- TABS -->
-    <v-tabs v-model="activeTab" vertical>
+    <v-tabs v-model="activeTab" :vertical="$vuetify.breakpoint.lgAndUp">
       <v-tab v-for="tab of tabs" :key="tab.path" :to="tab.path">
         <v-icon left>{{ tab.icon }}</v-icon>
         <span>{{ tab.label }}</span>
