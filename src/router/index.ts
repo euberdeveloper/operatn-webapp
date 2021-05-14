@@ -57,6 +57,9 @@ import AdminFabbricati from '@/views/admin/fabbricati/AdminFabbricatiView.vue';
 import AdminFabbricatiId from '@/views/admin/fabbricati/id/AdminFabbricatiIdView.vue';
 import AdminFabbricatiIdStanzeId from '@/views/admin/fabbricati/id/stanze/id/AdminFabbricatiIdStanzeIdView.vue';
 import AdminDipartimentiUnitn from '@/views/admin/dipartimenti-unitn/AdminDipartimentiUnitnView.vue';
+import AdminTabellone from '@/views/admin/tabellone/AdminTabelloneView.vue';
+import AdminTabelloneEsporta from '@/views/admin/tabellone/esporta/AdminTabelloneEsportaView.vue';
+import AdminTabelloneCronologia from '@/views/admin/tabellone/cronologia/AdminTabelloneCronologiaView.vue';
 
 Vue.use(VueRouter);
 
@@ -176,6 +179,26 @@ const routes: Array<RouteConfig> = [
         name: 'admin-fabbricati-id-stanze-id',
         component: AdminFabbricatiIdStanzeId,
         props: true
+      },
+      {
+        path: 'tabellone',
+        component: AdminTabellone,
+        children: [
+          {
+            path: '',
+            redirect: 'esporta'
+          },
+          {
+            path: 'esporta',
+            name: 'admin-tabellone-esporta',
+            component: AdminTabelloneEsporta
+          },
+          {
+            path: 'cronologia',
+            name: 'admin-tabellone-cronologia',
+            component: AdminTabelloneCronologia
+          }
+        ]
       },
     ]
   },
