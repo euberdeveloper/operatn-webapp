@@ -32,6 +32,9 @@ import RootFabbricati from '@/views/root/fabbricati/RootFabbricatiView.vue';
 import RootFabbricatiId from '@/views/root/fabbricati/id/RootFabbricatiIdView.vue';
 import RootFabbricatiIdStanzeId from '@/views/root/fabbricati/id/stanze/id/RootFabbricatiIdStanzeIdView.vue';
 import RootDipartimentiUnitn from '@/views/root/dipartimenti-unitn/RootDipartimentiUnitnView.vue';
+import RootTabellone from '@/views/root/tabellone/RootTabelloneView.vue';
+import RootTabelloneEsporta from '@/views/root/tabellone/esporta/RootTabelloneEsportaView.vue';
+import RootTabelloneCronologia from '@/views/root/tabellone/cronologia/RootTabelloneCronologiaView.vue';
 
 
 /* ADMIN */
@@ -270,6 +273,26 @@ const routes: Array<RouteConfig> = [
         name: 'root-fabbricati-id-stanze-id',
         component: RootFabbricatiIdStanzeId,
         props: true
+      },
+      {
+        path: 'tabellone',
+        component: RootTabellone,
+        children: [
+          {
+            path: '',
+            redirect: 'esporta'
+          },
+          {
+            path: 'esporta',
+            name: 'root-tabellone-esporta',
+            component: RootTabelloneEsporta
+          },
+          {
+            path: 'cronologia',
+            name: 'root-tabellone-cronologia',
+            component: RootTabelloneCronologia
+          }
+        ]
       },
     ]
 

@@ -81,6 +81,11 @@ export default class MenuRoot extends Vue {
       text: "Fabbricati",
       path: "/root/fabbricati",
     },
+    {
+      icon: "mdi-table-large",
+      text: "Tabellone",
+      path: "/root/tabellone",
+    },
   ];
 }
 </script>

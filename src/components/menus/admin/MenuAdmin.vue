@@ -81,6 +81,11 @@ export default class MenuAdmin extends Vue {
       text: "Fabbricati",
       path: "/admin/fabbricati",
     },
+    {
+      icon: "mdi-table-large",
+      text: "Tabellone",
+      path: "/admin/tabellone",
+    },
   ];
 }
 </script>
