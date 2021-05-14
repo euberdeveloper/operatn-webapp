@@ -44,13 +44,9 @@
             </v-btn>
           </v-col>
         </v-row>
-        <v-row align="center" justify="center" v-if="tabellone.length">
-          <v-col cols="12">
-            <operatn-base-table title="Tabellone" :columns="columns" :values="tabellone" multiSort :elevation="5" />
-          </v-col>
-        </v-row>
       </v-container>
     </v-form>
+    <operatn-base-table title="Tabellone" :columns="columns" :values="tabellone" multiSort :elevation="5" class="mt-6 mr-6" v-if="tabellone.length" />
   </v-card>
 </template>
 
