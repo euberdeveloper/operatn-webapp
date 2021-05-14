@@ -14,6 +14,7 @@ export interface State {
     primaryColour: string | null;
     roles: RuoloUtente[];
     piani: { piano: Piano, label: string }[];
+    sigleCausali: string[];
 }
 
 export const state: State = {
@@ -65,5 +66,11 @@ export const state: State = {
             piano: Piano.SETTIMO_PIANO,
             label: 'SETTIMO PIANO'
         }
+    ],
+    sigleCausali: [
+        'B',
+        'C',
+        'F',
+        'P'
     ]
 }
