@@ -18,3 +18,12 @@ export function getRoleIcon(role?: RuoloUtente | null): string | null {
             return null;
     }
 }
+
+export function downloadBlob(blob: Blob, name: string): void {
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", name);
+    document.body.appendChild(link);
+    link.click();
+}

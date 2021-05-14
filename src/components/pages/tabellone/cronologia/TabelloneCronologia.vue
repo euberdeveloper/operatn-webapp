@@ -1,19 +1,73 @@
 <template>
   <v-card flat>
-    <v-card-text>
-     
-      <p class="mb-0">
-        Phasellus dolor. Fusce neque. Fusce fermentum odio nec arcu. Pellentesque libero tortor, tincidunt et, tincidunt eget, semper nec, quam. Phasellus blandit leo ut
-        odio.
-      </p>
-    </v-card-text>
+    <v-card-text> Qui puoi vedere e scaricare la cronologia dei vecchi tabelloni salvati ed inviati via email. </v-card-text>
+    <operatn-base-table title="Tabelloni" :columns="columns" :actions="actions" :values="filesInfos" itemKey="path" sortBy="path" />
   </v-card>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Mixins } from "vue-property-decorator";
+import { FilesInfo } from "operatn-api-client";
 
-@Component
-export default class TabelloneCronologia extends Vue {}
+import TabelloneHandlerMixin from "@/mixins/handlers/TabelloneHandlerMixin";
+import OperatnBaseTable, { Actions, Column } from "@/components/gears/bases/OperatnBaseTable.vue";
+import { downloadBlob } from "@/utils";
+import { ActionTypes } from "@/store";
+
+@Component({
+  components: {
+    OperatnBaseTable,
+  },
+})
+export default class TabelloneCronologia extends Mixins(TabelloneHandlerMixin) {
+  /* DATA */
+
+  private filesInfos: FilesInfo[] = [];
+  private columns: Column<FilesInfo>[] = [
+    {
+      text: "Nome",
+      value: "path",
+      groupable: false,
+      editable: false,
+    },
+    {
+      text: "Estensione",
+      value: "extension",
+      groupable: false,
+      editable: false,
+    },
+    {
+      text: "Dimensione",
+      value: "size",
+      groupable: false,
+      editable: false,
+    },
+  ];
+
+  private actions: Actions<FilesInfo> = {
+    showView: () => true,
+    onView: async (item) => this.downloadTabellone(item.path),
+  };
+
+  /* METHODS */
+
+  async downloadTabellone(filename: string): Promise<void> {
+    try {
+      const response = await this.$api.axiosInstance.get(`/stored/tabellone/${filename}`, { responseType: "blob" });
+      const blob: Blob = response.data;
+      downloadBlob(blob, filename);
+    } catch (error) {
+      if (error) {
+        this.$store.dispatch(ActionTypes.ALERT, { message: `Impossibile scaricare tabellone.` });
+      }
+    }
+  }
+
+  /* LIFE CYCLE */
+
+  async mounted() {
+    this.filesInfos = await this.getTabelloneCronology();
+  }
+}
 </script>
 
