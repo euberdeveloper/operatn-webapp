@@ -5,7 +5,7 @@ import { InputValidationRule } from 'vuetify';
 
 const validator = {
     requiredText(name: any): InputValidationRule {
-        return value => (!!value || value != 0) || `${name} è un campo obbligatorio`;
+        return value => (!!value || value == 0) || `${name} è un campo obbligatorio`;
     },
     nomeUtente(): InputValidationRule {
         return value => /^[\w.]+$/.test(value) || `Sono ammesse solo lettere, numeri e punto`;
