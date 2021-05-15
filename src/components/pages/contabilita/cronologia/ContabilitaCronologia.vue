@@ -51,7 +51,7 @@ export default class ContabilitaCronologia extends Mixins(ContabilitaHandlerMixi
   private actions: Actions<Tuple> = {
     others: [
       {
-        icon: "mdi-table-large",
+        icon: "mdi-file-table",
         color: "success",
         action: (value) => this.downloadContabilita(value.path, "tsv"),
       },
