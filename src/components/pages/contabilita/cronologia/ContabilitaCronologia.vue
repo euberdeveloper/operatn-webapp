@@ -72,9 +72,9 @@ export default class ContabilitaCronologia extends Mixins(ContabilitaHandlerMixi
 
   get tuples(): Tuple[] {
     function getDate(path: string): Date {
-      const matched = /^contabilita__(?<year>\d{4})_(?<month>\d{2})_(?<day>\d{2})__\d+.\w+$/.exec(path);
+      const matched = /^contabilita__\d{4}_\d{2}_\d{2}__(?<millis>\d+)$/.exec(path);
       const groups = matched?.groups as Record<string, string>;
-      return new Date(+groups.year, +groups.month, +groups.day);
+      return new Date(+groups.millis);
     }
 
     return this.dirsInfo.map((el) => ({
