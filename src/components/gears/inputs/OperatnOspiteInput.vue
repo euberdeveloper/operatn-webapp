@@ -69,7 +69,7 @@ export default class OperatnOspiteInput extends Mixins(OspiteHandlerMixin) {
   get items(): { label: string; value: number }[] {
     return this.ospiti.map((ospite) => ({
       value: ospite.id,
-      label: `ID:${ospite.id} ${ospite.cognome} ${ospite.nome} ${ospite.sesso[0]} ${ospite.dataDiNascita.toLocaleDateString()}`,
+      label: this.getOspiteText(ospite),
     }));
   }
 
@@ -77,10 +77,17 @@ export default class OperatnOspiteInput extends Mixins(OspiteHandlerMixin) {
 
   @Watch("searchQuery")
   watchSearchQuery(value: string) {
-    const val = value && value.trim();
-    if (val) {
-      this.page = 1;
-      this.search();
+    const selectedOspite = typeof this.internalValue === "number" ? this.ospiti.find(o => o.id === this.internalValue) : null;
+    if (!selectedOspite || value !== this.getOspiteText(selectedOspite)) {
+      const val = value && value.trim();
+      if (val) {
+        this.internalValue = null;
+        this.page = 1;
+        this.search();
+      }
+    }
+    else {
+      this.ospiti = [selectedOspite];
     }
   }
   @Watch("page")
@@ -92,6 +99,10 @@ export default class OperatnOspiteInput extends Mixins(OspiteHandlerMixin) {
 
   /* METHODS */
 
+  getOspiteText(ospite?: OspitiReturned): string {
+    return ospite ? `ID:${ospite.id} ${ospite.cognome} ${ospite.nome} ${ospite.sesso[0]} ${ospite.dataDiNascita.toLocaleDateString()}` : '';
+  }
+
   onScrollToBottom(entries: any[]): void {
     if (entries[0].intersectionRatio > 0) {
       this.page++;
@@ -102,7 +113,7 @@ export default class OperatnOspiteInput extends Mixins(OspiteHandlerMixin) {
     try {
       this.isLoading = true;
       const ospiti = await this.getOspiti({
-        search: this.searchQuery ?? '',
+        search: this.searchQuery ?? "",
         page: this.page,
         pageSize: this.pageSize,
       });
@@ -121,6 +132,7 @@ export default class OperatnOspiteInput extends Mixins(OspiteHandlerMixin) {
 
   async mounted() {
     await this.search();
+    this.page++;
   }
 }
 </script>
