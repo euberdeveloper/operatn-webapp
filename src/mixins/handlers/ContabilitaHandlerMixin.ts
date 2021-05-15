@@ -1,6 +1,6 @@
 
 import { Component, Vue } from "vue-property-decorator";
-import { ContabilitaBollettaInfo, ContabilitaPageParams, ContabilitaQueryParams } from "operatn-api-client";
+import { ContabilitaBollettaInfo, ContabilitaDirsInfo, ContabilitaPageParams, ContabilitaQueryParams } from "operatn-api-client";
 
 import { ActionTypes, AlertType } from "@/store";
 
@@ -26,6 +26,17 @@ export default class ContabilitaHandlerMixin extends Vue {
     } catch (error) {
       if (error) {
         this.$store.dispatch(ActionTypes.ALERT, { message: `Errore nel contare bollette`, alertType });
+      }
+      throw error;
+    }
+  }
+
+  async getContabilitaCronology(alertType = AlertType.ERROR_ALERT): Promise<ContabilitaDirsInfo[]> {
+    try {
+      return await this.$api.contabilita.getCronology({ alertType });
+    } catch (error) {
+      if (error) {
+        this.$store.dispatch(ActionTypes.ALERT, { message: `Errore nel caricare cronologia contabilità`, alertType });
       }
       throw error;
     }

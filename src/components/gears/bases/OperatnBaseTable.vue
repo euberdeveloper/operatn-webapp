@@ -106,8 +106,18 @@
           class="mx-1"
           @click="column.actions.onDelete(item)"
           v-if="column.actions && column.actions.onDelete && column.actions.showDelete(item)"
-          >mdi-delete</v-icon
+          >mdi-delete</v-icon>
+        <template v-if="column.actions && column.actions.others">
+        <v-icon
+          v-for="(action, index) of actions.others"
+          :key="`${action.icon}_${index}`"
+          small
+          :color="action.color"
+          class="mx-1"
+          @click="action.action(item)"
+          >{{action.icon}}</v-icon
         >
+        </template>
       </span>
     </template>
   </v-data-table>
@@ -149,6 +159,8 @@ export interface Actions<T = any> {
   showEdit?: (value: T) => boolean;
   showDelete?: (value: T) => boolean;
   showView?: (value: T) => boolean;
+
+  others?: { icon: string; color?: string; action: (value: T) => void | Promise<void> }[];
 }
 
 export interface GroupHeaders {
@@ -244,6 +256,7 @@ export default class OperatnBaseTable extends Vue {
                 showEdit: this.actions.showEdit ?? (() => !!this.actions?.onEdit),
                 showDelete: this.actions.showDelete ?? (() => !!this.actions?.onDelete),
                 showView: this.actions.showView ?? (() => !!this.actions?.onView),
+                others: this.actions?.others
               },
             },
           ]

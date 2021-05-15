@@ -46,8 +46,13 @@ export default class TabelloneCronologia extends Mixins(TabelloneHandlerMixin) {
   ];
 
   private actions: Actions<FilesInfo> = {
-    showView: () => true,
-    onView: async (item) => this.downloadTabellone(item.path),
+    others: [
+      {
+        icon: "mdi-google-spreadsheet",
+        color: "success",
+        action: (item) => this.downloadTabellone(item.path),
+      },
+    ],
   };
 
   /* METHODS */

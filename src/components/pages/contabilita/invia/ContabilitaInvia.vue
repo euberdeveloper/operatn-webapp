@@ -1,8 +1,5 @@
 <template>
   <v-card>
-    <v-toolbar flat color="primary">
-      <v-toolbar-title class="headline primary white--text">Contabilità</v-toolbar-title>
-    </v-toolbar>
     <v-card-subtitle>Qui puoi contabilizzare le bollette</v-card-subtitle>
     <v-form v-model="formValid" @submit.prevent class="ma-8">
       <v-container fluid>
@@ -44,7 +41,7 @@
               </template>
             </v-btn>
 
-             <v-btn class="ma-2" :loading="loading" :disabled="isDisabledCarica" color="warning" @click="uploadBollette">
+            <v-btn class="ma-2" :loading="loading" :disabled="isDisabledCarica" color="warning" @click="uploadBollette">
               <v-icon left dark>mdi-upload</v-icon>
               <span>CARICA</span>
               <template v-slot:loader>
@@ -58,7 +55,15 @@
       </v-container>
     </v-form>
 
-    <v-data-table v-if="bollette.length" :headers="headers" :items="handledBollette" item-key="id" :options.sync="tableOptions" :loading="loadingBollette" :server-items-length="totalBollette">
+    <v-data-table
+      v-if="bollette.length"
+      :headers="headers"
+      :items="handledBollette"
+      item-key="id"
+      :options.sync="tableOptions"
+      :loading="loadingBollette"
+      :server-items-length="totalBollette"
+    >
       <template v-slot:item.importoCanoni="{ value }"> € {{ value ? value : 0 }} </template>
       <template v-slot:item.importoConsumi="{ value }"> € {{ value ? value : 0 }} </template>
       <template v-slot:item.importoTotale="{ value }"> € {{ value }} </template>
@@ -161,8 +166,8 @@ export default class Contabilita extends Mixins(TipoOspiteHandlerMixin, Contabil
     groupBy: [],
     groupDesc: [],
     multiSort: false,
-    mustSort: false
-  }
+    mustSort: false,
+  };
 
   /* GETTERS */
 
@@ -181,7 +186,7 @@ export default class Contabilita extends Mixins(TipoOspiteHandlerMixin, Contabil
       idOspite: this.formValue.idOspite ?? undefined,
       siglaCausale: this.formValue.siglaCausale ?? undefined,
       page: this.tableOptions.itemsPerPage > 0 ? this.tableOptions.page : undefined,
-      pageSize: this.tableOptions.itemsPerPage > 0 ? this.tableOptions.itemsPerPage : undefined
+      pageSize: this.tableOptions.itemsPerPage > 0 ? this.tableOptions.itemsPerPage : undefined,
     };
   }
 
@@ -230,18 +235,19 @@ export default class Contabilita extends Mixins(TipoOspiteHandlerMixin, Contabil
       try {
         this.loading = true;
         this.success = await this.sendContabilitaBollette(this.queryParams);
-      } 
-      catch (error) {
+      } catch (error) {
         if (error instanceof ContabilitaError) {
           const nSuccessed = error.passedBollette.length;
           const nFailed = error.failedBollette.length;
-          this.$store.dispatch(ActionTypes.ALERT, { message: `Errore nell'inviare bollette, ${nSuccessed} inviate, ${nFailed} fallite`, alertType: AlertType.ERROR_ALERT });
+          this.$store.dispatch(ActionTypes.ALERT, {
+            message: `Errore nell'inviare bollette, ${nSuccessed} inviate, ${nFailed} fallite`,
+            alertType: AlertType.ERROR_ALERT,
+          });
 
           this.success.push(...error.passedBollette);
           this.failed = error.failedBollette;
         }
-      }
-      finally {
+      } finally {
         this.loading = false;
       }
     }

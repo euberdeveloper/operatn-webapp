@@ -36,6 +36,8 @@ import RootTabellone from '@/views/root/tabellone/RootTabelloneView.vue';
 import RootTabelloneEsporta from '@/views/root/tabellone/esporta/RootTabelloneEsportaView.vue';
 import RootTabelloneCronologia from '@/views/root/tabellone/cronologia/RootTabelloneCronologiaView.vue';
 import RootContabilita from '@/views/root/contabilita/RootContabilitaView.vue';
+import RootContabilitaInvia from '@/views/root/contabilita/invia/RootContabilitaInviaView.vue';
+import RootContabilitaCronologia from '@/views/root/contabilita/cronologia/RootContabilitaCronologiaView.vue';
 
 
 /* ADMIN */
@@ -62,6 +64,8 @@ import AdminTabellone from '@/views/admin/tabellone/AdminTabelloneView.vue';
 import AdminTabelloneEsporta from '@/views/admin/tabellone/esporta/AdminTabelloneEsportaView.vue';
 import AdminTabelloneCronologia from '@/views/admin/tabellone/cronologia/AdminTabelloneCronologiaView.vue';
 import AdminContabilita from '@/views/admin/contabilita/AdminContabilitaView.vue';
+import AdminContabilitaInvia from '@/views/admin/contabilita/invia/AdminContabilitaInviaView.vue';
+import AdminContabilitaCronologia from '@/views/admin/contabilita/cronologia/AdminContabilitaCronologiaView.vue';
 
 Vue.use(VueRouter);
 
@@ -204,8 +208,23 @@ const routes: Array<RouteConfig> = [
       },
       {
         path: 'contabilita',
-        name: 'admin-contabilita',
-        component: AdminContabilita
+        component: AdminContabilita,
+        children: [
+          {
+            path: '',
+            redirect: 'invia'
+          },
+          {
+            path: 'invia',
+            name: 'admin-contabilita-invia',
+            component: AdminContabilitaInvia
+          },
+          {
+            path: 'cronologia',
+            name: 'admin-contabilita-cronologia',
+            component: AdminContabilitaCronologia
+          }
+        ]
       },
     ]
   },
@@ -326,8 +345,23 @@ const routes: Array<RouteConfig> = [
       },
       {
         path: 'contabilita',
-        name: 'root-contabilita',
-        component: RootContabilita
+        component: RootContabilita,
+        children: [
+          {
+            path: '',
+            redirect: 'invia'
+          },
+          {
+            path: 'invia',
+            name: 'root-contabilita-invia',
+            component: RootContabilitaInvia
+          },
+          {
+            path: 'cronologia',
+            name: 'root-contabilita-cronologia',
+            component: RootContabilitaCronologia
+          }
+        ]
       },
     ]
 
