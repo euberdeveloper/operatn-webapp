@@ -198,14 +198,14 @@ export default class StanzaId extends Mixins<
   get actions(): Actions<PostiLettoReturned> {
     return {
       onEdit: (item) => this.openEdit(item),
-      onDelete: this.isRoot ? (item) => this.askDelete(item) : undefined,
+      onDelete: (item) => this.askDelete(item),
     };
   }
 
   get manutenzioniActions(): Actions<PostiLettoReturned> {
     return {
-      onDelete: this.isRoot ? async (item) => this.removeManutenzione(item) : undefined,
-      showDelete: (item) => !item.eliminato,
+      onDelete: async (item) => this.removeManutenzione(item),
+      showDelete: (item) => { console.log(item); return !item.eliminato }
     };
   }
 
