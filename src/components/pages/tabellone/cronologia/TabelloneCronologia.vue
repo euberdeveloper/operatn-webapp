@@ -8,11 +8,12 @@
 <script lang="ts">
 import { Component, Mixins } from "vue-property-decorator";
 import { FilesInfo } from "operatn-api-client";
+import axios from "axios";
 
 import TabelloneHandlerMixin from "@/mixins/handlers/TabelloneHandlerMixin";
 import OperatnBaseTable, { Actions, Column } from "@/components/gears/bases/OperatnBaseTable.vue";
 import { downloadBlob } from "@/utils";
-import { ActionTypes } from "@/store";
+import { ActionTypes, AlertType } from "@/store";
 
 @Component({
   components: {
@@ -53,13 +54,12 @@ export default class TabelloneCronologia extends Mixins(TabelloneHandlerMixin) {
 
   async downloadTabellone(filename: string): Promise<void> {
     try {
-      const response = await this.$api.axiosInstance.get(`/stored/tabellone/${filename}`, { responseType: "blob" });
+      const path = this.$stored.getPath(`tabellone/${filename}`);
+      const response = await axios.get(path, { responseType: "blob" });
       const blob: Blob = response.data;
       downloadBlob(blob, filename);
     } catch (error) {
-      if (error) {
-        this.$store.dispatch(ActionTypes.ALERT, { message: `Impossibile scaricare tabellone.` });
-      }
+      this.$store.dispatch(ActionTypes.ALERT, { message: `Errore nello scaricare tabellone.`, alertType: AlertType.ERRORS_QUEUE });
     }
   }
 

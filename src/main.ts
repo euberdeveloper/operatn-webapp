@@ -5,6 +5,7 @@ import router from '@/router'
 import store, { ActionTypes } from '@/store'
 import vuetify from '@/plugins/vuetify';
 import api from '@/plugins/api';
+import '@/plugins/stored';
 import '@/plugins/validator';
 
 Vue.config.productionTip = false
