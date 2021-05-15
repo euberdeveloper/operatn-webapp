@@ -16,7 +16,7 @@
           />
         </v-col>
         <v-col cols="6">
-         <v-select
+          <v-select
             type="text"
             label="Tipo tariffa"
             name="idTipoTariffa"
@@ -31,13 +31,14 @@
       </v-row>
       <v-row align="center" justify="center">
         <v-col cols="6">
-         <v-text-field
+          <v-select
             type="text"
             label="Utilizzo stanza"
             name="idUtilizzoStanza"
             clearable
-            disabled
-            hint="TODO"
+            :items="tipiStanza"
+            item-text="tipoStanza"
+            item-value="id"
             v-model="internalValue.idUtilizzoStanza"
           />
         </v-col>
@@ -56,7 +57,7 @@
       </v-row>
       <v-row align="center" justify="center">
         <v-col cols="6">
-         <v-text-field
+          <v-text-field
             type="number"
             label="Prezzo canoni"
             name="prezzoCanoni"
@@ -66,7 +67,7 @@
           />
         </v-col>
         <v-col cols="6">
-         <v-text-field
+          <v-text-field
             type="number"
             label="Prezzo consumi"
             name="prezzoConsumi"
@@ -82,11 +83,12 @@
 
 <script lang="ts">
 import { Component, Mixins, Prop, Watch } from "vue-property-decorator";
-import { TariffeCreateBody, TariffeReplaceBody, TipiOspiteReturned, TipoFabbricato, TipoTariffa } from "operatn-api-client";
+import { TariffeCreateBody, TariffeReplaceBody, TipiOspiteReturned, TipoFabbricato, TipoStanza, TipoTariffa } from "operatn-api-client";
 
 import TipoFabbricatoHandlerMixin from "@/mixins/handlers/TipoFabbricatoHandlerMixin";
 import TipoOspiteHandlerMixin from "@/mixins/handlers/TipoOspiteHandlerMixin";
 import TipoTariffaHandlerMixin from "@/mixins/handlers/TipoTariffaHandlerMixin";
+import TipoStanzaHandlerMixin from "@/mixins/handlers/TipoStanzaHandlerMixin";
 
 @Component({
   model: {
@@ -94,7 +96,7 @@ import TipoTariffaHandlerMixin from "@/mixins/handlers/TipoTariffaHandlerMixin";
     event: "save",
   },
 })
-export default class OperatnTariffaForm extends Mixins(TipoFabbricatoHandlerMixin, TipoOspiteHandlerMixin, TipoTariffaHandlerMixin) {
+export default class OperatnTariffaForm extends Mixins(TipoFabbricatoHandlerMixin, TipoOspiteHandlerMixin, TipoTariffaHandlerMixin, TipoStanzaHandlerMixin) {
   /* PROPS */
 
   @Prop({ type: Object, default: null })
@@ -106,6 +108,7 @@ export default class OperatnTariffaForm extends Mixins(TipoFabbricatoHandlerMixi
   /* DATA */
 
   private tipiFabbricato: TipoFabbricato[] = [];
+  private tipiStanza: TipoStanza[] = [];
   private tipiOspite: TipiOspiteReturned[] = [];
   private tipiTariffa: TipoTariffa[] = [];
 
@@ -151,6 +154,7 @@ export default class OperatnTariffaForm extends Mixins(TipoFabbricatoHandlerMixi
 
   async mounted() {
     this.tipiFabbricato = await this.getTipiFabbricato();
+    this.tipiStanza = await this.getTipiStanza();
     this.tipiTariffa = await this.getTipiTariffa();
     this.tipiOspite = await this.getTipiOspite();
   }

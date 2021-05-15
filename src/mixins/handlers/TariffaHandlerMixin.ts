@@ -40,6 +40,14 @@ export default class TariffaHandlerMixin extends Vue {
 
   async updateTariffa(id: number, body: TariffeReplaceBody, alertType = AlertType.ERROR_ALERT): Promise<void> {
     try {
+      console.log({
+        idTipoFabbricato: body.idTipoFabbricato,
+        idUtilizzoStanza: body.idUtilizzoStanza,
+        idTipoOspite: body.idTipoOspite,
+        idTipoTariffa: body.idTipoTariffa,
+        prezzoCanoni: +body.prezzoCanoni,
+        prezzoConsumi: +body.prezzoConsumi
+      })
       await this.$api.tariffe.replace(id, {
         idTipoFabbricato: body.idTipoFabbricato,
         idUtilizzoStanza: body.idUtilizzoStanza,

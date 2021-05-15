@@ -7,6 +7,7 @@
     :tableColumns="columns"
     :tableActions="actions"
     :tableValues="values"
+    :tableGroupHeaders="groupHeaders"
     tableItemKey="id"
     :tableShowSelect="isRoot"
     :tableUpdateBody.sync="updateBody"
@@ -35,17 +36,18 @@
 
 <script lang="ts">
 import { Component, Mixins, Prop } from "vue-property-decorator";
-import { Tariffa, TariffeCreateBody, TariffeReplaceBody, TipiOspiteReturned, TipoFabbricato, TipoTariffa } from "operatn-api-client";
+import { Tariffa, TariffeCreateBody, TariffeReplaceBody, TipiOspiteReturned, TipoFabbricato, TipoStanza, TipoTariffa } from "operatn-api-client";
 
 import { AlertType } from "@/store";
 import ResourceManagerMixin from "@/mixins/ResourceManagerMixin";
 import TariffaHandlerMixin from "@/mixins/handlers/TariffaHandlerMixin";
 import TipoFabbricatoHandlerMixin from "@/mixins/handlers/TipoFabbricatoHandlerMixin";
 import TipoOspiteHandlerMixin from "@/mixins/handlers/TipoOspiteHandlerMixin";
+import TipoStanzaHandlerMixin from "@/mixins/handlers/TipoStanzaHandlerMixin";
 import TipoTariffaHandlerMixin from "@/mixins/handlers/TipoTariffaHandlerMixin";
 
 import OperatnActionDialog from "@/components/gears/dialogs/OperatnActionDialog.vue";
-import OperatnBaseResourceManager, { Column, Actions } from "@/components/gears/bases/OperatnBaseResourceManager.vue";
+import OperatnBaseResourceManager, { Column, Actions, GroupHeaders } from "@/components/gears/bases/OperatnBaseResourceManager.vue";
 import OperatnTariffaForm from "@/components/gears/forms/OperatnTariffaForm.vue";
 
 @Component({
@@ -55,13 +57,14 @@ import OperatnTariffaForm from "@/components/gears/forms/OperatnTariffaForm.vue"
     OperatnTariffaForm,
   },
 })
-export default class Tariffe extends Mixins<ResourceManagerMixin<Tariffa, TariffeCreateBody, TariffeReplaceBody, number> & TariffaHandlerMixin & TipoFabbricatoHandlerMixin & TipoOspiteHandlerMixin & TipoTariffaHandlerMixin>(
-  ResourceManagerMixin,
-  TariffaHandlerMixin,
-  TipoFabbricatoHandlerMixin,
-  TipoOspiteHandlerMixin,
-  TipoTariffaHandlerMixin
-) {
+export default class Tariffe extends Mixins<
+  ResourceManagerMixin<Tariffa, TariffeCreateBody, TariffeReplaceBody, number> &
+    TariffaHandlerMixin &
+    TipoFabbricatoHandlerMixin &
+    TipoOspiteHandlerMixin &
+    TipoTariffaHandlerMixin &
+    TipoStanzaHandlerMixin
+>(ResourceManagerMixin, TariffaHandlerMixin, TipoFabbricatoHandlerMixin, TipoOspiteHandlerMixin, TipoTariffaHandlerMixin, TipoStanzaHandlerMixin) {
   /* PROPS */
 
   @Prop({ type: Boolean, required: true })
@@ -73,6 +76,7 @@ export default class Tariffe extends Mixins<ResourceManagerMixin<Tariffa, Tariff
   protected askDeleteMultipleText = "Sei sicuro di voler eliminare i tariffe selezionati?";
 
   private tipiFabbricato: TipoFabbricato[] = [];
+  private tipiStanza: TipoStanza[] = [];
   private tipiOspite: TipiOspiteReturned[] = [];
   private tipiTariffa: TipoTariffa[] = [];
 
@@ -89,7 +93,7 @@ export default class Tariffe extends Mixins<ResourceManagerMixin<Tariffa, Tariff
       {
         text: "Tipo ospite",
         value: "idTipoOspite",
-        groupable: false,
+        groupable: true,
 
         editable: true,
         onEditCancel: () => this.sprepareUpdateBody(),
@@ -103,17 +107,17 @@ export default class Tariffe extends Mixins<ResourceManagerMixin<Tariffa, Tariff
           label: "Modifica",
           hint: "Premi invio per salvare",
           items: this.tipiOspite,
-          itemText: 'tipoOspite',
-          itemValue: 'id',
+          itemText: "tipoOspite",
+          itemValue: "id",
           rules: [this.$validator.requiredText("Tipo ospite")],
         },
 
-        itemTextHandler: id => this.tipiOspite.find(v => v.id === id)?.tipoOspite ?? 'NON TROVATO'
+        itemTextHandler: (id) => this.tipiOspite.find((v) => v.id === id)?.tipoOspite ?? "[NULL]",
       },
       {
         text: "Tipo tariffa",
         value: "idTipoTariffa",
-        groupable: false,
+        groupable: true,
 
         editable: true,
         onEditCancel: () => this.sprepareUpdateBody(),
@@ -127,23 +131,41 @@ export default class Tariffe extends Mixins<ResourceManagerMixin<Tariffa, Tariff
           label: "Modifica",
           hint: "Premi invio per salvare",
           items: this.tipiTariffa,
-          itemText: 'tipoTariffa',
-          itemValue: 'id',
+          itemText: "tipoTariffa",
+          itemValue: "id",
           rules: [this.$validator.requiredText("Tipo tariffa")],
         },
 
-        itemTextHandler: id => this.tipiTariffa.find(v => v.id === id)?.tipoTariffa ?? 'NON TROVATO'
+        itemTextHandler: (id) => this.tipiTariffa.find((v) => v.id === id)?.tipoTariffa ?? "[NULL]",
       },
       {
         text: "Utilizzo stanza",
         value: "idUtilizzoStanza",
-        groupable: false,
-        editable: false
+        groupable: true,
+
+        editable: true,
+        onEditCancel: () => this.sprepareUpdateBody(),
+        onEditClose: () => {},
+        onEditSave: () => this.updateValue(),
+        onEditOpen: (item) => {
+          this.prepareUpdateBody(item);
+        },
+        editInput: {
+          type: "select",
+          label: "Modifica",
+          hint: "Premi invio per salvare",
+          items: this.tipiStanza,
+          itemText: "tipoStanza",
+          itemValue: "id",
+          clearable: true,
+        },
+
+        itemTextHandler: (id) => this.tipiStanza.find((v) => v.id === id)?.tipoStanza ?? "[NULL]",
       },
       {
         text: "Tipo fabbricato",
         value: "idTipoFabbricato",
-        groupable: false,
+        groupable: true,
 
         editable: true,
         onEditCancel: () => this.sprepareUpdateBody(),
@@ -157,12 +179,12 @@ export default class Tariffe extends Mixins<ResourceManagerMixin<Tariffa, Tariff
           label: "Modifica",
           hint: "Premi invio per salvare",
           items: this.tipiFabbricato,
-          itemText: 'tipoFabbricato',
-          itemValue: 'id',
-          clearable: true
+          itemText: "tipoFabbricato",
+          itemValue: "id",
+          clearable: true,
         },
 
-        itemTextHandler: id => this.tipiFabbricato.find(v => v.id === id)?.tipoFabbricato ?? 'NON TROVATO'
+        itemTextHandler: (id) => this.tipiFabbricato.find((v) => v.id === id)?.tipoFabbricato ?? "[NULL]",
       },
       {
         text: "Prezzo canoni",
@@ -182,9 +204,9 @@ export default class Tariffe extends Mixins<ResourceManagerMixin<Tariffa, Tariff
           hint: "Premi invio per salvare",
           clearable: true,
           counter: true,
-          rules: [this.$validator.requiredText('Prezzo canoni'), this.$validator.price()],
+          rules: [this.$validator.requiredText("Prezzo canoni"), this.$validator.price()],
         },
-        itemTextHandler: v => v ?? '[NULL]'
+        itemTextHandler: (v) => v ?? "[NULL]",
       },
       {
         text: "Prezzo consumi",
@@ -204,9 +226,9 @@ export default class Tariffe extends Mixins<ResourceManagerMixin<Tariffa, Tariff
           hint: "Premi invio per salvare",
           clearable: true,
           counter: true,
-          rules: [this.$validator.requiredText('Prezzo consumi'), this.$validator.price()],
+          rules: [this.$validator.requiredText("Prezzo consumi"), this.$validator.price()],
         },
-        itemTextHandler: v => v ?? '[NULL]'
+        itemTextHandler: (v) => v ?? "[NULL]",
       },
     ];
   }
@@ -215,6 +237,39 @@ export default class Tariffe extends Mixins<ResourceManagerMixin<Tariffa, Tariff
     return {
       onEdit: (item) => this.openEdit(item),
       onDelete: this.isRoot ? (item) => this.askDelete(item) : undefined,
+    };
+  }
+
+  get groupHeaders(): GroupHeaders {
+    return {
+      keyHandler: (key) => {
+        switch (key) {
+          case "idTipoOspite":
+            return "TIPO OSPITE";
+          case "idTipoTariffa":
+            return "TIPO TARIFFA";
+          case "idUtilizzoStanza":
+            return "UTILIZZO STANZA";
+          case "idTipoFabbricato":
+            return "TIPO FABBRICATO";
+          default:
+            return key;
+        }
+      },
+      valueHandler: (value, key) => {
+        switch (key) {
+          case "idTipoOspite":
+            return this.tipiOspite.find((v) => v.id === +value)?.tipoOspite ?? "[NULL]"
+          case "idTipoTariffa":
+            return this.tipiTariffa.find((v) => v.id === +value)?.tipoTariffa ?? "[NULL]"
+          case "idUtilizzoStanza":
+            return this.tipiStanza.find((v) => v.id === +value)?.tipoStanza ?? "[NULL]"
+          case "idTipoFabbricato":
+            return this.tipiFabbricato.find((v) => v.id === +value)?.tipoFabbricato ?? "[NULL]"
+          default:
+            return key;
+        }
+      },
     };
   }
 
@@ -278,6 +333,7 @@ export default class Tariffe extends Mixins<ResourceManagerMixin<Tariffa, Tariff
   async mounted() {
     this.values = await this.getTariffe();
     this.tipiFabbricato = await this.getTipiFabbricato();
+    this.tipiStanza = await this.getTipiStanza();
     this.tipiTariffa = await this.getTipiTariffa();
     this.tipiOspite = await this.getTipiOspite();
   }

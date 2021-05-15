@@ -70,7 +70,7 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 import OperatnActionDialog from "@/components/gears/dialogs/OperatnActionDialog.vue";
 import OperatnBaseTable, { Actions, Column, GroupHeaders } from "@/components/gears/bases/OperatnBaseTable.vue";
 
-export { Actions, Column } from "@/components/gears/bases/OperatnBaseTable.vue";
+export { Actions, Column, GroupHeaders } from "@/components/gears/bases/OperatnBaseTable.vue";
 
 @Component({
   components: {

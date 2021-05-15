@@ -4,8 +4,8 @@ import { PluginObject } from 'vue/types/umd';
 import { InputValidationRule } from 'vuetify';
 
 const validator = {
-    requiredText(name: string): InputValidationRule {
-        return value => !!value || `${name} è un campo obbligatorio`;
+    requiredText(name: any): InputValidationRule {
+        return value => (!!value || value != 0) || `${name} è un campo obbligatorio`;
     },
     nomeUtente(): InputValidationRule {
         return value => /^[\w.]+$/.test(value) || `Sono ammesse solo lettere, numeri e punto`;
@@ -71,6 +71,9 @@ const validator = {
             }
             if (isNaN(n)) {
                 return 'Devi inserire un numero valido';
+            }
+            if (n < 0) {
+                return 'Devi inserire un numero maggiore o uguale a zero';
             }
             const parts = n.toString().split('.');
             if (parts.length === 2 && parts[1].length > 2) {
