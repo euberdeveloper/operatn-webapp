@@ -59,6 +59,18 @@
         <operatn-ospiti-stanze v-model="internalValue" :formValid.sync="ospitiPostiLettoValid" />
       </v-expansion-panel-content>
     </v-expansion-panel>
+
+    <v-expansion-panel>
+      <v-expansion-panel-header disable-icon-rotate>
+        <span class="text-h6">Note</span>
+        <template v-slot:actions>
+          <v-icon color="teal">mdi-check</v-icon>
+        </template>
+      </v-expansion-panel-header>
+      <v-expansion-panel-content>
+        <operatn-note v-model="internalValue" />
+      </v-expansion-panel-content>
+    </v-expansion-panel>
   </v-expansion-panels>
 </template>
 
@@ -73,6 +85,7 @@ import OperatnQuietanziante from "./gears/OperatnQuietanziante.vue";
 import OperatnTipoContratto from "./gears/OperatnTipoContratto.vue";
 import OperatnTariffa from "./gears/OperatnTariffa.vue";
 import OperatnOspitiStanze from "./gears/OperatnOspitiStanze.vue";
+import OperatnNote from "./gears/OperatnNote.vue";
 
 @Component({
   model: {
@@ -86,6 +99,7 @@ import OperatnOspitiStanze from "./gears/OperatnOspitiStanze.vue";
     OperatnTipoContratto,
     OperatnTariffa,
     OperatnOspitiStanze,
+    OperatnNote
   },
 })
 export default class OperatnContrattoForm extends Vue {

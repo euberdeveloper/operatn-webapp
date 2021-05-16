@@ -21,7 +21,6 @@
 <script lang="ts">
 import { Component, Prop, Mixins, Watch } from "vue-property-decorator";
 import { ContrattiCreateBody, ContrattiReplaceBody, OspitiReturned } from "operatn-api-client";
-import { AlertType } from "@/store";
 
 import OspiteHandlerMixin from "@/mixins/handlers/OspiteHandlerMixin";
 import PostoLettoHandlerMixin from "@/mixins/handlers/PostoLettoHandlerMixin";
