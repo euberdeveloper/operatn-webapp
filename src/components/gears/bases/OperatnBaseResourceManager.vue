@@ -19,9 +19,14 @@
       :sortBy="tableSortBy"
       :showSelect="tableShowSelect"
       :multiSort="tableMultiSort"
+      :loading="tableLoading"
       :updateBody.sync="internalTableUpdateBody"
       v-if="showTable"
-    />
+    >
+      <template v-slot:header>
+        <slot name="tableHeader" />
+      </template>
+    </operatn-base-table>
 
     <!-- PLUS FAB BUTTON -->
     <v-fab-transition v-if="showActionButton && !isSelecting" key="plus">
@@ -122,6 +127,9 @@ export default class OperatnBaseResourceManager extends Vue {
 
   @Prop({ type: Boolean, default: false })
   private tableMultiSort!: boolean;
+
+  @Prop({ type: Boolean, default: false })
+  private tableLoading!: boolean;
 
   @Prop({ validator: (v) => typeof v === "object" || v === null, required: true })
   private tableUpdateBody!: any;

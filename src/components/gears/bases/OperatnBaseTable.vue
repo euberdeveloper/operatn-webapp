@@ -9,6 +9,7 @@
     :search="search"
     :group-by.sync="aggregateBy"
     :multi-sort="multiSort"
+    :loading="loading"
     :class="['operatn-base-table', elevationClass]"
   >
     <template v-slot:top>
@@ -211,6 +212,9 @@ export default class OperatnBaseTable extends Vue {
 
   @Prop({ validator: (v) => typeof v === "object" || v === null, required: false })
   private updateBody?: any;
+
+  @Prop({ type: Boolean, default: false })
+  private loading!: boolean;
 
   @Prop({ type: Number, default: 1 })
   private elevation!: number;

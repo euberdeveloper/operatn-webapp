@@ -48,15 +48,15 @@ export default class ResourceManagerMixin<TupleType = any, CreateType = any, Upd
     }
     protected updateHandler(_id: IdType, _value: UpdateType, _isTableEdit: boolean): Promise<void> | void { }
 
-    protected updateBodyFromValue(value: TupleType): UpdateType {
+    protected updateBodyFromValue(value: TupleType): UpdateType | Promise<UpdateType> {
         const val: any = value;
         return val as UpdateType;
     }
-    protected tupleValueFromCreateBody(_id: IdType, body: CreateType): TupleType {
+    protected tupleValueFromCreateBody(_id: IdType, body: CreateType): TupleType | Promise<TupleType> {
         const res: any = body;
         return res as TupleType;
     }
-    protected tupleValueFromUpdateBody(_id: IdType, body: UpdateType, _backupValue?: TupleType): TupleType {
+    protected tupleValueFromUpdateBody(_id: IdType, body: UpdateType, _backupValue?: TupleType): TupleType | Promise<TupleType> {
         const res: any = body;
         return res as TupleType;
     }
@@ -122,7 +122,7 @@ export default class ResourceManagerMixin<TupleType = any, CreateType = any, Upd
         if (this.createBodyValid && this.createBody) {
             try {
                 const id = await this.createHandler(this.createBody);
-                this.values.push(this.tupleValueFromCreateBody(id, this.createBody))
+                this.values.push(await this.tupleValueFromCreateBody(id, this.createBody))
                 this.createBody = null;
                 this.showCreateDialog = false;
             }
@@ -131,9 +131,9 @@ export default class ResourceManagerMixin<TupleType = any, CreateType = any, Upd
     }
 
 
-    prepareUpdateBody(value: TupleType): void {
+    async prepareUpdateBody(value: TupleType): Promise<void> {
         this.backupValue = value;
-        this.updateBody = this.updateBodyFromValue(value);
+        this.updateBody = await this.updateBodyFromValue(value);
         this.updateId = this.getIdFromValue(value);
     }
     sprepareUpdateBody(): void {
@@ -141,8 +141,8 @@ export default class ResourceManagerMixin<TupleType = any, CreateType = any, Upd
         this.updateId = null;
         this.backupValue = null
     }
-    openEdit(value: TupleType): void {
-        this.prepareUpdateBody(value);
+    async openEdit(value: TupleType): Promise<void> {
+        await this.prepareUpdateBody(value);
         this.updateBodyValid = false;
         this.showEditDialog = true;
     }
@@ -161,7 +161,7 @@ export default class ResourceManagerMixin<TupleType = any, CreateType = any, Upd
 
             try {
                 const index = this.values.findIndex((v) => this.getIdFromValue(v) === this.updateId);
-                this.values.splice(index, 1, this.tupleValueFromUpdateBody(this.updateId, this.updateBody, this.backupValue as TupleType));
+                this.values.splice(index, 1, await this.tupleValueFromUpdateBody(this.updateId, this.updateBody, this.backupValue as TupleType));
 
                 this.sprepareUpdateBody();
                 this.showEditDialog = false;
@@ -181,7 +181,7 @@ export default class ResourceManagerMixin<TupleType = any, CreateType = any, Upd
             try {
                 await this.updateHandler(updateId, updateBody, true);
                 const index = this.values.findIndex((v) => this.getIdFromValue(v) === updateId);
-                this.values.splice(index, 1, this.tupleValueFromUpdateBody(updateId, updateBody, backupValue as TupleType));
+                this.values.splice(index, 1, await this.tupleValueFromUpdateBody(updateId, updateBody, backupValue as TupleType));
             } catch (error) { console.error(error) }
 
         }

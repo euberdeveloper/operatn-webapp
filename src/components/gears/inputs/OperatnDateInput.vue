@@ -4,10 +4,13 @@
       <v-text-field
         v-model="dateFormatted"
         :label="label"
+        :placeholder="placeholder"
         hint="Formato DD/MM/YYYY"
         persistent-hint
         :prepend-icon="icon"
         :clearable="clearable"
+        :dense="dense"
+        :hide-details="hideDetails"
         :rules="rules"
         @blur="internalValue = parseDate(dateFormatted)"
         @keypress.enter="enterClicked"
@@ -35,8 +38,11 @@ export default class OperatnDateInput extends Vue {
   @Prop({ validator: (v) => typeof v === "object" || v === null || v === undefined, required: true })
   value!: Date | null;
 
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, default: '' })
   label!: string;
+
+  @Prop({ type: String, default: '' })
+  placeholder!: string;
 
   @Prop({ type: String, required: false })
   icon?: string;
@@ -46,6 +52,13 @@ export default class OperatnDateInput extends Vue {
 
   @Prop({ type: Boolean, default: false })
   clearable?: boolean;
+
+  @Prop({ type: Boolean, default: false })
+  hideDetails?: boolean;
+
+  @Prop({ type: Boolean, default: false })
+  dense?: boolean;
+
 
   /* DATA */
 
