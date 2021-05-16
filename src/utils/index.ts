@@ -1,5 +1,7 @@
 import { RuoloUtente } from "operatn-api-client";
 
+export * as pdf from './pdf';
+
 export function getRoleIcon(role?: RuoloUtente | null): string | null {
     switch (role) {
         case RuoloUtente.ROOT:

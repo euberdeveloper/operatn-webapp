@@ -115,9 +115,24 @@ export default class ContrattoHandlerMixin extends Vue {
     }
   }
 
-  async closeContrattoInAnticipo(id: number, body: ContrattiChiusuraAnticipataBody  , alertType = AlertType.ERROR_ALERT): Promise<void> {
+  async closeContrattoInAnticipo(id: number, body: ContrattiChiusuraAnticipataBody, alertType = AlertType.ERROR_ALERT): Promise<void> {
     try {
       return await this.$api.contratti.closeAnticipated(id, body, { alertType });
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        this.$store.dispatch(ActionTypes.ALERT, { message: `Contratto non trovato`, alertType });
+      } else if (error instanceof BadRequestError) {
+        this.$store.dispatch(ActionTypes.ALERT, { message: `Richiesta non valida`, alertType });
+      } else {
+        this.$store.dispatch(ActionTypes.ALERT, { message: `Errore del server`, alertType });
+      }
+      throw error;
+    }
+  }
+
+  async sendContrattoEmailFirma(id: number, alertType = AlertType.ERROR_ALERT): Promise<void> {
+    try {
+      return await this.$api.contratti.sendEmailFirma(id, { alertType });
     } catch (error) {
       if (error instanceof NotFoundError) {
         this.$store.dispatch(ActionTypes.ALERT, { message: `Contratto non trovato`, alertType });
@@ -147,5 +162,5 @@ export default class ContrattoHandlerMixin extends Vue {
     }
   }
 
- 
+
 }

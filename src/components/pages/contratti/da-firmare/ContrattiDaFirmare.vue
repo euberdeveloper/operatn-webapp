@@ -32,8 +32,8 @@
       <operatn-date-input placeholder="Data fine" style="flex: 1" name="dataFine" dense hideDetails clearable v-model="dateQueryParams.dataFine" />
       <span class="mx-4" />
       <v-radio-group v-model="selectAction" row dense hide-details>
-        <v-radio label="Scarica pdf" value="pdf"  />
-        <v-radio label="Invia email" value="email"  />
+        <v-radio label="Scarica pdf" value="pdf" />
+        <v-radio label="Invia email" value="email" />
       </v-radio-group>
     </template>
     <template v-slot:createDialog>
@@ -44,7 +44,7 @@
     </template>
     <template v-slot:selectFab>
       <v-btn color="accent" @click="selectButtonPressed" fab large fixed bottom right>
-        <v-icon>{{ selectAction === 'pdf' ? 'mdi-file-pdf' : 'mdi-email-send' }}</v-icon>
+        <v-icon>{{ selectAction === "pdf" ? "mdi-file-pdf" : "mdi-email-send" }}</v-icon>
       </v-btn>
     </template>
   </operatn-base-resource-manager>
@@ -62,6 +62,8 @@ import OperatnActionDialog from "@/components/gears/dialogs/OperatnActionDialog.
 import OperatnBaseResourceManager, { Column, Actions } from "@/components/gears/bases/OperatnBaseResourceManager.vue";
 import OperatnContrattoForm from "@/components/gears/forms/contratto/OperatnContrattoForm.vue";
 import OperatnDateInput from "@/components/gears/inputs/OperatnDateInput.vue";
+import { pdfContratto, pdfGetBlob } from "@/utils/pdf";
+import { downloadBlob } from "@/utils";
 
 interface Tuple {
   id: number;
@@ -99,7 +101,7 @@ export default class Contratti extends Mixins<ResourceManagerMixin<Tuple, Contra
     dataInizio: undefined,
     dataFine: undefined,
   };
-  private selectAction: 'pdf' | 'email' = 'pdf';
+  private selectAction: "pdf" | "email" = "pdf";
   private tableLoading = false;
 
   /* GETTERS AND SETTERS */
@@ -174,12 +176,12 @@ export default class Contratti extends Mixins<ResourceManagerMixin<Tuple, Contra
         {
           icon: "mdi-file-pdf",
           color: "error",
-          action: (item) => {},
+          action: (item) => this.downloadContratto(item),
         },
         {
           icon: "mdi-email-send",
           color: "primary",
-          action: (item) => {},
+          action: (item) => this.sendContrattoEmailFirma(item.id),
         },
         {
           icon: "mdi-upload",
@@ -245,7 +247,7 @@ export default class Contratti extends Mixins<ResourceManagerMixin<Tuple, Contra
       note: value.reference.note,
     };
   }
-  async tupleValueFromCreateBody(id: number, _body: ContrattiCreateBody): Promise<Tuple> {
+  async tupleValueFromCreateBody(id: number): Promise<Tuple> {
     const contratto = await this.getContratto(id, {
       contrattiSuOspite: {
         ospite: { persona: true },
@@ -256,7 +258,7 @@ export default class Contratti extends Mixins<ResourceManagerMixin<Tuple, Contra
     });
     return this.contrattoValueToTuple(contratto);
   }
-  async tupleValueFromUpdateBody(id: number, _body: ContrattiReplaceBody): Promise<Tuple> {
+  async tupleValueFromUpdateBody(id: number): Promise<Tuple> {
     const contratto = await this.getContratto(id, {
       contrattiSuOspite: {
         ospite: { persona: true },
@@ -266,10 +268,29 @@ export default class Contratti extends Mixins<ResourceManagerMixin<Tuple, Contra
       },
     });
     return this.contrattoValueToTuple(contratto);
+  }
+
+  async downloadContratto(tuple: Tuple): Promise<void> {
+    const contratto = tuple.reference;
+    const pdf = pdfContratto(contratto);
+    const blob = await pdfGetBlob(pdf);
+    downloadBlob(blob, `contratto_${contratto.id}.pdf`);
   }
 
   async selectButtonPressed(): Promise<void> {
-
+    switch (this.selectAction) {
+      case "pdf":
+        for (const tuple of this.selectedValues) {
+          await this.downloadContratto(tuple);
+        }
+        break;
+      case "email":
+        for (const tuple of this.selectedValues) {
+          await this.sendContrattoEmailFirma(tuple.id, AlertType.ERRORS_QUEUE);
+        }
+        break;
+    }
+    this.selectedValues = [];
   }
 
   async fetchContratti(): Promise<void> {
