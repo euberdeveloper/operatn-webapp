@@ -91,6 +91,11 @@ export default class MenuAdmin extends Vue {
       text: "Contabilità",
       path: "/admin/contabilita",
     },
+    {
+      icon: "mdi-file-document-edit-outline",
+      text: "Contratti",
+      path: "/admin/contratti",
+    },
   ];
 }
 </script>

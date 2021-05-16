@@ -94,17 +94,17 @@
         </v-edit-dialog>
       </span>
       <span :key="`item-${column.value}-${index}`" v-else>
-        <v-icon small color="success" class="mx-1" @click="column.actions.onView(item)" v-if="column.actions && column.actions.onView && column.actions.showView(item)"
+        <v-icon small color="success" class="mx-1" @click="column.actions.onView(item, index)" v-if="column.actions && column.actions.onView && column.actions.showView(item)"
           >mdi-eye</v-icon
         >
-        <v-icon small color="primary" class="mx-1" @click="column.actions.onEdit(item)" v-if="column.actions && column.actions.onEdit && column.actions.showEdit(item)"
+        <v-icon small color="primary" class="mx-1" @click="column.actions.onEdit(item, index)" v-if="column.actions && column.actions.onEdit && column.actions.showEdit(item)"
           >mdi-pencil</v-icon
         >
         <v-icon
           small
           color="error"
           class="mx-1"
-          @click="column.actions.onDelete(item)"
+          @click="column.actions.onDelete(item, index)"
           v-if="column.actions && column.actions.onDelete && column.actions.showDelete(item)"
           >mdi-delete</v-icon>
         <template v-if="column.actions && column.actions.others">
@@ -114,7 +114,7 @@
           small
           :color="action.color"
           class="mx-1"
-          @click="action.action(item)"
+          @click="action.action(item, index)"
           >{{action.icon}}</v-icon
         >
         </template>
@@ -152,15 +152,15 @@ export interface Column<T = any> extends DataTableHeader {
 }
 
 export interface Actions<T = any> {
-  onEdit?: (value: T) => void | Promise<void>;
-  onDelete?: (value: T) => void | Promise<void>;
-  onView?: (value: T) => void | Promise<void>;
+  onEdit?: (value: T, index: number) => void | Promise<void>;
+  onDelete?: (value: T, index: number) => void | Promise<void>;
+  onView?: (value: T, index: number) => void | Promise<void>;
 
-  showEdit?: (value: T) => boolean;
-  showDelete?: (value: T) => boolean;
-  showView?: (value: T) => boolean;
+  showEdit?: (value: T, index: number) => boolean;
+  showDelete?: (value: T, index: number) => boolean;
+  showView?: (value: T, index: number) => boolean;
 
-  others?: { icon: string; color?: string; action: (value: T) => void | Promise<void> }[];
+  others?: { icon: string; color?: string; action: (value: T, index: number) => void | Promise<void> }[];
 }
 
 export interface GroupHeaders {
@@ -197,8 +197,8 @@ export default class OperatnBaseTable extends Vue {
   @Prop({ type: Array, required: true })
   private values!: any[];
 
-  @Prop({ type: String, required: true })
-  private itemKey!: string;
+  @Prop({ type: String, required: false })
+  private itemKey?: string;
 
   @Prop({ type: Boolean, default: false })
   private showSelect!: boolean;

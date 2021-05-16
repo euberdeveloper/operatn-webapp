@@ -7,11 +7,12 @@
         hint="Formato DD/MM/YYYY"
         persistent-hint
         :prepend-icon="icon"
-        v-bind="attrs"
+        :clearable="clearable"
         :rules="rules"
         @blur="internalValue = parseDate(dateFormatted)"
         @keypress.enter="enterClicked"
         v-on="on"
+        v-bind="attrs"
       ></v-text-field>
     </template>
     <v-date-picker v-model="internalValue" no-title @input="menu = false" />
@@ -31,7 +32,7 @@ import { Component, Prop, Watch } from "vue-property-decorator";
 export default class OperatnDateInput extends Vue {
   /* PROPS */
 
-  @Prop({ validator: (v) => typeof v === "object" || v === null, required: true })
+  @Prop({ validator: (v) => typeof v === "object" || v === null || v === undefined, required: true })
   value!: Date | null;
 
   @Prop({ type: String, required: true })
@@ -42,6 +43,9 @@ export default class OperatnDateInput extends Vue {
 
   @Prop({ type: Array, default: () => [] })
   rules!: any[];
+
+  @Prop({ type: Boolean, default: false })
+  clearable?: boolean;
 
   /* DATA */
 

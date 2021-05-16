@@ -20,6 +20,17 @@ export default class OspiteHandlerMixin extends Vue {
     }
   }
 
+  async getOspite(id: number, params: OspitiIncludeParams = {}, alertType = AlertType.ERROR_ALERT): Promise<OspitiReturned> {
+    try {
+      return this.$api.ospiti.get(id, params, { alertType });
+    } catch (error) {
+      if (error) {
+        this.$store.dispatch(ActionTypes.ALERT, { message: `Ospite non trovato`, alertType });
+      }
+      throw error;
+    }
+  }
+
   async createOspite(body: OspitiCreateBody, alertType = AlertType.ERROR_ALERT): Promise<number> {
     try {
       const id = await this.$api.ospiti.create(body, { alertType });

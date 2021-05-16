@@ -1,6 +1,6 @@
 
 import { Component, Vue } from "vue-property-decorator";
-import { BadRequestError, InvalidBodyError, InvalidPathParamError, NotFoundError, Stanza, StanzeCreateBody, StanzeReplaceBody, StanzeIncludeParams, StanzeReturned } from "operatn-api-client";
+import { BadRequestError, InvalidBodyError, InvalidPathParamError, NotFoundError, StanzeCreateBody, StanzeReplaceBody, StanzeIncludeParams, StanzeReturned, StanzeLibereParams } from "operatn-api-client";
 
 import { ActionTypes, AlertType } from "@/store";
 
@@ -9,12 +9,23 @@ export default class StanzaHandlerMixin extends Vue {
 
   /* METHODS */
 
-  async getStanze(fid: number, params: StanzeIncludeParams = {}, alertType = AlertType.ERROR_ALERT): Promise<Stanza[]> {
+  async getStanze(fid: number, params: StanzeIncludeParams = {}, alertType = AlertType.ERROR_ALERT): Promise<StanzeReturned[]> {
     try {
       return await this.$api.fabbricati.stanze(fid).getAll(params, { alertType });
     } catch (error) {
       if (error) {
         this.$store.dispatch(ActionTypes.ALERT, { message: `Impossibile caricare le stanze`, alertType });
+      }
+      throw error;
+    }
+  }
+
+  async getStanzeLibere(fid: number, params: StanzeLibereParams, alertType = AlertType.ERROR_ALERT): Promise<StanzeReturned[]> {
+    try {
+      return await this.$api.fabbricati.stanze(fid).getLibere(params, { alertType });
+    } catch (error) {
+      if (error) {
+        this.$store.dispatch(ActionTypes.ALERT, { message: `Impossibile caricare le stanze libere`, alertType });
       }
       throw error;
     }

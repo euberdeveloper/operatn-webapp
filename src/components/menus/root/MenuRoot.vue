@@ -91,6 +91,11 @@ export default class MenuRoot extends Vue {
       text: "Contabilità",
       path: "/root/contabilita",
     },
+    {
+      icon: "mdi-file-document-edit-outline",
+      text: "Contratti",
+      path: "/root/contratti",
+    },
   ];
 }
 </script>

@@ -1,4 +1,4 @@
-import { Piano, RuoloUtente } from "operatn-api-client"
+import { Piano, RuoloUtente, TipoRata } from "operatn-api-client"
 import { UtentiReturned } from "operatn-api-client/api/controllers/index"
 
 export interface State {
@@ -14,6 +14,7 @@ export interface State {
     primaryColour: string | null;
     roles: RuoloUtente[];
     piani: { piano: Piano, label: string }[];
+    tipiRata: { tipoRata: TipoRata, label: string }[];
     sigleCausali: string[];
 }
 
@@ -66,6 +67,12 @@ export const state: State = {
             piano: Piano.SETTIMO_PIANO,
             label: 'SETTIMO PIANO'
         }
+    ],
+    tipiRata: [
+        { tipoRata: TipoRata.MENSILE, label: 'MENSILE' },
+        { tipoRata: TipoRata.DA_BANDO, label: 'DA BANDO' },
+        { tipoRata: TipoRata.UNICA, label: 'UNICA' },
+        { tipoRata: TipoRata.QUADRIMESTRALE, label: 'QUADRIMESTRALE' }
     ],
     sigleCausali: [
         'B',

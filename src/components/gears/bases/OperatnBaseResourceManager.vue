@@ -46,7 +46,7 @@
       @cancel="createDialogCancel"
       @confirm="createDialogConfirm"
     >
-      <slot name="createDialog" />
+      <slot />
     </operatn-action-dialog>
 
     <!-- EDIT DIALOG -->

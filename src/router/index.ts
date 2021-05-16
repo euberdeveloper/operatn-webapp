@@ -38,6 +38,7 @@ import RootTabelloneCronologia from '@/views/root/tabellone/cronologia/RootTabel
 import RootContabilita from '@/views/root/contabilita/RootContabilitaView.vue';
 import RootContabilitaInvia from '@/views/root/contabilita/invia/RootContabilitaInviaView.vue';
 import RootContabilitaCronologia from '@/views/root/contabilita/cronologia/RootContabilitaCronologiaView.vue';
+import RootContratti from '@/views/root/contratti/RootContrattiView.vue';
 
 
 /* ADMIN */
@@ -362,6 +363,11 @@ const routes: Array<RouteConfig> = [
             component: RootContabilitaCronologia
           }
         ]
+      },
+      {
+        path: 'contratti',
+        name: 'root-contratti',
+        component: RootContratti
       },
     ]
 
