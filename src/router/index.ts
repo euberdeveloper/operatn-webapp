@@ -39,6 +39,7 @@ import RootContabilita from '@/views/root/contabilita/RootContabilitaView.vue';
 import RootContabilitaInvia from '@/views/root/contabilita/invia/RootContabilitaInviaView.vue';
 import RootContabilitaCronologia from '@/views/root/contabilita/cronologia/RootContabilitaCronologiaView.vue';
 import RootContratti from '@/views/root/contratti/RootContrattiView.vue';
+import RootContrattiProvvisori from '@/views/root/contratti/provvisori/RootContrattiProvvisoriView.vue';
 
 
 /* ADMIN */
@@ -366,8 +367,18 @@ const routes: Array<RouteConfig> = [
       },
       {
         path: 'contratti',
-        name: 'root-contratti',
-        component: RootContratti
+        component: RootContratti,
+        children: [
+          {
+            path: '',
+            redirect: 'provvisori'
+          },
+          {
+            path: 'provvisori',
+            name: 'root-contratti-provvisori',
+            component: RootContrattiProvvisori
+          },
+        ]
       },
     ]
 

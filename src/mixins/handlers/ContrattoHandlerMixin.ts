@@ -85,26 +85,35 @@ export default class ContrattoHandlerMixin extends Vue {
     }
   }
 
-  // async updateContratto(id: number, body: ContrattiReplaceBody, alertType = AlertType.ERROR_ALERT): Promise<void> {
-  //   try {
-  //     await this.$api.contratti.replace(id, {
-        
-  //     }, { alertType });
-  //   } catch (error) {
-  //     if (error) {
-  //       if (error instanceof InvalidPathParamError) {
-  //         this.$store.dispatch(ActionTypes.ALERT, { message: `Id contratto non valido`, alertType });
-  //       } else if (error instanceof InvalidBodyError) {
-  //         this.$store.dispatch(ActionTypes.ALERT, { message: `Dati da aggiornare del contratto non validi`, alertType });
-  //       } else if (error instanceof NotFoundError) {
-  //         this.$store.dispatch(ActionTypes.ALERT, { message: `Contratto non trovato`, alertType });
-  //       } else if (error instanceof BadRequestError) {
-  //         this.$store.dispatch(ActionTypes.ALERT, { message: `Richiesta non valida.`, alertType });
-  //       }
-  //     }
-  //     throw error;
-  //   }
-  // }
+  async updateContratto(id: number, body: ContrattiReplaceBody, alertType = AlertType.ERROR_ALERT): Promise<void> {
+    try {
+      await this.$api.contratti.replace(id, {
+        dataInizio: body.dataInizio,
+        dataFine: body.dataFine,
+        checkout: body.checkout,
+        cauzione: body.cauzione,
+        tipoRata: body.tipoRata,
+        idTariffa: body.idTariffa,
+        idTipoContratto: body.idTipoContratto,
+        idQuietanziante: body.idQuietanziante,
+        ospiti: body.ospiti,
+        note: body.note,
+      }, { alertType });
+    } catch (error) {
+      if (error) {
+        if (error instanceof InvalidPathParamError) {
+          this.$store.dispatch(ActionTypes.ALERT, { message: `Id contratto non valido`, alertType });
+        } else if (error instanceof InvalidBodyError) {
+          this.$store.dispatch(ActionTypes.ALERT, { message: `Dati da aggiornare del contratto non validi`, alertType });
+        } else if (error instanceof NotFoundError) {
+          this.$store.dispatch(ActionTypes.ALERT, { message: `Contratto non trovato`, alertType });
+        } else if (error instanceof BadRequestError) {
+          this.$store.dispatch(ActionTypes.ALERT, { message: `Richiesta non valida.`, alertType });
+        }
+      }
+      throw error;
+    }
+  }
 
   async closeContrattoInAnticipo(id: number, body: ContrattiChiusuraAnticipataBody  , alertType = AlertType.ERROR_ALERT): Promise<void> {
     try {
@@ -116,6 +125,23 @@ export default class ContrattoHandlerMixin extends Vue {
         this.$store.dispatch(ActionTypes.ALERT, { message: `Richiesta non valida`, alertType });
       } else {
         this.$store.dispatch(ActionTypes.ALERT, { message: `Errore del server`, alertType });
+      }
+      throw error;
+    }
+  }
+
+  async deleteContratto(id: number, alertType = AlertType.ERROR_ALERT): Promise<void> {
+    try {
+      await this.$api.contratti.delete(id, { alertType });
+    } catch (error) {
+      if (error) {
+        if (error instanceof InvalidPathParamError) {
+          this.$store.dispatch(ActionTypes.ALERT, { message: `Id contratto non valido`, alertType });
+        } else if (error instanceof NotFoundError) {
+          this.$store.dispatch(ActionTypes.ALERT, { message: `Contratto non trovato`, alertType });
+        } else if (error instanceof BadRequestError) {
+          this.$store.dispatch(ActionTypes.ALERT, { message: `Richiesta non valida.`, alertType });
+        }
       }
       throw error;
     }

@@ -1,6 +1,6 @@
 <template>
   <v-card>
-    <v-card-title class="headline primary white--text">{{ title }}</v-card-title>
+    <v-card-title class="headline primary white--text" v-if="isCard">{{ title }}</v-card-title>
     <v-card-text>
       <slot name="description">
         <v-subheader class="px-0 mt-md-4 mb-md-0 mt-8 mb-4 text-subtitle-1" v-if="description">{{ description }}</v-subheader>
@@ -46,7 +46,7 @@
       @cancel="createDialogCancel"
       @confirm="createDialogConfirm"
     >
-      <slot />
+      <slot name="createDialog" />
     </operatn-action-dialog>
 
     <!-- EDIT DIALOG -->
@@ -80,6 +80,9 @@ export { Actions, Column, GroupHeaders } from "@/components/gears/bases/OperatnB
 })
 export default class OperatnBaseResourceManager extends Vue {
   /* PROPS */
+
+  @Prop({ type: Boolean, default: true })
+  private isCard!: boolean;
 
   @Prop({ type: String, required: true })
   private title!: string;

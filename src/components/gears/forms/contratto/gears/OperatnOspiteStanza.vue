@@ -21,7 +21,7 @@
             v-model="selectedFabbricato"
           >
             <template v-slot:append-outer v-if="selectedFabbricato">
-              <v-btn icon :to="`fabbricati/${selectedFabbricato.id}`"><v-icon>mdi-eye</v-icon></v-btn>
+              <v-btn icon color="primary" :to="`fabbricati/${selectedFabbricato.id}`"><v-icon>mdi-eye</v-icon></v-btn>
             </template>
           </v-autocomplete>
         </v-col>
@@ -62,8 +62,8 @@
             clearable
             v-model="internalValue.postiLetto"
           >
-            <template v-slot:append v-if="internalValue.postiLetto.length">
-              <v-btn icon :to="`fabbricati/${selectedFabbricato.id}/stanze/${internalValue.postiLetto[0].idStanza}`"><v-icon>mdi-eye</v-icon></v-btn>
+            <template v-slot:append-outer v-if="internalValue.postiLetto.length">
+              <v-btn icon color="primary" :to="`fabbricati/${selectedFabbricato.id}/stanze/${internalValue.postiLetto[0].idStanza}`"><v-icon>mdi-eye</v-icon></v-btn>
             </template>
           </v-autocomplete>
         </v-col>
