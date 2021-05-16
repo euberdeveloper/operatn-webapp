@@ -1,7 +1,7 @@
 <template>
   <operatn-base-resource-manager
-    title="Contratti provvisori"
-    description="Gestione dei contratti non ancora firmati, che sono quindi modificabili ed eliminabili"
+    title="Contratti da firmare"
+    description="Gestione dei contratti da firmare. Si può scaricare, firmare e caricare un contratto se l'ospite viene allo sportello, oppure inviare una email con il contratto allegato ed un link per caricarlo una volta firmato. In questo secondo caso lo sportello dovrà comunque controllare il documento e confermarlo."
     :isCard="false"
     tableTitle="Contratti"
     :tableSelectedValues.sync="selectedValues"
@@ -31,12 +31,21 @@
       <span class="mx-4" />
       <operatn-date-input placeholder="Data fine" style="flex: 1" name="dataFine" dense hideDetails clearable v-model="dateQueryParams.dataFine" />
       <span class="mx-4" />
+      <v-radio-group v-model="selectAction" row dense hide-details>
+        <v-radio label="Scarica pdf" value="pdf"  />
+        <v-radio label="Invia email" value="email"  />
+      </v-radio-group>
     </template>
     <template v-slot:createDialog>
       <operatn-contratto-form v-if="showCreateDialog" v-model="createBody" :formValid.sync="createBodyValid" class="mt-6" />
     </template>
     <template v-slot:editDialog>
       <operatn-contratto-form v-if="showEditDialog" v-model="updateBody" :formValid.sync="updateBodyValid" class="mt-6" />
+    </template>
+    <template v-slot:selectFab>
+      <v-btn color="accent" @click="selectButtonPressed" fab large fixed bottom right>
+        <v-icon>{{ selectAction === 'pdf' ? 'mdi-file-pdf' : 'mdi-email-send' }}</v-icon>
+      </v-btn>
     </template>
   </operatn-base-resource-manager>
 </template>
@@ -90,6 +99,7 @@ export default class Contratti extends Mixins<ResourceManagerMixin<Tuple, Contra
     dataInizio: undefined,
     dataFine: undefined,
   };
+  private selectAction: 'pdf' | 'email' = 'pdf';
   private tableLoading = false;
 
   /* GETTERS AND SETTERS */
@@ -133,7 +143,7 @@ export default class Contratti extends Mixins<ResourceManagerMixin<Tuple, Contra
       {
         text: "Fabbricato",
         value: "codiceFabbricato",
-        groupable: false,
+        groupable: true,
         editable: false,
       },
       {
@@ -160,8 +170,23 @@ export default class Contratti extends Mixins<ResourceManagerMixin<Tuple, Contra
 
   get actions(): Actions<Tuple> {
     return {
-      onEdit: (item) => this.openEdit(item),
-      onDelete: (item) => this.askDelete(item),
+      others: [
+        {
+          icon: "mdi-file-pdf",
+          color: "error",
+          action: (item) => {},
+        },
+        {
+          icon: "mdi-email-send",
+          color: "primary",
+          action: (item) => {},
+        },
+        {
+          icon: "mdi-upload",
+          color: "success",
+          action: (item) => {},
+        },
+      ],
     };
   }
 
@@ -241,6 +266,10 @@ export default class Contratti extends Mixins<ResourceManagerMixin<Tuple, Contra
       },
     });
     return this.contrattoValueToTuple(contratto);
+  }
+
+  async selectButtonPressed(): Promise<void> {
+
   }
 
   async fetchContratti(): Promise<void> {

@@ -34,11 +34,13 @@
         <v-icon>mdi-plus</v-icon>
       </v-btn>
     </v-fab-transition>
-    <!-- DELETE FAB BUTTON -->
+    <!-- DELETE/SELECT FAB BUTTON -->
     <v-fab-transition v-else-if="showActionButton" key="delete">
-      <v-btn color="error" @click="fabDeleteClick" fab large fixed bottom right>
-        <v-icon>mdi-delete</v-icon>
-      </v-btn>
+      <slot name="selectFab">
+        <v-btn color="error" @click="fabDeleteClick" fab large fixed bottom right>
+          <v-icon>mdi-delete</v-icon>
+        </v-btn>
+      </slot>
     </v-fab-transition>
 
     <!-- CREATE DIALOG -->
