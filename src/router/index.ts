@@ -74,6 +74,11 @@ import AdminTabelloneCronologia from '@/views/admin/tabellone/cronologia/AdminTa
 import AdminContabilita from '@/views/admin/contabilita/AdminContabilitaView.vue';
 import AdminContabilitaInvia from '@/views/admin/contabilita/invia/AdminContabilitaInviaView.vue';
 import AdminContabilitaCronologia from '@/views/admin/contabilita/cronologia/AdminContabilitaCronologiaView.vue';
+import AdminContratti from '@/views/admin/contratti/AdminContrattiView.vue';
+import AdminContrattiProvvisori from '@/views/admin/contratti/provvisori/AdminContrattiProvvisoriView.vue';
+import AdminContrattiDaFirmare from '@/views/admin/contratti/da-firmare/AdminContrattiDaFirmareView.vue';
+import AdminContrattiDaVisionare from '@/views/admin/contratti/da-visionare/AdminContrattiDaVisionareView.vue';
+import AdminContrattiFirmati from '@/views/admin/contratti/firmati/AdminContrattiFirmatiView.vue';
 
 Vue.use(VueRouter);
 
@@ -240,6 +245,35 @@ const routes: Array<RouteConfig> = [
           }
         ]
       },
+      {
+        path: 'contratti',
+        component: AdminContratti,
+        children: [
+          {
+            path: '',
+            redirect: 'provvisori'
+          },
+          {
+            path: 'provvisori',
+            name: 'admin-contratti-provvisori',
+            component: AdminContrattiProvvisori
+          },
+          {
+            path: 'da-firmare',
+            name: 'admin-contratti-da-firmare',
+            component: AdminContrattiDaFirmare
+          },
+          {
+            path: 'da-visionare',
+            name: 'admin-contratti-da-visionare',
+            component: AdminContrattiDaVisionare
+          }, {
+            path: 'firmati',
+            name: 'admin-contratti-firmati',
+            component: AdminContrattiFirmati
+          },
+        ]
+      },
     ]
   },
   {
@@ -399,7 +433,7 @@ const routes: Array<RouteConfig> = [
             path: 'da-visionare',
             name: 'root-contratti-da-visionare',
             component: RootContrattiDaVisionare
-          },{
+          }, {
             path: 'firmati',
             name: 'root-contratti-firmati',
             component: RootContrattiFirmati
