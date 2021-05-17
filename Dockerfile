@@ -4,4 +4,4 @@ COPY package.json .
 RUN npm install
 COPY . .
 RUN rm -rf dist
-CMD [ "npm", "run", "build ]
+CMD [ "npm", "run", "build" ]
