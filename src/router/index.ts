@@ -12,6 +12,9 @@ import Login from '@/views/login/LoginView.vue';
 import PasswordRecovery from '@/views/password-recovery/PasswordRecoveryView.vue';
 import PasswordRecoveryToken from '@/views/password-recovery/token/PasswordRecoveryTokenView.vue';
 
+/* SIGN CONTRACT */
+import ContrattiEmailTokenFirma from '@/views/contratti/email-token/token/firma/ContrattiEmailTokenFirmaView.vue';
+
 /* ROOT */
 import Root from '@/views/root/RootView.vue';
 import RootBar from '@/views/root/RootBarView.vue';
@@ -41,6 +44,7 @@ import RootContabilitaCronologia from '@/views/root/contabilita/cronologia/RootC
 import RootContratti from '@/views/root/contratti/RootContrattiView.vue';
 import RootContrattiProvvisori from '@/views/root/contratti/provvisori/RootContrattiProvvisoriView.vue';
 import RootContrattiDaFirmare from '@/views/root/contratti/da-firmare/RootContrattiDaFirmareView.vue';
+import RootContrattiDaVisionare from '@/views/root/contratti/da-visionare/RootContrattiDaVisionareView.vue';
 
 
 /* ADMIN */
@@ -92,6 +96,12 @@ const routes: Array<RouteConfig> = [
     path: '/password-recovery/:token',
     name: 'recover-password',
     component: PasswordRecoveryToken,
+    props: true
+  },
+  {
+    path: '/contratti/email-token/:token/firma',
+    name: 'contratti-email-token-firma',
+    component: ContrattiEmailTokenFirma,
     props: true
   },
   {
@@ -383,6 +393,11 @@ const routes: Array<RouteConfig> = [
             path: 'da-firmare',
             name: 'root-contratti-da-firmare',
             component: RootContrattiDaFirmare
+          },
+          {
+            path: 'da-visionare',
+            name: 'root-contratti-da-visionare',
+            component: RootContrattiDaVisionare
           },
         ]
       },

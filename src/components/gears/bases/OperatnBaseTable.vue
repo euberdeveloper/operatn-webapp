@@ -95,10 +95,20 @@
         </v-edit-dialog>
       </span>
       <span :key="`item-${column.value}-${index}`" v-else>
-        <v-icon small color="success" class="mx-1" @click="column.actions.onView(item, index)" v-if="column.actions && column.actions.onView && column.actions.showView(item)"
+        <v-icon
+          small
+          color="success"
+          class="mx-1"
+          @click="column.actions.onView(item, index)"
+          v-if="column.actions && column.actions.onView && column.actions.showView(item)"
           >mdi-eye</v-icon
         >
-        <v-icon small color="primary" class="mx-1" @click="column.actions.onEdit(item, index)" v-if="column.actions && column.actions.onEdit && column.actions.showEdit(item)"
+        <v-icon
+          small
+          color="primary"
+          class="mx-1"
+          @click="column.actions.onEdit(item, index)"
+          v-if="column.actions && column.actions.onEdit && column.actions.showEdit(item)"
           >mdi-pencil</v-icon
         >
         <v-icon
@@ -107,17 +117,20 @@
           class="mx-1"
           @click="column.actions.onDelete(item, index)"
           v-if="column.actions && column.actions.onDelete && column.actions.showDelete(item)"
-          >mdi-delete</v-icon>
-        <template v-if="column.actions && column.actions.others">
-        <v-icon
-          v-for="(action, index) of actions.others"
-          :key="`${action.icon}_${index}`"
-          small
-          :color="action.color"
-          class="mx-1"
-          @click="action.action(item, index)"
-          >{{action.icon}}</v-icon
+          >mdi-delete</v-icon
         >
+        <template v-if="column.actions && column.actions.others">
+          <template v-for="(action, index) of actions.others">
+            <v-icon
+              :key="`${action.icon}_${index}`"
+              small
+              :color="action.color"
+              class="mx-1"
+              v-if="!action.showAction || action.showAction(item)"
+              @click="action.action(item, index)"
+              >{{ action.icon }}</v-icon
+            >
+          </template>
         </template>
       </span>
     </template>
@@ -161,7 +174,7 @@ export interface Actions<T = any> {
   showDelete?: (value: T, index: number) => boolean;
   showView?: (value: T, index: number) => boolean;
 
-  others?: { icon: string; color?: string; action: (value: T, index: number) => void | Promise<void> }[];
+  others?: { icon: string; color?: string; showAction?: (value: T, index: number) => boolean; action: (value: T, index: number) => void | Promise<void> }[];
 }
 
 export interface GroupHeaders {
@@ -260,7 +273,7 @@ export default class OperatnBaseTable extends Vue {
                 showEdit: this.actions.showEdit ?? (() => !!this.actions?.onEdit),
                 showDelete: this.actions.showDelete ?? (() => !!this.actions?.onDelete),
                 showView: this.actions.showView ?? (() => !!this.actions?.onView),
-                others: this.actions?.others
+                others: this.actions?.others,
               },
             },
           ]

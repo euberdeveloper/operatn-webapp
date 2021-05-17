@@ -37,7 +37,7 @@ const validator = {
         }
     },
     passwordsCoincide(pwd: string): InputValidationRule {
-        return value => (!value || value === pwd )|| 'Le password devono coincidere';
+        return value => (!value || value === pwd) || 'Le password devono coincidere';
     },
     ruoloUtente(): InputValidationRule {
         return value => (!value || Object.values(RuoloUtente).includes(value)) || `Ruolo utente non valido`;
@@ -81,7 +81,10 @@ const validator = {
             }
             return true;
         }
-    }
+    },
+    maxSize(max: number): InputValidationRule {
+        return value => (value === null || value.size <= max) || `La dimensione massima è di ${max} byte`
+    },
 };
 
 export type Validator = typeof validator;

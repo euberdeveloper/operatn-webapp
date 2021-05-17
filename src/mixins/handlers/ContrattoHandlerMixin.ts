@@ -67,6 +67,22 @@ export default class ContrattoHandlerMixin extends Vue {
     }
   }
 
+
+  async getContrattoByToken(token: string, params: ContrattiIncludeParams = {}, alertType = AlertType.ERROR_ALERT): Promise<ContrattiReturned> {
+    try {
+      return await this.$api.contratti.getByToken(token, params, { alertType });
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        this.$store.dispatch(ActionTypes.ALERT, { message: `Contratto non trovato`, alertType });
+      } else if (error instanceof BadRequestError) {
+        this.$store.dispatch(ActionTypes.ALERT, { message: `Richiesta non valida`, alertType });
+      } else {
+        this.$store.dispatch(ActionTypes.ALERT, { message: `Errore del server`, alertType });
+      }
+      throw error;
+    }
+  }
+
   async createContratto(body: ContrattiCreateBody, alertType = AlertType.ERROR_ALERT): Promise<number> {
     try {
       const id = await this.$api.contratti.create({ ...body }, { alertType });
@@ -133,6 +149,36 @@ export default class ContrattoHandlerMixin extends Vue {
   async sendContrattoEmailFirma(id: number, alertType = AlertType.ERROR_ALERT): Promise<void> {
     try {
       return await this.$api.contratti.sendEmailFirma(id, { alertType });
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        this.$store.dispatch(ActionTypes.ALERT, { message: `Contratto non trovato`, alertType });
+      } else if (error instanceof BadRequestError) {
+        this.$store.dispatch(ActionTypes.ALERT, { message: `Richiesta non valida`, alertType });
+      } else {
+        this.$store.dispatch(ActionTypes.ALERT, { message: `Errore del server`, alertType });
+      }
+      throw error;
+    }
+  }
+
+  async uploadContrattoFirmaFromEmail(token: string, formData: FormData, alertType = AlertType.ERROR_ALERT): Promise<void> {
+    try {
+      return await this.$api.contratti.uploadFirmaFromEmail(token, formData, { alertType });
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        this.$store.dispatch(ActionTypes.ALERT, { message: `Contratto non trovato`, alertType });
+      } else if (error instanceof BadRequestError) {
+        this.$store.dispatch(ActionTypes.ALERT, { message: `Richiesta non valida`, alertType });
+      } else {
+        this.$store.dispatch(ActionTypes.ALERT, { message: `Errore del server`, alertType });
+      }
+      throw error;
+    }
+  }
+
+  async answerContrattoFirmaFromEmail(id: number, body: { accettato: boolean }, alertType = AlertType.ERROR_ALERT): Promise<void> {
+    try {
+      return await this.$api.contratti.answerFirmaFromEmail(id, body, { alertType });
     } catch (error) {
       if (error instanceof NotFoundError) {
         this.$store.dispatch(ActionTypes.ALERT, { message: `Contratto non trovato`, alertType });

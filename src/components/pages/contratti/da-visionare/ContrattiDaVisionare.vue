@@ -1,7 +1,7 @@
 <template>
   <operatn-base-resource-manager
-    title="Contratti da firmare"
-    description="Gestione dei contratti da firmare. Si può scaricare, firmare e caricare un contratto se l'ospite viene allo sportello, oppure inviare una email con il contratto allegato ed un link per caricarlo una volta firmato. In questo secondo caso lo sportello dovrà comunque controllare il documento e confermarlo."
+    title="Contratti da visionare"
+    description="Gestione dei contratti da visionare. Si può scaricare il documento che è stato inviato via email, controllarlo e confermarlo."
     :isCard="false"
     tableTitle="Contratti"
     :tableSelectedValues.sync="selectedValues"
@@ -9,7 +9,6 @@
     :tableActions="actions"
     :tableValues="values"
     tableItemKey="id"
-    tableShowSelect
     :tableLoading="tableLoading"
     :tableUpdateBody.sync="updateBody"
     createDialogTitle="Nuovo contratto"
@@ -31,10 +30,6 @@
       <span class="mx-4" />
       <operatn-date-input placeholder="Data fine" style="flex: 1" name="dataFine" dense hideDetails clearable v-model="dateQueryParams.dataFine" />
       <span class="mx-4" />
-      <v-radio-group v-model="selectAction" row dense hide-details>
-        <v-radio label="Scarica pdf" value="pdf" />
-        <v-radio label="Invia email" value="email" />
-      </v-radio-group>
     </template>
     <template v-slot:createDialog>
       <operatn-contratto-form v-if="showCreateDialog" v-model="createBody" :formValid.sync="createBodyValid" class="mt-6" />
@@ -53,6 +48,7 @@
 <script lang="ts">
 import { Component, Mixins, Watch } from "vue-property-decorator";
 import { ContrattiCreateBody, ContrattiFilterParams, ContrattiReplaceBody, ContrattiReturned } from "operatn-api-client";
+import axios from "axios";
 
 import { ActionTypes, AlertType } from "@/store";
 import ResourceManagerMixin from "@/mixins/ResourceManagerMixin";
@@ -62,7 +58,6 @@ import OperatnActionDialog from "@/components/gears/dialogs/OperatnActionDialog.
 import OperatnBaseResourceManager, { Column, Actions } from "@/components/gears/bases/OperatnBaseResourceManager.vue";
 import OperatnContrattoForm from "@/components/gears/forms/contratto/OperatnContrattoForm.vue";
 import OperatnDateInput from "@/components/gears/inputs/OperatnDateInput.vue";
-import { pdfContratto, pdfGetBlob } from "@/utils/pdf";
 import { downloadBlob } from "@/utils";
 
 interface Tuple {
@@ -75,7 +70,7 @@ interface Tuple {
   unitaImmobiliare: string;
   numeroStanza: string;
   postiLetto: string;
-  dataInserimento: Date;
+  dataRisposta: Date | null;
   reference: ContrattiReturned;
 }
 
@@ -87,21 +82,17 @@ interface Tuple {
     OperatnDateInput,
   },
 })
-export default class ContrattiDaFirmare extends Mixins<ResourceManagerMixin<Tuple, ContrattiCreateBody, ContrattiReplaceBody, number> & ContrattoHandlerMixin>(
+export default class ContrattiDaVisionare extends Mixins<ResourceManagerMixin<Tuple, ContrattiCreateBody, ContrattiReplaceBody, number> & ContrattoHandlerMixin>(
   ResourceManagerMixin,
   ContrattoHandlerMixin
 ) {
   /* DATA */
-
-  protected askDeleteText = "Sei sicuro di voler eliminare questo contratto?";
-  protected askDeleteMultipleText = "Sei sicuro di voler eliminare i contratti selezionati?";
 
   private contratti: ContrattiReturned[] = [];
   private dateQueryParams: ContrattiFilterParams = {
     dataInizio: undefined,
     dataFine: undefined,
   };
-  private selectAction: "pdf" | "email" = "pdf";
   private tableLoading = false;
 
   /* GETTERS AND SETTERS */
@@ -161,11 +152,11 @@ export default class ContrattiDaFirmare extends Mixins<ResourceManagerMixin<Tupl
         editable: false,
       },
       {
-        text: "Inserimento",
-        value: "dataInserimento",
+        text: "Data risposta",
+        value: "dataRisposta",
         groupable: false,
         editable: false,
-        itemTextHandler: (value) => value.toLocaleDateString(),
+        itemTextHandler: (value) => (value ? value.toLocaleDateString() : ""),
       },
     ];
   }
@@ -174,20 +165,19 @@ export default class ContrattiDaFirmare extends Mixins<ResourceManagerMixin<Tupl
     return {
       others: [
         {
-          icon: "mdi-file-pdf",
-          color: "error",
+          icon: "mdi-download",
+          color: "primary",
           action: (item) => this.downloadContratto(item),
         },
         {
-          icon: "mdi-email-send",
-          color: "primary",
-          showAction: (item) => { console.log(item.reference.dataRispostaEmail); return item.reference.dataRispostaEmail === null },
-          action: (item) => this.sendEmail(item),
+          icon: "mdi-check",
+          color: "success",
+          action: (item, index) => this.answerContratto(item, index, true),
         },
         {
-          icon: "mdi-upload",
-          color: "success",
-          action: (item) => {},
+          icon: "mdi-close",
+          color: "error",
+          action: (item, index) => this.answerContratto(item, index, false),
         },
       ],
     };
@@ -208,7 +198,7 @@ export default class ContrattiDaFirmare extends Mixins<ResourceManagerMixin<Tupl
       postiLetto: contratto.contrattiSuOspite?.[0].contrattiSuOspiteSuPostoLetto
         ? contratto.contrattiSuOspite[0].contrattiSuOspiteSuPostoLetto.map((pl) => pl.postoLetto).join(", ")
         : "",
-      dataInserimento: contratto.dataInserimento,
+      dataRisposta: contratto.dataRispostaEmail,
       reference: contratto,
     };
   }
@@ -272,37 +262,27 @@ export default class ContrattiDaFirmare extends Mixins<ResourceManagerMixin<Tupl
   }
 
   async downloadContratto(tuple: Tuple): Promise<void> {
-    const contratto = tuple.reference;
-    const pdf = pdfContratto(contratto);
-    const blob = await pdfGetBlob(pdf);
-    downloadBlob(blob, `contratto_${contratto.id}.pdf`);
-  }
-
-  async sendEmail(tuple: Tuple): Promise<void> {
-      await this.sendContrattoEmailFirma(tuple.id, AlertType.ERRORS_QUEUE);
-      this.$store.dispatch(ActionTypes.SET_TOAST, { message: `Email inviata`, color: 'success' });
-  }
-
-  async selectButtonPressed(): Promise<void> {
-    switch (this.selectAction) {
-      case "pdf":
-        for (const tuple of this.selectedValues) {
-          await this.downloadContratto(tuple);
-        }
-        break;
-      case "email":
-        for (const tuple of this.selectedValues) {
-          await this.sendEmail(tuple);
-        }
-        break;
+    try {
+      const filename = `${tuple.id}.pdf`;
+      const path = this.$stored.getPath(`contratti/${filename}`);
+      const response = await axios.get(path, { responseType: "blob" });
+      const blob: Blob = response.data;
+      downloadBlob(blob, filename);
+    } catch (error) {
+      this.$store.dispatch(ActionTypes.ALERT, { message: `File non trovato`, alertType: AlertType.ERRORS_QUEUE });
     }
-    this.selectedValues = [];
   }
-Firmare
+
+  async answerContratto(tuple: Tuple, index: number, answer: boolean): Promise<void> {
+      await this.answerContrattoFirmaFromEmail(tuple.id, { accettato: answer}, AlertType.ERRORS_QUEUE);
+      this.$store.dispatch(ActionTypes.SET_TOAST, { message: `Risposta inviata`, color: 'success' });
+      this.contratti.splice(index, 1);
+  }
+
   async fetchContratti(): Promise<void> {
     try {
       this.tableLoading = true;
-      this.contratti = await this.getContrattiDaFirmare({
+      this.contratti = await this.getContrattiDaVisionare({
         contrattiSuOspite: {
           ospite: { persona: true },
           contrattiSuOspiteSuPostoLetto: {
