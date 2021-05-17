@@ -161,6 +161,21 @@ export default class ContrattoHandlerMixin extends Vue {
     }
   }
 
+  async uploadContrattoFirma(id: number, formData: FormData, alertType = AlertType.ERROR_ALERT): Promise<void> {
+    try {
+      return await this.$api.contratti.uploadFirma(id, formData, { alertType });
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        this.$store.dispatch(ActionTypes.ALERT, { message: `Contratto non trovato`, alertType });
+      } else if (error instanceof BadRequestError) {
+        this.$store.dispatch(ActionTypes.ALERT, { message: `Richiesta non valida`, alertType });
+      } else {
+        this.$store.dispatch(ActionTypes.ALERT, { message: `Errore del server`, alertType });
+      }
+      throw error;
+    }
+  }
+
   async uploadContrattoFirmaFromEmail(token: string, formData: FormData, alertType = AlertType.ERROR_ALERT): Promise<void> {
     try {
       return await this.$api.contratti.uploadFirmaFromEmail(token, formData, { alertType });

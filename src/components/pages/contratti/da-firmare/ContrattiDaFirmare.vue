@@ -1,53 +1,59 @@
 <template>
-  <operatn-base-resource-manager
-    title="Contratti da firmare"
-    description="Gestione dei contratti da firmare. Si può scaricare, firmare e caricare un contratto se l'ospite viene allo sportello, oppure inviare una email con il contratto allegato ed un link per caricarlo una volta firmato. In questo secondo caso lo sportello dovrà comunque controllare il documento e confermarlo."
-    :isCard="false"
-    tableTitle="Contratti"
-    :tableSelectedValues.sync="selectedValues"
-    :tableColumns="columns"
-    :tableActions="actions"
-    :tableValues="values"
-    tableItemKey="id"
-    tableShowSelect
-    :tableLoading="tableLoading"
-    :tableUpdateBody.sync="updateBody"
-    createDialogTitle="Nuovo contratto"
-    :createDialogShow.sync="showCreateDialog"
-    :createDialogDisabled="!createBodyValid"
-    editDialogTitle="Modifica contratto"
-    :editDialogShow.sync="showEditDialog"
-    :editDialogDisabled="!updateBodyValid"
-    @fabCreateClick="openCreate"
-    @fabDeleteClick="askDeleteMultiple"
-    @createDialogConfirm="closeCreate(true)"
-    @createDialogCancel="closeCreate(false)"
-    @editDialogConfirm="closeEdit(true)"
-    @editDialogCancel="closeEdit(false)"
-  >
-    <template v-slot:tableHeader>
-      <span class="mx-4" />
-      <operatn-date-input placeholder="Data inizio" style="flex: 1" name="dataInizio" dense hideDetails clearable v-model="dateQueryParams.dataInizio" />
-      <span class="mx-4" />
-      <operatn-date-input placeholder="Data fine" style="flex: 1" name="dataFine" dense hideDetails clearable v-model="dateQueryParams.dataFine" />
-      <span class="mx-4" />
-      <v-radio-group v-model="selectAction" row dense hide-details>
-        <v-radio label="Scarica pdf" value="pdf" />
-        <v-radio label="Invia email" value="email" />
-      </v-radio-group>
-    </template>
-    <template v-slot:createDialog>
-      <operatn-contratto-form v-if="showCreateDialog" v-model="createBody" :formValid.sync="createBodyValid" class="mt-6" />
-    </template>
-    <template v-slot:editDialog>
-      <operatn-contratto-form v-if="showEditDialog" v-model="updateBody" :formValid.sync="updateBodyValid" class="mt-6" />
-    </template>
-    <template v-slot:selectFab>
-      <v-btn color="accent" @click="selectButtonPressed" fab large fixed bottom right>
-        <v-icon>{{ selectAction === "pdf" ? "mdi-file-pdf" : "mdi-email-send" }}</v-icon>
-      </v-btn>
-    </template>
-  </operatn-base-resource-manager>
+  <div>
+    <operatn-base-resource-manager
+      title="Contratti da firmare"
+      description="Gestione dei contratti da firmare. Si può scaricare, firmare e caricare un contratto se l'ospite viene allo sportello, oppure inviare una email con il contratto allegato ed un link per caricarlo una volta firmato. In questo secondo caso lo sportello dovrà comunque controllare il documento e confermarlo."
+      :isCard="false"
+      tableTitle="Contratti"
+      :tableSelectedValues.sync="selectedValues"
+      :tableColumns="columns"
+      :tableActions="actions"
+      :tableValues="values"
+      tableItemKey="id"
+      tableShowSelect
+      :tableLoading="tableLoading"
+      :tableUpdateBody.sync="updateBody"
+      createDialogTitle="Nuovo contratto"
+      :createDialogShow.sync="showCreateDialog"
+      :createDialogDisabled="!createBodyValid"
+      editDialogTitle="Modifica contratto"
+      :editDialogShow.sync="showEditDialog"
+      :editDialogDisabled="!updateBodyValid"
+      @fabCreateClick="openCreate"
+      @fabDeleteClick="askDeleteMultiple"
+      @createDialogConfirm="closeCreate(true)"
+      @createDialogCancel="closeCreate(false)"
+      @editDialogConfirm="closeEdit(true)"
+      @editDialogCancel="closeEdit(false)"
+    >
+      <template v-slot:tableHeader>
+        <span class="mx-4" />
+        <operatn-date-input placeholder="Data inizio" style="flex: 1" name="dataInizio" dense hideDetails clearable v-model="dateQueryParams.dataInizio" />
+        <span class="mx-4" />
+        <operatn-date-input placeholder="Data fine" style="flex: 1" name="dataFine" dense hideDetails clearable v-model="dateQueryParams.dataFine" />
+        <span class="mx-4" />
+        <v-radio-group v-model="selectAction" row dense hide-details>
+          <v-radio label="Scarica pdf" value="pdf" />
+          <v-radio label="Invia email" value="email" />
+        </v-radio-group>
+      </template>
+      <template v-slot:createDialog>
+        <operatn-contratto-form v-if="showCreateDialog" v-model="createBody" :formValid.sync="createBodyValid" class="mt-6" />
+      </template>
+      <template v-slot:editDialog>
+        <operatn-contratto-form v-if="showEditDialog" v-model="updateBody" :formValid.sync="updateBodyValid" class="mt-6" />
+      </template>
+      <template v-slot:selectFab>
+        <v-btn color="accent" @click="selectButtonPressed" fab large fixed bottom right>
+          <v-icon>{{ selectAction === "pdf" ? "mdi-file-pdf" : "mdi-email-send" }}</v-icon>
+        </v-btn>
+      </template>
+    </operatn-base-resource-manager>
+
+    <operatn-action-dialog title="Firma contratto" v-model="showFirmaDialog" :disabled="!contrattoFirmatoValid" @cancel="firmaDialogCancel" @confirm="firmaDialogConfirm">
+      <operatn-contratto-firma-form v-if="showFirmaDialog" v-model="contrattoFirmato" :formValid.sync="contrattoFirmatoValid" class="mt-6" />
+    </operatn-action-dialog>
+  </div>
 </template>
 
 <script lang="ts">
@@ -61,6 +67,7 @@ import ContrattoHandlerMixin from "@/mixins/handlers/ContrattoHandlerMixin";
 import OperatnActionDialog from "@/components/gears/dialogs/OperatnActionDialog.vue";
 import OperatnBaseResourceManager, { Column, Actions } from "@/components/gears/bases/OperatnBaseResourceManager.vue";
 import OperatnContrattoForm from "@/components/gears/forms/contratto/OperatnContrattoForm.vue";
+import OperatnContrattoFirmaForm from "@/components/gears/forms/contratto/OperatnContrattoFirmaForm.vue";
 import OperatnDateInput from "@/components/gears/inputs/OperatnDateInput.vue";
 import { pdfContratto, pdfGetBlob } from "@/utils/pdf";
 import { downloadBlob } from "@/utils";
@@ -84,6 +91,7 @@ interface Tuple {
     OperatnActionDialog,
     OperatnBaseResourceManager,
     OperatnContrattoForm,
+    OperatnContrattoFirmaForm,
     OperatnDateInput,
   },
 })
@@ -103,6 +111,11 @@ export default class ContrattiDaFirmare extends Mixins<ResourceManagerMixin<Tupl
   };
   private selectAction: "pdf" | "email" = "pdf";
   private tableLoading = false;
+
+  private contrattoDaFirmare: Tuple | null = null;
+  private contrattoFirmato: File | null = null;
+  private contrattoFirmatoValid = false;
+  private showFirmaDialog = false;
 
   /* GETTERS AND SETTERS */
 
@@ -181,13 +194,15 @@ export default class ContrattiDaFirmare extends Mixins<ResourceManagerMixin<Tupl
         {
           icon: "mdi-email-send",
           color: "primary",
-          showAction: (item) => { console.log(item.reference.dataRispostaEmail); return item.reference.dataRispostaEmail === null },
+          showAction: (item) => {
+            return item.reference.dataRispostaEmail === null;
+          },
           action: (item) => this.sendEmail(item),
         },
         {
           icon: "mdi-upload",
           color: "success",
-          action: (item) => {},
+          action: (item) => this.openFirmaContratto(item),
         },
       ],
     };
@@ -279,8 +294,8 @@ export default class ContrattiDaFirmare extends Mixins<ResourceManagerMixin<Tupl
   }
 
   async sendEmail(tuple: Tuple): Promise<void> {
-      await this.sendContrattoEmailFirma(tuple.id, AlertType.ERRORS_QUEUE);
-      this.$store.dispatch(ActionTypes.SET_TOAST, { message: `Email inviata`, color: 'success' });
+    await this.sendContrattoEmailFirma(tuple.id, AlertType.ERRORS_QUEUE);
+    this.$store.dispatch(ActionTypes.SET_TOAST, { message: `Email inviata`, color: "success" });
   }
 
   async selectButtonPressed(): Promise<void> {
@@ -298,7 +313,33 @@ export default class ContrattiDaFirmare extends Mixins<ResourceManagerMixin<Tupl
     }
     this.selectedValues = [];
   }
-Firmare
+
+  openFirmaContratto(tuple: Tuple): void {
+    this.contrattoDaFirmare = tuple;
+    this.showFirmaDialog = true;
+    this.contrattoFirmato = null;
+    this.contrattoFirmatoValid = false;
+  }
+  firmaDialogCancel(): void {
+    this.showFirmaDialog = false;
+    this.contrattoDaFirmare = null;
+    this.contrattoFirmato = null;
+  }
+  async firmaDialogConfirm(): Promise<void> {
+    if (this.contrattoFirmatoValid) {
+      try {
+        const formData = new FormData();
+        formData.append("contratto", this.contrattoFirmato as File);
+        await this.uploadContrattoFirma(this.contrattoDaFirmare?.id as number, formData);
+      } finally {
+        this.firmaDialogCancel();
+      }
+    }
+    else {
+      this.firmaDialogCancel();
+    }
+  }
+
   async fetchContratti(): Promise<void> {
     try {
       this.tableLoading = true;
