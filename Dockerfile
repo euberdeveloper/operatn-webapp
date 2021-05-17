@@ -3,8 +3,5 @@ WORKDIR /app
 COPY package.json .
 RUN npm install
 COPY . .
-RUN rm -rf dist && \
-    npm run build && \
-    rm -r node_modules src
-RUN npm install -g http-server
-CMD [ "http-server", "dist" ]
+RUN rm -rf dist
+CMD [ "npm", "run", "build ]
