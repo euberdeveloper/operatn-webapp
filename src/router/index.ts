@@ -45,6 +45,7 @@ import RootContratti from '@/views/root/contratti/RootContrattiView.vue';
 import RootContrattiProvvisori from '@/views/root/contratti/provvisori/RootContrattiProvvisoriView.vue';
 import RootContrattiDaFirmare from '@/views/root/contratti/da-firmare/RootContrattiDaFirmareView.vue';
 import RootContrattiDaVisionare from '@/views/root/contratti/da-visionare/RootContrattiDaVisionareView.vue';
+import RootContrattiFirmati from '@/views/root/contratti/firmati/RootContrattiFirmatiView.vue';
 
 
 /* ADMIN */
@@ -398,6 +399,10 @@ const routes: Array<RouteConfig> = [
             path: 'da-visionare',
             name: 'root-contratti-da-visionare',
             component: RootContrattiDaVisionare
+          },{
+            path: 'firmati',
+            name: 'root-contratti-firmati',
+            component: RootContrattiFirmati
           },
         ]
       },
