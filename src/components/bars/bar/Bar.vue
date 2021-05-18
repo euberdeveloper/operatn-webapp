@@ -23,8 +23,6 @@
     <!-- CHANGE PALETTE -->
     <v-menu ref="colourMenu" v-model="colourMenu" :close-on-content-click="false" left open-on-hover :nudge-bottom="28" transition="scale-transition" rounded="xl">
       <template v-slot:activator="{ on, attrs }">
-      aasfd{{primaryColour}}
-
         <v-btn v-on="on" v-bind="attrs" icon="icon" @click="changePalette">
           <v-icon>mdi-format-color-fill</v-icon>
         </v-btn>
