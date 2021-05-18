@@ -92,11 +92,16 @@ export default class Bar extends Vue {
 
   /* COMPUTED */
 
-  get primaryColour(): string | null {
-    return this.$store.state.primaryColour;
+  get primaryColour(): any {
+    return this.$store.state.primaryColour ? this.$store.state.primaryColour : '#1976D2';
   }
-  set primaryColour(colour: string | null) {
-    this.$store.dispatch(ActionTypes.CHANGE_PRIMARY_COLOUR, colour);
+  set primaryColour(colour: any) {
+    if (colour === null || typeof colour === 'string') {
+      this.$store.dispatch(ActionTypes.CHANGE_PRIMARY_COLOUR, colour);
+    }
+    else {
+      this.$store.dispatch(ActionTypes.CHANGE_PRIMARY_COLOUR, colour.hex);
+    }
   }
 
   /* METHODS */
