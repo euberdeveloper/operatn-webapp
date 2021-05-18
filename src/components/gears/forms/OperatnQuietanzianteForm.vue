@@ -39,7 +39,7 @@
             label="CAP"
             name="cap"
             clearable
-            :rules="[$validator.requiredText('CAP'), $validator.length(5), $validator.numeric()]"
+            :rules="[$validator.length(5), $validator.numeric()]"
             v-model="internalValue.cap"
           />
         </v-col>
