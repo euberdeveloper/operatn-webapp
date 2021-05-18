@@ -80,6 +80,19 @@ import AdminContrattiDaFirmare from '@/views/admin/contratti/da-firmare/AdminCon
 import AdminContrattiDaVisionare from '@/views/admin/contratti/da-visionare/AdminContrattiDaVisionareView.vue';
 import AdminContrattiFirmati from '@/views/admin/contratti/firmati/AdminContrattiFirmatiView.vue';
 
+/* RAGIONERIA */
+import Ragioneria from '@/views/ragioneria/RagioneriaView.vue';
+import RagioneriaBar from '@/views/ragioneria/RagioneriaBarView.vue';
+import RagioneriaMenu from '@/views/ragioneria/RagioneriaMenuView.vue';
+import RagioneriaUserInfo from '@/views/ragioneria/user-info/RagioneriaUserInfoView.vue';
+import RagioneriaQuietanzianti from '@/views/ragioneria/quietanzianti/RagioneriaQuietanziantiView.vue';
+import RagioneriaContiRicavi from '@/views/ragioneria/conti-ricavi/RagioneriaContiRicaviView.vue';
+import RagioneriaTipiBolletta from '@/views/ragioneria/tipi-bolletta/RagioneriaTipiBollettaView.vue';
+import RagioneriaTariffe from '@/views/ragioneria/tariffe/RagioneriaTariffeView.vue';
+import RagioneriaContabilita from '@/views/ragioneria/contabilita/RagioneriaContabilitaView.vue';
+import RagioneriaContabilitaInvia from '@/views/ragioneria/contabilita/invia/RagioneriaContabilitaInviaView.vue';
+import RagioneriaContabilitaCronologia from '@/views/ragioneria/contabilita/cronologia/RagioneriaContabilitaCronologiaView.vue';
+
 Vue.use(VueRouter);
 
 const routes: Array<RouteConfig> = [
@@ -109,6 +122,172 @@ const routes: Array<RouteConfig> = [
     name: 'contratti-email-token-firma',
     component: ContrattiEmailTokenFirma,
     props: true
+  },
+  {
+    path: '/root',
+    components: {
+      default: Root,
+      bar: RootBar,
+      menu: RootMenu
+    },
+    meta: { authentication: [RuoloUtente.ROOT] },
+    children: [
+      {
+        path: '',
+        redirect: 'utenti'
+      },
+      {
+        path: 'user-info',
+        name: 'root-user-info',
+        component: RootUserInfo
+      },
+      {
+        path: 'utenti',
+        name: 'root-utenti',
+        component: RootUtenti
+      },
+      {
+        path: 'tipi-stanza',
+        name: 'root-tipi-stanza',
+        component: RootTipiStanza
+      },
+      {
+        path: 'tipi-fabbricato',
+        name: 'root-tipi-fabbricato',
+        component: RootTipiFabbricato
+      },
+      {
+        path: 'quietanzianti',
+        name: 'root-quietanzianti',
+        component: RootQuietanzianti
+      },
+      {
+        path: 'tipi-studente',
+        name: 'root-tipi-studente',
+        component: RootTipiStudente
+      },
+      {
+        path: 'conti-ricavi',
+        name: 'root-conti-ricavi',
+        component: RootContiRicavi
+      },
+      {
+        path: 'tipi-ospite',
+        name: 'root-tipi-ospite',
+        component: RootTipiOspite
+      },
+      {
+        path: 'tipi-tariffa',
+        name: 'root-tipi-tariffa',
+        component: RootTipiTariffa
+      },
+      {
+        path: 'tipi-contratto',
+        name: 'root-tipi-contratto',
+        component: RootTipiContratto
+      },
+      {
+        path: 'tipi-bolletta',
+        name: 'root-tipi-bolletta',
+        component: RootTipiBolletta
+      },
+      {
+        path: 'dipartimenti-unitn',
+        name: 'root-dipartimenti-unitn',
+        component: RootDipartimentiUnitn
+      },
+      {
+        path: 'tariffe',
+        name: 'root-tariffe',
+        component: RootTariffe
+      },
+      {
+        path: 'fabbricati',
+        name: 'root-fabbricati',
+        component: RootFabbricati
+      },
+      {
+        path: 'fabbricati/:fid',
+        name: 'root-fabbricati-id',
+        component: RootFabbricatiId,
+        props: true
+      },
+      {
+        path: 'fabbricati/:fid/stanze/:sid',
+        name: 'root-fabbricati-id-stanze-id',
+        component: RootFabbricatiIdStanzeId,
+        props: true
+      },
+      {
+        path: 'tabellone',
+        component: RootTabellone,
+        children: [
+          {
+            path: '',
+            redirect: 'esporta'
+          },
+          {
+            path: 'esporta',
+            name: 'root-tabellone-esporta',
+            component: RootTabelloneEsporta
+          },
+          {
+            path: 'cronologia',
+            name: 'root-tabellone-cronologia',
+            component: RootTabelloneCronologia
+          }
+        ]
+      },
+      {
+        path: 'contabilita',
+        component: RootContabilita,
+        children: [
+          {
+            path: '',
+            redirect: 'invia'
+          },
+          {
+            path: 'invia',
+            name: 'root-contabilita-invia',
+            component: RootContabilitaInvia
+          },
+          {
+            path: 'cronologia',
+            name: 'root-contabilita-cronologia',
+            component: RootContabilitaCronologia
+          }
+        ]
+      },
+      {
+        path: 'contratti',
+        component: RootContratti,
+        children: [
+          {
+            path: '',
+            redirect: 'provvisori'
+          },
+          {
+            path: 'provvisori',
+            name: 'root-contratti-provvisori',
+            component: RootContrattiProvvisori
+          },
+          {
+            path: 'da-firmare',
+            name: 'root-contratti-da-firmare',
+            component: RootContrattiDaFirmare
+          },
+          {
+            path: 'da-visionare',
+            name: 'root-contratti-da-visionare',
+            component: RootContrattiDaVisionare
+          }, {
+            path: 'firmati',
+            name: 'root-contratti-firmati',
+            component: RootContrattiFirmati
+          },
+        ]
+      },
+    ]
   },
   {
     path: '/admin',
@@ -277,123 +456,46 @@ const routes: Array<RouteConfig> = [
     ]
   },
   {
-    path: '/root',
+    path: '/ragioneria',
     components: {
-      default: Root,
-      bar: RootBar,
-      menu: RootMenu
+      default: Ragioneria,
+      bar: RagioneriaBar,
+      menu: RagioneriaMenu
     },
-    meta: { authentication: [RuoloUtente.ROOT] },
+    meta: { authentication: [RuoloUtente.RAGIONERIA] },
     children: [
       {
         path: '',
-        redirect: 'utenti'
+        redirect: 'contabilita'
       },
       {
         path: 'user-info',
-        name: 'root-user-info',
-        component: RootUserInfo
-      },
-      {
-        path: 'utenti',
-        name: 'root-utenti',
-        component: RootUtenti
-      },
-      {
-        path: 'tipi-stanza',
-        name: 'root-tipi-stanza',
-        component: RootTipiStanza
-      },
-      {
-        path: 'tipi-fabbricato',
-        name: 'root-tipi-fabbricato',
-        component: RootTipiFabbricato
+        name: 'ragioneria-user-info',
+        component: RagioneriaUserInfo
       },
       {
         path: 'quietanzianti',
-        name: 'root-quietanzianti',
-        component: RootQuietanzianti
-      },
-      {
-        path: 'tipi-studente',
-        name: 'root-tipi-studente',
-        component: RootTipiStudente
+        name: 'ragioneria-quietanzianti',
+        component: RagioneriaQuietanzianti
       },
       {
         path: 'conti-ricavi',
-        name: 'root-conti-ricavi',
-        component: RootContiRicavi
-      },
-      {
-        path: 'tipi-ospite',
-        name: 'root-tipi-ospite',
-        component: RootTipiOspite
-      },
-      {
-        path: 'tipi-tariffa',
-        name: 'root-tipi-tariffa',
-        component: RootTipiTariffa
-      },
-      {
-        path: 'tipi-contratto',
-        name: 'root-tipi-contratto',
-        component: RootTipiContratto
+        name: 'ragioneria-conti-ricavi',
+        component: RagioneriaContiRicavi
       },
       {
         path: 'tipi-bolletta',
-        name: 'root-tipi-bolletta',
-        component: RootTipiBolletta
-      },
-      {
-        path: 'dipartimenti-unitn',
-        name: 'root-dipartimenti-unitn',
-        component: RootDipartimentiUnitn
+        name: 'ragioneria-tipi-bolletta',
+        component: RagioneriaTipiBolletta
       },
       {
         path: 'tariffe',
-        name: 'root-tariffe',
-        component: RootTariffe
-      },
-      {
-        path: 'fabbricati',
-        name: 'root-fabbricati',
-        component: RootFabbricati
-      },
-      {
-        path: 'fabbricati/:fid',
-        name: 'root-fabbricati-id',
-        component: RootFabbricatiId,
-        props: true
-      },
-      {
-        path: 'fabbricati/:fid/stanze/:sid',
-        name: 'root-fabbricati-id-stanze-id',
-        component: RootFabbricatiIdStanzeId,
-        props: true
-      },
-      {
-        path: 'tabellone',
-        component: RootTabellone,
-        children: [
-          {
-            path: '',
-            redirect: 'esporta'
-          },
-          {
-            path: 'esporta',
-            name: 'root-tabellone-esporta',
-            component: RootTabelloneEsporta
-          },
-          {
-            path: 'cronologia',
-            name: 'root-tabellone-cronologia',
-            component: RootTabelloneCronologia
-          }
-        ]
+        name: 'ragioneria-tariffe',
+        component: RagioneriaTariffe
       },
       {
         path: 'contabilita',
-        component: RootContabilita,
+        component: RagioneriaContabilita,
         children: [
           {
             path: '',
@@ -401,48 +503,18 @@ const routes: Array<RouteConfig> = [
           },
           {
             path: 'invia',
-            name: 'root-contabilita-invia',
-            component: RootContabilitaInvia
+            name: 'ragioneria-contabilita-invia',
+            component: RagioneriaContabilitaInvia
           },
           {
             path: 'cronologia',
-            name: 'root-contabilita-cronologia',
-            component: RootContabilitaCronologia
+            name: 'ragioneria-contabilita-cronologia',
+            component: RagioneriaContabilitaCronologia
           }
         ]
       },
-      {
-        path: 'contratti',
-        component: RootContratti,
-        children: [
-          {
-            path: '',
-            redirect: 'provvisori'
-          },
-          {
-            path: 'provvisori',
-            name: 'root-contratti-provvisori',
-            component: RootContrattiProvvisori
-          },
-          {
-            path: 'da-firmare',
-            name: 'root-contratti-da-firmare',
-            component: RootContrattiDaFirmare
-          },
-          {
-            path: 'da-visionare',
-            name: 'root-contratti-da-visionare',
-            component: RootContrattiDaVisionare
-          }, {
-            path: 'firmati',
-            name: 'root-contratti-firmati',
-            component: RootContrattiFirmati
-          },
-        ]
-      },
     ]
-
-  }
+  },
 ];
 
 const router = new VueRouter({

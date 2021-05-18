@@ -1,0 +1,45 @@
+<template>
+  <v-card>
+    <!-- TOOLBAR -->
+    <v-toolbar flat color="primary">
+      <v-toolbar-title class="headline primary white--text">Contabilita</v-toolbar-title>
+    </v-toolbar>
+
+    <!-- TABS -->
+    <v-tabs v-model="activeTab">
+      <v-tab v-for="tab of tabs" :key="tab.path" :to="tab.path">
+        <v-icon left>{{ tab.icon }}</v-icon>
+        <span>{{ tab.label }}</span>
+      </v-tab>
+
+      <v-tabs-items v-model="activeTab">
+        <v-tab-item v-for="tab of tabs" :key="tab.path" :value="tab.path">
+          <router-view />
+        </v-tab-item>
+      </v-tabs-items>
+    </v-tabs>
+  </v-card>
+</template>
+
+<script lang="ts">
+import { Component, Vue } from "vue-property-decorator";
+
+@Component
+export default class RagioneriaContabilitaView extends Vue {
+  /* DATA */
+  private activeTab = "";
+  private tabs = [
+    {
+      path: "invia",
+      icon: "mdi-table-arrow-up",
+      label: "Invia",
+    },
+    {
+      path: "cronologia",
+      icon: "mdi-table-sync",
+      label: "Cronologia",
+    },
+  ];
+}
+</script>
+

@@ -81,6 +81,8 @@ export default class QuietanzianteHandlerMixin extends Vue {
           this.$store.dispatch(ActionTypes.ALERT, { message: `Quietanziante non trovato`, alertType });
         } else if (error instanceof BadRequestError) {
           this.$store.dispatch(ActionTypes.ALERT, { message: `Richiesta non valida.`, alertType });
+        } else {
+          this.$store.dispatch(ActionTypes.ALERT, { message: `Errore generico`, alertType });
         }
       }
       throw error;
