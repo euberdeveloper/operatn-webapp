@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card flat>
     <v-card-subtitle>Qui puoi contabilizzare le bollette</v-card-subtitle>
     <v-form v-model="formValid" @submit.prevent class="ma-8">
       <v-container fluid>
