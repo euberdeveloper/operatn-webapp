@@ -15,7 +15,7 @@
     <template v-slot:top>
       <v-toolbar flat>
         <v-container class="pa-0 fill-height fluid d-flex" fluid>
-          <v-toolbar-title class="mr-4" v-if="$vuetify.breakpoint.mdAndUp">{{ title }}</v-toolbar-title>
+          <v-toolbar-title class="mr-4" v-if="showTitle && $vuetify.breakpoint.mdAndUp">{{ title }}</v-toolbar-title>
           <slot name="header">
             <v-text-field class="flex" v-model="search" label="Cerca" dense solo outlined clearable hide-details prepend-inner-icon="mdi-magnify" />
           </slot>
@@ -229,8 +229,12 @@ export default class OperatnBaseTable extends Vue {
   @Prop({ type: Boolean, default: false })
   private loading!: boolean;
 
+  @Prop({ type: Boolean, default: true })
+  private showTitle!: boolean;
+
   @Prop({ type: Number, default: 1 })
   private elevation!: number;
+  
 
   /* DATA */
 

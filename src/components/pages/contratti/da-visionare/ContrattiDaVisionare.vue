@@ -4,6 +4,7 @@
     description="Gestione dei contratti da visionare. Si può scaricare il documento che è stato inviato via email, controllarlo e confermarlo."
     :isCard="false"
     tableTitle="Contratti"
+    :tableShowTitle="false"
     :tableSelectedValues.sync="selectedValues"
     :tableColumns="columns"
     :tableActions="actions"

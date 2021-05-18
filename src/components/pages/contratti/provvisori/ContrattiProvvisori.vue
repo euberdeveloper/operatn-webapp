@@ -8,6 +8,7 @@
     :tableColumns="columns"
     :tableActions="actions"
     :tableValues="values"
+    :tableShowTitle="false"
     tableItemKey="id"
     tableShowSelect
     :tableLoading="tableLoading"
@@ -27,9 +28,11 @@
   >
     <template v-slot:tableHeader>
       <span class="mx-4" />
-      <operatn-date-input placeholder="Data inizio" style="flex: 1" name="dataInizio" dense hideDetails clearable v-model="dateQueryParams.dataInizio" />
+      <operatn-date-input placeholder="Data inizio" name="dataInizio" dense hideDetails clearable v-model="dateQueryParams.dataInizio" />
       <span class="mx-4" />
-      <operatn-date-input placeholder="Data fine" style="flex: 1" name="dataFine" dense hideDetails clearable v-model="dateQueryParams.dataFine" />
+      <operatn-date-input placeholder="Data fine" name="dataFine" dense hideDetails clearable v-model="dateQueryParams.dataFine" />
+      <span class="mx-4" />
+      <operatn-ospite-input placeholder="Ospite" name="idOspite" dense hideDetails clearable v-model="dateQueryParams.idOspite" />
       <span class="mx-4" />
     </template>
     <template v-slot:createDialog>
@@ -53,6 +56,7 @@ import OperatnActionDialog from "@/components/gears/dialogs/OperatnActionDialog.
 import OperatnBaseResourceManager, { Column, Actions } from "@/components/gears/bases/OperatnBaseResourceManager.vue";
 import OperatnContrattoForm from "@/components/gears/forms/contratto/OperatnContrattoForm.vue";
 import OperatnDateInput from "@/components/gears/inputs/OperatnDateInput.vue";
+import OperatnOspiteInput from "@/components/gears/inputs/OperatnOspiteInput.vue";
 
 interface Tuple {
   id: number;
@@ -74,6 +78,7 @@ interface Tuple {
     OperatnBaseResourceManager,
     OperatnContrattoForm,
     OperatnDateInput,
+    OperatnOspiteInput
   },
 })
 export default class Contratti extends Mixins<ResourceManagerMixin<Tuple, ContrattiCreateBody, ContrattiReplaceBody, number> & ContrattoHandlerMixin>(
@@ -89,6 +94,7 @@ export default class Contratti extends Mixins<ResourceManagerMixin<Tuple, Contra
   private dateQueryParams: ContrattiFilterParams = {
     dataInizio: undefined,
     dataFine: undefined,
+    idOspite: undefined
   };
   private tableLoading = false;
 
