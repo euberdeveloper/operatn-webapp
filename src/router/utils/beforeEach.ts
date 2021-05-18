@@ -13,7 +13,7 @@ const beforeEach: NavigationGuard = function (to, _from, next) {
     }
     else {
         if (ruolo !== null) {
-            store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `L'utente non ha i permessi per accedere a questa pagina`);
+            store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `L'utente non ha i permessi per accedere a questa pagina, provare rimuovendo la parte che inizia con ? nella barra dell'url`);
         }
         next({ name: 'login', query: { requestedRoute: to.path } });
     }
