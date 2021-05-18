@@ -1,9 +1,9 @@
 import { NavigationGuard } from 'vue-router';
 import { RuoloUtente } from 'operatn-api-client';
-import store from '@/store';
+import store, { ActionTypes } from '@/store';
 
 const beforeEach: NavigationGuard = function (to, _from, next) {
-    const ruolo: RuoloUtente | undefined = store.state.user?.ruolo;
+    const ruolo: RuoloUtente | null = store.getters.role;
     const allowed = to.matched.reduce((prev: RuoloUtente[], curr) => curr.meta.authentication
         ? [...prev, ...curr.meta.authentication]
         : prev, []);
@@ -12,6 +12,9 @@ const beforeEach: NavigationGuard = function (to, _from, next) {
         next();
     }
     else {
+        if (ruolo !== null) {
+            store.dispatch(ActionTypes.SHOW_ERROR_DIALOG, `L'utente non ha i permessi per accedere a questa pagina`);
+        }
         next({ name: 'login', query: { requestedRoute: to.path } });
     }
 }
