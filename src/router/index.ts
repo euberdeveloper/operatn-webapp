@@ -93,6 +93,27 @@ import RagioneriaContabilita from '@/views/ragioneria/contabilita/RagioneriaCont
 import RagioneriaContabilitaInvia from '@/views/ragioneria/contabilita/invia/RagioneriaContabilitaInviaView.vue';
 import RagioneriaContabilitaCronologia from '@/views/ragioneria/contabilita/cronologia/RagioneriaContabilitaCronologiaView.vue';
 
+/* SPORTELLO */
+import Sportello from '@/views/sportello/SportelloView.vue';
+import SportelloBar from '@/views/sportello/SportelloBarView.vue';
+import SportelloMenu from '@/views/sportello/SportelloMenuView.vue';
+import SportelloUserInfo from '@/views/sportello/user-info/SportelloUserInfoView.vue';
+import SportelloTipiStudente from '@/views/sportello/tipi-studente/SportelloTipiStudenteView.vue';
+import SportelloTipiContratto from '@/views/sportello/tipi-contratto/SportelloTipiContrattoView.vue';
+import SportelloFabbricati from '@/views/sportello/fabbricati/SportelloFabbricatiView.vue';
+import SportelloFabbricatiId from '@/views/sportello/fabbricati/id/SportelloFabbricatiIdView.vue';
+import SportelloFabbricatiIdStanzeId from '@/views/sportello/fabbricati/id/stanze/id/SportelloFabbricatiIdStanzeIdView.vue';
+import SportelloDipartimentiUnitn from '@/views/sportello/dipartimenti-unitn/SportelloDipartimentiUnitnView.vue';
+import SportelloTabellone from '@/views/sportello/tabellone/SportelloTabelloneView.vue';
+import SportelloTabelloneEsporta from '@/views/sportello/tabellone/esporta/SportelloTabelloneEsportaView.vue';
+import SportelloTabelloneCronologia from '@/views/sportello/tabellone/cronologia/SportelloTabelloneCronologiaView.vue';
+import SportelloContratti from '@/views/sportello/contratti/SportelloContrattiView.vue';
+import SportelloContrattiProvvisori from '@/views/sportello/contratti/provvisori/SportelloContrattiProvvisoriView.vue';
+import SportelloContrattiDaFirmare from '@/views/sportello/contratti/da-firmare/SportelloContrattiDaFirmareView.vue';
+import SportelloContrattiDaVisionare from '@/views/sportello/contratti/da-visionare/SportelloContrattiDaVisionareView.vue';
+import SportelloContrattiFirmati from '@/views/sportello/contratti/firmati/SportelloContrattiFirmatiView.vue';
+
+
 Vue.use(VueRouter);
 
 const routes: Array<RouteConfig> = [
@@ -511,6 +532,107 @@ const routes: Array<RouteConfig> = [
             name: 'ragioneria-contabilita-cronologia',
             component: RagioneriaContabilitaCronologia
           }
+        ]
+      },
+    ]
+  },
+  {
+    path: '/sportello',
+    components: {
+      default: Sportello,
+      bar: SportelloBar,
+      menu: SportelloMenu
+    },
+    meta: { authentication: [RuoloUtente.SPORTELLO] },
+    children: [
+      {
+        path: '',
+        redirect: 'tabellone'
+      },
+      {
+        path: 'user-info',
+        name: 'sportello-user-info',
+        component: SportelloUserInfo
+      },
+      {
+        path: 'tipi-studente',
+        name: 'sportello-tipi-studente',
+        component: SportelloTipiStudente
+      },
+      {
+        path: 'tipi-contratto',
+        name: 'sportello-tipi-contratto',
+        component: SportelloTipiContratto
+      },
+      {
+        path: 'dipartimenti-unitn',
+        name: 'sportello-dipartimenti-unitn',
+        component: SportelloDipartimentiUnitn
+      },
+      {
+        path: 'fabbricati',
+        name: 'sportello-fabbricati',
+        component: SportelloFabbricati
+      },
+      {
+        path: 'fabbricati/:fid',
+        name: 'sportello-fabbricati-id',
+        component: SportelloFabbricatiId,
+        props: true
+      },
+      {
+        path: 'fabbricati/:fid/stanze/:sid',
+        name: 'sportello-fabbricati-id-stanze-id',
+        component: SportelloFabbricatiIdStanzeId,
+        props: true
+      },
+      {
+        path: 'tabellone',
+        component: SportelloTabellone,
+        children: [
+          {
+            path: '',
+            redirect: 'esporta'
+          },
+          {
+            path: 'esporta',
+            name: 'sportello-tabellone-esporta',
+            component: SportelloTabelloneEsporta
+          },
+          {
+            path: 'cronologia',
+            name: 'sportello-tabellone-cronologia',
+            component: SportelloTabelloneCronologia
+          }
+        ]
+      },
+      {
+        path: 'contratti',
+        component: SportelloContratti,
+        children: [
+          {
+            path: '',
+            redirect: 'provvisori'
+          },
+          {
+            path: 'provvisori',
+            name: 'sportello-contratti-provvisori',
+            component: SportelloContrattiProvvisori
+          },
+          {
+            path: 'da-firmare',
+            name: 'sportello-contratti-da-firmare',
+            component: SportelloContrattiDaFirmare
+          },
+          {
+            path: 'da-visionare',
+            name: 'sportello-contratti-da-visionare',
+            component: SportelloContrattiDaVisionare
+          }, {
+            path: 'firmati',
+            name: 'sportello-contratti-firmati',
+            component: SportelloContrattiFirmati
+          },
         ]
       },
     ]
