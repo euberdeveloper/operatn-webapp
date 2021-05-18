@@ -97,7 +97,7 @@
       <span :key="`item-${column.value}-${index}`" v-else>
         <v-icon
           small
-          color="success"
+          color="green"
           class="mx-1"
           @click="column.actions.onView(item, index)"
           v-if="column.actions && column.actions.onView && column.actions.showView(item)"
@@ -105,7 +105,7 @@
         >
         <v-icon
           small
-          color="primary"
+          color="indigo"
           class="mx-1"
           @click="column.actions.onEdit(item, index)"
           v-if="column.actions && column.actions.onEdit && column.actions.showEdit(item)"
@@ -113,7 +113,7 @@
         >
         <v-icon
           small
-          color="error"
+          color="red"
           class="mx-1"
           @click="column.actions.onDelete(item, index)"
           v-if="column.actions && column.actions.onDelete && column.actions.showDelete(item)"
