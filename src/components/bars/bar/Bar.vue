@@ -23,6 +23,8 @@
     <!-- CHANGE PALETTE -->
     <v-menu ref="colourMenu" v-model="colourMenu" :close-on-content-click="false" left open-on-hover :nudge-bottom="28" transition="scale-transition" rounded="xl">
       <template v-slot:activator="{ on, attrs }">
+      aasfd{{primaryColour}}
+
         <v-btn v-on="on" v-bind="attrs" icon="icon" @click="changePalette">
           <v-icon>mdi-format-color-fill</v-icon>
         </v-btn>
@@ -92,11 +94,16 @@ export default class Bar extends Vue {
 
   /* COMPUTED */
 
-  get primaryColour(): string | null {
-    return this.$store.state.primaryColour;
+  get primaryColour(): any {
+    return this.$store.state.primaryColour ? this.$store.state.primaryColour : '#1976D2';
   }
-  set primaryColour(colour: string | null) {
-    this.$store.dispatch(ActionTypes.CHANGE_PRIMARY_COLOUR, colour);
+  set primaryColour(colour: any) {
+    if (colour === null || typeof colour === 'string') {
+      this.$store.dispatch(ActionTypes.CHANGE_PRIMARY_COLOUR, colour);
+    }
+    else {
+      this.$store.dispatch(ActionTypes.CHANGE_PRIMARY_COLOUR, colour.hex);
+    }
   }
 
   /* METHODS */
