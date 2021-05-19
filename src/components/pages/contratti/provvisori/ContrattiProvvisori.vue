@@ -19,6 +19,7 @@
     editDialogTitle="Modifica contratto"
     :editDialogShow.sync="showEditDialog"
     :editDialogDisabled="!updateBodyValid"
+    dialogWidth="80vw"
     @fabCreateClick="openCreate"
     @fabDeleteClick="askDeleteMultiple"
     @createDialogConfirm="closeCreate(true)"
@@ -68,6 +69,7 @@ interface Tuple {
   unitaImmobiliare: string;
   numeroStanza: string;
   postiLetto: string;
+  nOspiti: number;
   dataInserimento: Date;
   reference: ContrattiReturned;
 }
@@ -78,7 +80,7 @@ interface Tuple {
     OperatnBaseResourceManager,
     OperatnContrattoForm,
     OperatnDateInput,
-    OperatnOspiteInput
+    OperatnOspiteInput,
   },
 })
 export default class Contratti extends Mixins<ResourceManagerMixin<Tuple, ContrattiCreateBody, ContrattiReplaceBody, number> & ContrattoHandlerMixin>(
@@ -94,7 +96,7 @@ export default class Contratti extends Mixins<ResourceManagerMixin<Tuple, Contra
   private dateQueryParams: ContrattiFilterParams = {
     dataInizio: undefined,
     dataFine: undefined,
-    idOspite: undefined
+    idOspite: undefined,
   };
   private tableLoading = false;
 
@@ -155,6 +157,12 @@ export default class Contratti extends Mixins<ResourceManagerMixin<Tuple, Contra
         editable: false,
       },
       {
+        text: "N. ospiti",
+        value: "nOspiti",
+        groupable: false,
+        editable: false,
+      },
+      {
         text: "Data inserimento",
         value: "dataInserimento",
         groupable: false,
@@ -186,6 +194,7 @@ export default class Contratti extends Mixins<ResourceManagerMixin<Tuple, Contra
       postiLetto: contratto.contrattiSuOspite?.[0].contrattiSuOspiteSuPostoLetto
         ? contratto.contrattiSuOspite[0].contrattiSuOspiteSuPostoLetto.map((pl) => pl.postoLetto).join(", ")
         : "",
+      nOspiti: contratto.contrattiSuOspite?.length ?? 0,
       dataInserimento: contratto.dataInserimento,
       reference: contratto,
     };
@@ -211,8 +220,8 @@ export default class Contratti extends Mixins<ResourceManagerMixin<Tuple, Contra
     return {
       dataInizio: value.reference.dataInizio,
       dataFine: value.reference.dataFine,
-      checkout: value.reference.checkout,
-      cauzione: value.reference.cauzione,
+      checkout: !!value.reference.checkout,
+      cauzione: !!value.reference.cauzione,
       tipoRata: value.reference.tipoRata,
       idTariffa: value.reference.idTariffa,
       idTipoContratto: value.reference.idTipoContratto,

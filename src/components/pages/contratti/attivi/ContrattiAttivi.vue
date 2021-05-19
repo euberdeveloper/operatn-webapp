@@ -19,6 +19,7 @@
       editDialogTitle="Modifica contratto"
       :editDialogShow.sync="showEditDialog"
       :editDialogDisabled="!updateBodyValid"
+      dialogWidth="80vw"
       @fabCreateClick="openCreate"
       @fabDeleteClick="askDeleteMultiple"
       @createDialogConfirm="closeCreate(true)"
@@ -48,8 +49,21 @@
       </template>
     </operatn-base-resource-manager>
 
-     <operatn-action-dialog title="Chiudi contratto" v-model="showChiudiDialog" :disabled="!contrattoChiusoValid" @cancel="chiudiDialogCancel" @confirm="chiudiDialogConfirm">
-      <operatn-contratto-chiudi-form v-if="showChiudiDialog" v-model="contrattoChiuso" :formValid.sync="contrattoChiusoValid" :dataInizioContratto="contrattoDaChiudere.dataInizio" :dataFineContratto="contrattoDaChiudere.dataFine" class="mt-6" />
+    <operatn-action-dialog
+      title="Chiudi contratto"
+      v-model="showChiudiDialog"
+      :disabled="!contrattoChiusoValid"
+      @cancel="chiudiDialogCancel"
+      @confirm="chiudiDialogConfirm"
+    >
+      <operatn-contratto-chiudi-form
+        v-if="showChiudiDialog"
+        v-model="contrattoChiuso"
+        :formValid.sync="contrattoChiusoValid"
+        :dataInizioContratto="contrattoDaChiudere.dataInizio"
+        :dataFineContratto="contrattoDaChiudere.dataFine"
+        class="mt-6"
+      />
     </operatn-action-dialog>
   </div>
 </template>
@@ -83,6 +97,7 @@ interface Tuple {
   numeroStanza: string;
   postiLetto: string;
   dataFirma: Date | null;
+  dataChiusuraAnticipata: Date | null;
   reference: ContrattiReturned;
 }
 
@@ -178,6 +193,13 @@ export default class ContrattiAttivi extends Mixins<ResourceManagerMixin<Tuple, 
         editable: false,
         itemTextHandler: (value) => (value ? value.toLocaleDateString() : ""),
       },
+      {
+        text: "Chiusura anticipata",
+        value: "dataChiusuraAnticipata",
+        groupable: false,
+        editable: false,
+        itemTextHandler: (value) => (value ? value.toLocaleDateString() : ""),
+      },
     ];
   }
 
@@ -193,6 +215,7 @@ export default class ContrattiAttivi extends Mixins<ResourceManagerMixin<Tuple, 
           icon: "mdi-close-circle",
           color: "error",
           action: (item) => this.openChiudiContratto(item),
+          showAction: (item) => item.dataChiusuraAnticipata === null
         },
       ],
     };
@@ -214,6 +237,7 @@ export default class ContrattiAttivi extends Mixins<ResourceManagerMixin<Tuple, 
         ? contratto.contrattiSuOspite[0].contrattiSuOspiteSuPostoLetto.map((pl) => pl.postoLetto).join(", ")
         : "",
       dataFirma: contratto.dataFirmaContratto,
+      dataChiusuraAnticipata: contratto.dataChiusuraAnticipata,
       reference: contratto,
     };
   }
@@ -238,8 +262,8 @@ export default class ContrattiAttivi extends Mixins<ResourceManagerMixin<Tuple, 
     return {
       dataInizio: value.reference.dataInizio,
       dataFine: value.reference.dataFine,
-      checkout: value.reference.checkout,
-      cauzione: value.reference.cauzione,
+      checkout: !!value.reference.checkout,
+      cauzione: !!value.reference.cauzione,
       tipoRata: value.reference.tipoRata,
       idTariffa: value.reference.idTariffa,
       idTipoContratto: value.reference.idTipoContratto,

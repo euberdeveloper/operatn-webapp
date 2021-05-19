@@ -18,6 +18,7 @@
     editDialogTitle="Modifica contratto"
     :editDialogShow.sync="showEditDialog"
     :editDialogDisabled="!updateBodyValid"
+    dialogWidth="80vw"
     @fabCreateClick="openCreate"
     @fabDeleteClick="askDeleteMultiple"
     @createDialogConfirm="closeCreate(true)"
@@ -230,8 +231,8 @@ export default class ContrattiTerminati extends Mixins<ResourceManagerMixin<Tupl
     return {
       dataInizio: value.reference.dataInizio,
       dataFine: value.reference.dataFine,
-      checkout: value.reference.checkout,
-      cauzione: value.reference.cauzione,
+      checkout: !!value.reference.checkout,
+      cauzione: !!value.reference.cauzione,
       tipoRata: value.reference.tipoRata,
       idTariffa: value.reference.idTariffa,
       idTipoContratto: value.reference.idTipoContratto,

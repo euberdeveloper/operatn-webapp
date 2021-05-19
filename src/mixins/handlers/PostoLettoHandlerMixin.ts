@@ -35,6 +35,21 @@ export default class PostoLettoHandlerMixin extends Vue {
     }
   }
 
+  async getPostoLettoGeneral(id: number, params: PostiLettoIncludeParams = {}, alertType = AlertType.ERROR_ALERT): Promise<PostiLettoReturned> {
+    try {
+      return await this.$api.postiLetto.get(id, params, { alertType });
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        this.$store.dispatch(ActionTypes.ALERT, { message: `PostoLetto non trovata`, alertType });
+      } else if (error instanceof BadRequestError) {
+        this.$store.dispatch(ActionTypes.ALERT, { message: `Richiesta non valida`, alertType });
+      } else {
+        this.$store.dispatch(ActionTypes.ALERT, { message: `Errore del server`, alertType });
+      }
+      throw error;
+    }
+  }
+
   async createPostoLetto(fid: number, sid: number, body: PostiLettoCreateBody, alertType = AlertType.ERROR_ALERT): Promise<number> {
     try {
       const id = await this.$api.fabbricati.stanze(fid).postiLetto(sid).create({ ...body }, { alertType });
