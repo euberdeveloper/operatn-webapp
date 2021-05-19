@@ -3,7 +3,7 @@
     <v-container fluid>
       <v-row align="center" justify="center">
         <v-col cols="12">
-          <operatn-ospite-input label="Ospite" name="idOspite" v-model="idOspite" :rules="[$validator.requiredText('Ospite')]" />
+          <operatn-ospite-input label="Ospite" name="idOspite" :dataInizioContratto="dataInizio" :dataFineContratto="dataFine"  :rules="[$validator.requiredText('Ospite')]" v-model="idOspite" />
         </v-col>
       </v-row>
       <v-row align="center" justify="center">

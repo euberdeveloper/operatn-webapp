@@ -49,6 +49,12 @@ export default class OperatnOspiteInput extends Mixins(OspiteHandlerMixin) {
   @Prop({ type: Array, default: () => [] })
   rules!: any[];
 
+  @Prop({ type: Date, required: false })
+  dataInizioContratto?: Date;
+
+  @Prop({ type: Date, required: false })
+  dataFineContratto?: Date;
+
   /* DATA */
 
   private ospiti: OspitiReturned[] = [];
@@ -116,6 +122,8 @@ export default class OperatnOspiteInput extends Mixins(OspiteHandlerMixin) {
         search: this.searchQuery ?? "",
         page: this.page,
         pageSize: this.pageSize,
+        dataInizio: this.dataInizioContratto ?? undefined,
+        dataFine: this.dataFineContratto ?? undefined
       });
       this.canLoadMore = ospiti.length >= this.pageSize;
       if (this.page === 1) {

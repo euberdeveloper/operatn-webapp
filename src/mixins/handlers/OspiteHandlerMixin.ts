@@ -1,6 +1,6 @@
 
 import { Component, Vue } from "vue-property-decorator";
-import { BadRequestError, InvalidBodyError, InvalidPathParamError, NotFoundError, OspitiReturned, OspitiCreateBody, OspitiIncludeParams, OspitiSearchParams, OspitiPageParams } from "operatn-api-client";
+import { BadRequestError, InvalidBodyError, InvalidPathParamError, NotFoundError, OspitiReturned, OspitiCreateBody, OspitiIncludeParams, OspitiSearchParams, OspitiPageParams, OspitiFilterParams } from "operatn-api-client";
 
 import { ActionTypes, AlertType } from "@/store";
 
@@ -9,7 +9,7 @@ export default class OspiteHandlerMixin extends Vue {
 
   /* METHODS */
 
-  async getOspiti(params: OspitiIncludeParams & OspitiSearchParams & OspitiPageParams = {}, alertType = AlertType.ERROR_ALERT): Promise<OspitiReturned[]> {
+  async getOspiti(params: OspitiIncludeParams & OspitiSearchParams & OspitiPageParams & OspitiFilterParams = {}, alertType = AlertType.ERROR_ALERT): Promise<OspitiReturned[]> {
     try {
       return this.$api.ospiti.getAll(params, { alertType });
     } catch (error) {
