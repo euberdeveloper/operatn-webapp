@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="internalShow" :width="width">
+  <v-dialog v-model="internalShow" :width="width" scrollable>
     <v-card>
       <v-card-title :class="['title', 'headline', 'white--text', 'text--darken-5', color, colorModificator]">
         <v-spacer />
@@ -9,7 +9,7 @@
 
       <v-card-text class="info-text">
         <slot>
-          <vue-markdown class="content">{{text}}</vue-markdown>
+          <vue-markdown class="content">{{ text }}</vue-markdown>
         </slot>
       </v-card-text>
 
@@ -28,7 +28,7 @@
 import Vue from "vue";
 import { Component, Prop } from "vue-property-decorator";
 
-import VueMarkdown from 'vue-markdown';
+import VueMarkdown from "vue-markdown";
 
 @Component({
   model: {
@@ -36,8 +36,8 @@ import VueMarkdown from 'vue-markdown';
     event: "show-updated",
   },
   components: {
-    VueMarkdown
-  }
+    VueMarkdown,
+  },
 })
 export default class OperatnInfoDialog extends Vue {
   /* PROPS */
@@ -60,6 +60,7 @@ export default class OperatnInfoDialog extends Vue {
   @Prop({ type: String, default: "600" })
   width!: string;
 
+
   /* GETTERS AND SETTERS */
 
   get internalShow(): boolean {
@@ -78,6 +79,7 @@ export default class OperatnInfoDialog extends Vue {
   margin: 30px 0;
 
   .content {
+    overflow-y: auto;
     overflow-x: auto;
   }
 }

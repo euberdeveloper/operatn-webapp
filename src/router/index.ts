@@ -4,6 +4,7 @@ import { RuoloUtente } from 'operatn-api-client';
 
 import rootRedirect from './utils/rootRedirect';
 import beforeEach from './utils/beforeEach';
+import infos from './utils/infos';
 
 /* LOGIN */
 import Login from '@/views/login/LoginView.vue';
@@ -112,7 +113,6 @@ import SportelloContratti from '@/views/sportello/contratti/SportelloContrattiVi
 import SportelloContrattiProvvisori from '@/views/sportello/contratti/provvisori/SportelloContrattiProvvisoriView.vue';
 import SportelloContrattiDaFirmare from '@/views/sportello/contratti/da-firmare/SportelloContrattiDaFirmareView.vue';
 import SportelloContrattiDaVisionare from '@/views/sportello/contratti/da-visionare/SportelloContrattiDaVisionareView.vue';
-import SportelloContrattiFirmati from '@/views/sportello/contratti/firmati/SportelloContrattiFirmatiView.vue';
 import SportelloContrattiAttivi from '@/views/sportello/contratti/attivi/SportelloContrattiAttiviView.vue';
 import SportelloContrattiTerminati from '@/views/sportello/contratti/terminati/SportelloContrattiTerminatiView.vue';
 
@@ -170,16 +170,7 @@ const routes: Array<RouteConfig> = [
         name: 'root-utenti',
         component: RootUtenti,
         meta: {
-          infoText: `
-Questa pagina ti permette di gestire gli utenti. 
-Ci può essere uno ed un solo utente root, che può eliminare, 
-aggiungere e modificare tutto di un qualunque utente. 
-Un admin non può modificare le password degli untenti e non 
-può modificare un altro utente admin. 
-Puoi eliminare più di un utente selezionando le righe della tabella, il bottone di aggiunta si trasformerà
-in un bottone di eliminazione. Puoi vedere gli utenti ordinati per più di una colonna premendone le freccette sui nomi delle colonne,
-o visualizzarli raggruppati per ruolo premendo l'icona coi quadrati sovrapposti. Puoi modificare un singolo parametro utente premendo sopra al 
-parametro che vedi nella tabella.`
+          infoText: infos.utenti
         }
       },
       {
