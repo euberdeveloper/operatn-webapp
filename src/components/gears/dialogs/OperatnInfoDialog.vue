@@ -9,7 +9,7 @@
 
       <v-card-text class="info-text">
         <slot>
-          <span>{{ text }}</span>
+          <vue-markdown class="content">{{text}}</vue-markdown>
         </slot>
       </v-card-text>
 
@@ -28,11 +28,16 @@
 import Vue from "vue";
 import { Component, Prop } from "vue-property-decorator";
 
+import VueMarkdown from 'vue-markdown';
+
 @Component({
   model: {
     prop: "show",
     event: "show-updated",
   },
+  components: {
+    VueMarkdown
+  }
 })
 export default class OperatnInfoDialog extends Vue {
   /* PROPS */
@@ -66,10 +71,14 @@ export default class OperatnInfoDialog extends Vue {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .info-text {
   text-align: justify;
   font-size: 16px;
   margin: 30px 0;
+
+  .content {
+    overflow-x: auto;
+  }
 }
 </style>

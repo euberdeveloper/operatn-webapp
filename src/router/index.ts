@@ -171,15 +171,15 @@ const routes: Array<RouteConfig> = [
         component: RootUtenti,
         meta: {
           infoText: `
-            Questa pagina ti permette di gestire gli utenti. 
-            Ci può essere uno ed un solo utente root, che può eliminare, 
-            aggiungere e modificare tutto di un qualunque utente. 
-            Un admin non può modificare le password degli untenti e non 
-            può modificare un altro utente admin. 
-            Puoi eliminare più di un utente selezionando le righe della tabella, il bottone di aggiunta si trasformerà
-            in un bottone di eliminazione. Puoi vedere gli utenti ordinati per più di una colonna premendone le freccette sui nomi delle colonne,
-            o visualizzarli raggruppati per ruolo premendo l'icona coi quadrati sovrapposti. Puoi modificare un singolo parametro utente premendo sopra al 
-            parametro che vedi nella tabella.`
+Questa pagina ti permette di gestire gli utenti. 
+Ci può essere uno ed un solo utente root, che può eliminare, 
+aggiungere e modificare tutto di un qualunque utente. 
+Un admin non può modificare le password degli untenti e non 
+può modificare un altro utente admin. 
+Puoi eliminare più di un utente selezionando le righe della tabella, il bottone di aggiunta si trasformerà
+in un bottone di eliminazione. Puoi vedere gli utenti ordinati per più di una colonna premendone le freccette sui nomi delle colonne,
+o visualizzarli raggruppati per ruolo premendo l'icona coi quadrati sovrapposti. Puoi modificare un singolo parametro utente premendo sopra al 
+parametro che vedi nella tabella.`
         }
       },
       {
