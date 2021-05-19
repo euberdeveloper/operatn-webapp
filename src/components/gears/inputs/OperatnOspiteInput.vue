@@ -34,14 +34,14 @@ import OspiteHandlerMixin from "@/mixins/handlers/OspiteHandlerMixin";
 export default class OperatnOspiteInput extends Mixins(OspiteHandlerMixin) {
   /* PROPS */
 
-  @Prop({ validator: (v) => typeof v === "number" || v === null, required: true })
+  @Prop({ validator: (v) => typeof v === "number" || v === null || v === undefined, required: true })
   value!: number | null;
 
   @Prop({ type: Number, default: 10 })
   pageSize!: number;
 
-  @Prop({ type: String, required: true })
-  label!: string;
+  @Prop({ type: String, required: false })
+  label?: string;
 
   @Prop({ type: String, required: false })
   icon?: string;
