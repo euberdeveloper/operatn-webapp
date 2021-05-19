@@ -85,6 +85,24 @@ const validator = {
     maxSize(max: number): InputValidationRule {
         return value => (value === null || value.size <= max) || `La dimensione massima è di ${max} byte`
     },
+    before(date: Date, dateValue: Date, txt?: string): InputValidationRule {
+        return value => { 
+            if (!value) {
+                return true;
+            }
+
+            return (+dateValue <= +date) || (txt || `La data deve essere precedente a ${date.toLocaleDateString()}`) 
+        }
+    },
+    after(date: Date, dateValue: Date, txt?: string): InputValidationRule {
+        return value => { 
+            if (!value) {
+                return true;
+            }
+
+            return (+dateValue >= +date) || (txt || `La data deve essere seguente a ${date.toLocaleDateString()}`) 
+        }
+    },
 };
 
 export type Validator = typeof validator;

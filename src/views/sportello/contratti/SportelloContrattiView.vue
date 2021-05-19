@@ -46,9 +46,14 @@ export default class SportelloContrattiView extends Vue {
       label: "Da visionare",
     },
     {
-      path: "firmati",
+      path: "attivi",
+      icon: "mdi-alarm-check",
+      label: "Attivi",
+    },
+    {
+      path: "terminati",
       icon: "mdi-archive",
-      label: "Firmati",
+      label: "Terminati",
     },
   ];
 }

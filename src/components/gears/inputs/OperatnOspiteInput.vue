@@ -7,7 +7,7 @@
     item-text="label"
     item-value="value"
     clearable
-    placeholder="Cognome Nome"
+    :placeholder="placeholder"
     :loading="isLoading"
     no-filter
     :append-icon="icon"
@@ -42,6 +42,9 @@ export default class OperatnOspiteInput extends Mixins(OspiteHandlerMixin) {
 
   @Prop({ type: String, required: false })
   label?: string;
+
+  @Prop({ type: String, default: 'Cognome Nome' })
+  placeholder!: string;
 
   @Prop({ type: String, required: false })
   icon?: string;

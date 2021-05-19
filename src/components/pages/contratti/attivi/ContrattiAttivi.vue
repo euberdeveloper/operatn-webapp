@@ -1,59 +1,73 @@
 <template>
-  <operatn-base-resource-manager
-    title="Contratti provvisori"
-    description="Gestione dei contratti non ancora firmati, che sono quindi modificabili ed eliminabili"
-    :isCard="false"
-    tableTitle="Contratti"
-    :tableSelectedValues.sync="selectedValues"
-    :tableColumns="columns"
-    :tableActions="actions"
-    :tableValues="values"
-    :tableShowTitle="false"
-    tableItemKey="id"
-    tableShowSelect
-    :tableLoading="tableLoading"
-    :tableUpdateBody.sync="updateBody"
-    createDialogTitle="Nuovo contratto"
-    :createDialogShow.sync="showCreateDialog"
-    :createDialogDisabled="!createBodyValid"
-    editDialogTitle="Modifica contratto"
-    :editDialogShow.sync="showEditDialog"
-    :editDialogDisabled="!updateBodyValid"
-    @fabCreateClick="openCreate"
-    @fabDeleteClick="askDeleteMultiple"
-    @createDialogConfirm="closeCreate(true)"
-    @createDialogCancel="closeCreate(false)"
-    @editDialogConfirm="closeEdit(true)"
-    @editDialogCancel="closeEdit(false)"
-  >
-    <template v-slot:tableHeader>
-      <span class="mx-4" />
-      <operatn-date-input placeholder="Inizia dopo il" name="dataInizio" dense hideDetails clearable v-model="dateQueryParams.dataInizio" />
-      <span class="mx-4" />
-      <operatn-date-input placeholder="Finisce prima del" name="dataFine" dense hideDetails clearable v-model="dateQueryParams.dataFine" />
-      <span class="mx-4" />
-      <operatn-ospite-input placeholder="Ospite" name="idOspite" dense hideDetails clearable v-model="dateQueryParams.idOspite" />
-      <span class="mx-4" />
-    </template>
-    <template v-slot:createDialog>
-      <operatn-contratto-form v-if="showCreateDialog" v-model="createBody" :formValid.sync="createBodyValid" class="mt-6" />
-    </template>
-    <template v-slot:editDialog>
-      <operatn-contratto-form v-if="showEditDialog" v-model="updateBody" :formValid.sync="updateBodyValid" class="mt-6" />
-    </template>
-  </operatn-base-resource-manager>
+  <div>
+    <operatn-base-resource-manager
+      title="Contratti attivi"
+      description="Visualizzazione dei contratti attivi."
+      :isCard="false"
+      tableTitle="Contratti"
+      :tableSelectedValues.sync="selectedValues"
+      :tableColumns="columns"
+      :tableActions="actions"
+      :tableValues="values"
+      tableItemKey="id"
+      :tableLoading="tableLoading"
+      :tableUpdateBody.sync="updateBody"
+      :tableShowTitle="false"
+      createDialogTitle="Nuovo contratto"
+      :createDialogShow.sync="showCreateDialog"
+      :createDialogDisabled="!createBodyValid"
+      editDialogTitle="Modifica contratto"
+      :editDialogShow.sync="showEditDialog"
+      :editDialogDisabled="!updateBodyValid"
+      @fabCreateClick="openCreate"
+      @fabDeleteClick="askDeleteMultiple"
+      @createDialogConfirm="closeCreate(true)"
+      @createDialogCancel="closeCreate(false)"
+      @editDialogConfirm="closeEdit(true)"
+      @editDialogCancel="closeEdit(false)"
+    >
+      <template v-slot:tableHeader>
+        <span class="mx-4" />
+        <operatn-date-input placeholder="Inizia dopo il" style="flex: 1" name="dataInizio" dense hideDetails clearable v-model="dateQueryParams.dataInizio" />
+        <span class="mx-4" />
+        <operatn-date-input placeholder="Finisce prima del" style="flex: 1" name="dataFine" dense hideDetails clearable v-model="dateQueryParams.dataFine" />
+        <span class="mx-4" />
+        <operatn-ospite-input placeholder="Ospite" name="idOspite" dense hideDetails clearable v-model="dateQueryParams.idOspite" />
+        <span class="mx-4" />
+      </template>
+      <template v-slot:createDialog>
+        <operatn-contratto-form v-if="showCreateDialog" v-model="createBody" :formValid.sync="createBodyValid" class="mt-6" />
+      </template>
+      <template v-slot:editDialog>
+        <operatn-contratto-form v-if="showEditDialog" v-model="updateBody" :formValid.sync="updateBodyValid" class="mt-6" />
+      </template>
+      <template v-slot:selectFab>
+        <v-btn color="accent" @click="selectButtonPressed" fab large fixed bottom right>
+          <v-icon>{{ selectAction === "pdf" ? "mdi-file-pdf" : "mdi-email-send" }}</v-icon>
+        </v-btn>
+      </template>
+    </operatn-base-resource-manager>
+
+     <operatn-action-dialog title="Chiudi contratto" v-model="showChiudiDialog" :disabled="!contrattoChiusoValid" @cancel="chiudiDialogCancel" @confirm="chiudiDialogConfirm">
+      <operatn-contratto-chiudi-form v-if="showChiudiDialog" v-model="contrattoChiuso" :formValid.sync="contrattoChiusoValid" :dataInizioContratto="contrattoDaChiudere.dataInizio" :dataFineContratto="contrattoDaChiudere.dataFine" class="mt-6" />
+    </operatn-action-dialog>
+  </div>
 </template>
 
 <script lang="ts">
 import { Component, Mixins, Watch } from "vue-property-decorator";
 import { ContrattiCreateBody, ContrattiFilterParams, ContrattiReplaceBody, ContrattiReturned } from "operatn-api-client";
+import axios from "axios";
 
-import { AlertType } from "@/store";
+import { ActionTypes, AlertType } from "@/store";
 import ResourceManagerMixin from "@/mixins/ResourceManagerMixin";
 import ContrattoHandlerMixin from "@/mixins/handlers/ContrattoHandlerMixin";
 
+import { downloadBlob } from "@/utils";
+
 import OperatnActionDialog from "@/components/gears/dialogs/OperatnActionDialog.vue";
 import OperatnBaseResourceManager, { Column, Actions } from "@/components/gears/bases/OperatnBaseResourceManager.vue";
+import OperatnContrattoChiudiForm from "@/components/gears/forms/contratto/OperatnContrattoChiudiForm.vue";
 import OperatnContrattoForm from "@/components/gears/forms/contratto/OperatnContrattoForm.vue";
 import OperatnDateInput from "@/components/gears/inputs/OperatnDateInput.vue";
 import OperatnOspiteInput from "@/components/gears/inputs/OperatnOspiteInput.vue";
@@ -68,7 +82,7 @@ interface Tuple {
   unitaImmobiliare: string;
   numeroStanza: string;
   postiLetto: string;
-  dataInserimento: Date;
+  dataFirma: Date | null;
   reference: ContrattiReturned;
 }
 
@@ -77,26 +91,29 @@ interface Tuple {
     OperatnActionDialog,
     OperatnBaseResourceManager,
     OperatnContrattoForm,
+    OperatnContrattoChiudiForm,
     OperatnDateInput,
-    OperatnOspiteInput
+    OperatnOspiteInput,
   },
 })
-export default class Contratti extends Mixins<ResourceManagerMixin<Tuple, ContrattiCreateBody, ContrattiReplaceBody, number> & ContrattoHandlerMixin>(
+export default class ContrattiAttivi extends Mixins<ResourceManagerMixin<Tuple, ContrattiCreateBody, ContrattiReplaceBody, number> & ContrattoHandlerMixin>(
   ResourceManagerMixin,
   ContrattoHandlerMixin
 ) {
   /* DATA */
 
-  protected askDeleteText = "Sei sicuro di voler eliminare questo contratto?";
-  protected askDeleteMultipleText = "Sei sicuro di voler eliminare i contratti selezionati?";
-
   private contratti: ContrattiReturned[] = [];
   private dateQueryParams: ContrattiFilterParams = {
     dataInizio: undefined,
     dataFine: undefined,
-    idOspite: undefined
+    idOspite: undefined,
   };
   private tableLoading = false;
+
+  private contrattoDaChiudere: Tuple | null = null;
+  private contrattoChiuso: Date | null = null;
+  private contrattoChiusoValid = false;
+  private showChiudiDialog = false;
 
   /* GETTERS AND SETTERS */
 
@@ -149,25 +166,35 @@ export default class Contratti extends Mixins<ResourceManagerMixin<Tuple, Contra
         editable: false,
       },
       {
-        text: "Numero stanza",
+        text: "N. stanza",
         value: "numeroStanza",
         groupable: false,
         editable: false,
       },
       {
-        text: "Data inserimento",
-        value: "dataInserimento",
+        text: "Data firma",
+        value: "dataFirma",
         groupable: false,
         editable: false,
-        itemTextHandler: (value) => value.toLocaleDateString(),
+        itemTextHandler: (value) => (value ? value.toLocaleDateString() : ""),
       },
     ];
   }
 
   get actions(): Actions<Tuple> {
     return {
-      onEdit: (item) => this.openEdit(item),
-      onDelete: (item) => this.askDelete(item),
+      others: [
+        {
+          icon: "mdi-download",
+          color: "indigo",
+          action: (item) => this.downloadContratto(item),
+        },
+        {
+          icon: "mdi-close-circle",
+          color: "error",
+          action: (item) => this.openChiudiContratto(item),
+        },
+      ],
     };
   }
 
@@ -186,7 +213,7 @@ export default class Contratti extends Mixins<ResourceManagerMixin<Tuple, Contra
       postiLetto: contratto.contrattiSuOspite?.[0].contrattiSuOspiteSuPostoLetto
         ? contratto.contrattiSuOspite[0].contrattiSuOspiteSuPostoLetto.map((pl) => pl.postoLetto).join(", ")
         : "",
-      dataInserimento: contratto.dataInserimento,
+      dataFirma: contratto.dataFirmaContratto,
       reference: contratto,
     };
   }
@@ -226,7 +253,7 @@ export default class Contratti extends Mixins<ResourceManagerMixin<Tuple, Contra
       note: value.reference.note,
     };
   }
-  async tupleValueFromCreateBody(id: number, _body: ContrattiCreateBody): Promise<Tuple> {
+  async tupleValueFromCreateBody(id: number): Promise<Tuple> {
     const contratto = await this.getContratto(id, {
       contrattiSuOspite: {
         ospite: { persona: true },
@@ -237,7 +264,7 @@ export default class Contratti extends Mixins<ResourceManagerMixin<Tuple, Contra
     });
     return this.contrattoValueToTuple(contratto);
   }
-  async tupleValueFromUpdateBody(id: number, _body: ContrattiReplaceBody): Promise<Tuple> {
+  async tupleValueFromUpdateBody(id: number): Promise<Tuple> {
     const contratto = await this.getContratto(id, {
       contrattiSuOspite: {
         ospite: { persona: true },
@@ -249,10 +276,45 @@ export default class Contratti extends Mixins<ResourceManagerMixin<Tuple, Contra
     return this.contrattoValueToTuple(contratto);
   }
 
+  openChiudiContratto(tuple: Tuple): void {
+    this.contrattoDaChiudere = tuple;
+    this.showChiudiDialog = true;
+    this.contrattoChiuso = null;
+    this.contrattoChiusoValid = false;
+  }
+  chiudiDialogCancel(): void {
+    this.showChiudiDialog = false;
+    this.contrattoDaChiudere = null;
+    this.contrattoChiuso = null;
+  }
+  async chiudiDialogConfirm(): Promise<void> {
+    if (this.contrattoChiusoValid) {
+      try {
+        await this.closeContrattoInAnticipo(this.contrattoDaChiudere?.id as number, { dataChiusura: this.contrattoChiuso as Date });
+      } finally {
+        this.chiudiDialogCancel();
+      }
+    } else {
+      this.chiudiDialogCancel();
+    }
+  }
+
+  async downloadContratto(tuple: Tuple): Promise<void> {
+    try {
+      const filename = `${tuple.id}.pdf`;
+      const path = this.$stored.getPath(`contratti/${filename}`);
+      const response = await axios.get(path, { responseType: "blob" });
+      const blob: Blob = response.data;
+      downloadBlob(blob, filename);
+    } catch (error) {
+      this.$store.dispatch(ActionTypes.ALERT, { message: `File non trovato`, alertType: AlertType.ERRORS_QUEUE });
+    }
+  }
+
   async fetchContratti(): Promise<void> {
     try {
       this.tableLoading = true;
-      this.contratti = await this.getContrattiDaFirmare({
+      this.contratti = await this.getContrattiAttivi({
         contrattiSuOspite: {
           ospite: { persona: true },
           contrattiSuOspiteSuPostoLetto: {

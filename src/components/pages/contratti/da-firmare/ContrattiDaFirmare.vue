@@ -29,9 +29,9 @@
     >
       <template v-slot:tableHeader>
         <span class="mx-4" />
-        <operatn-date-input placeholder="Data inizio" style="flex: 1" name="dataInizio" dense hideDetails clearable v-model="dateQueryParams.dataInizio" />
+        <operatn-date-input placeholder="Inizia dopo il" style="flex: 1" name="dataInizio" dense hideDetails clearable v-model="dateQueryParams.dataInizio" />
         <span class="mx-4" />
-        <operatn-date-input placeholder="Data fine" style="flex: 1" name="dataFine" dense hideDetails clearable v-model="dateQueryParams.dataFine" />
+        <operatn-date-input placeholder="Finisce prima del" style="flex: 1" name="dataFine" dense hideDetails clearable v-model="dateQueryParams.dataFine" />
         <span class="mx-4" />
         <operatn-ospite-input v-show="!selectedValues.length" placeholder="Ospite" name="idOspite" dense hideDetails clearable v-model="dateQueryParams.idOspite" />
         <span class="mx-4" />
@@ -195,12 +195,12 @@ export default class ContrattiDaFirmare extends Mixins<ResourceManagerMixin<Tupl
       others: [
         {
           icon: "mdi-file-pdf",
-          color: "error",
+          color: "red",
           action: (item) => this.downloadContratto(item),
         },
         {
           icon: "mdi-email-send",
-          color: "primary",
+          color: "indigo",
           showAction: (item) => {
             return item.reference.dataRispostaEmail === null;
           },
@@ -208,7 +208,7 @@ export default class ContrattiDaFirmare extends Mixins<ResourceManagerMixin<Tupl
         },
         {
           icon: "mdi-upload",
-          color: "success",
+          color: "green",
           action: (item) => this.openFirmaContratto(item),
         },
       ],
