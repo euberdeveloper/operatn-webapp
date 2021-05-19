@@ -20,6 +20,17 @@ export default class TipoTariffaHandlerMixin extends Vue {
     }
   }
 
+  async getTipoTariffaByValue(value: string, alertType = AlertType.ERROR_ALERT): Promise<TipoTariffa> {
+    try {
+      return await this.$api.tipiTariffa.getByValue(value, { alertType });
+    } catch (error) {
+      if (error) {
+        this.$store.dispatch(ActionTypes.ALERT, { message: `Tipo tariffa ${value} non trovato`, alertType });
+      }
+      throw error;
+    }
+  }
+
   async createTipoTariffa(body: TipiTariffaCreateBody, alertType = AlertType.ERROR_ALERT): Promise<number> {
     try {
       const id = await this.$api.tipiTariffa.create(body, { alertType });
