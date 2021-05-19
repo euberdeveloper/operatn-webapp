@@ -97,6 +97,7 @@ interface Tuple {
   numeroStanza: string;
   postiLetto: string;
   dataFirma: Date | null;
+  dataChiusuraAnticipata: Date | null;
   reference: ContrattiReturned;
 }
 
@@ -192,6 +193,13 @@ export default class ContrattiAttivi extends Mixins<ResourceManagerMixin<Tuple, 
         editable: false,
         itemTextHandler: (value) => (value ? value.toLocaleDateString() : ""),
       },
+      {
+        text: "Chiusura anticipata",
+        value: "dataChiusuraAnticipata",
+        groupable: false,
+        editable: false,
+        itemTextHandler: (value) => (value ? value.toLocaleDateString() : ""),
+      },
     ];
   }
 
@@ -207,6 +215,7 @@ export default class ContrattiAttivi extends Mixins<ResourceManagerMixin<Tuple, 
           icon: "mdi-close-circle",
           color: "error",
           action: (item) => this.openChiudiContratto(item),
+          showAction: (item) => item.dataChiusuraAnticipata === null
         },
       ],
     };
@@ -228,6 +237,7 @@ export default class ContrattiAttivi extends Mixins<ResourceManagerMixin<Tuple, 
         ? contratto.contrattiSuOspite[0].contrattiSuOspiteSuPostoLetto.map((pl) => pl.postoLetto).join(", ")
         : "",
       dataFirma: contratto.dataFirmaContratto,
+      dataChiusuraAnticipata: contratto.dataChiusuraAnticipata,
       reference: contratto,
     };
   }
