@@ -28,6 +28,7 @@ import PostoLettoHandlerMixin from "@/mixins/handlers/PostoLettoHandlerMixin";
 import OperatnBaseTable, { Actions, Column } from "@/components/gears/bases/OperatnBaseTable.vue";
 import OperatnActionDialog from "@/components/gears/dialogs/OperatnActionDialog.vue";
 import OperatnOspiteStanza, { Value } from "./OperatnOspiteStanza.vue";
+import { AlertType } from "@/store";
 
 interface Tuple {
   nomeOspite: string;
@@ -180,34 +181,6 @@ export default class OperatnOspitiStanze extends Mixins(OspiteHandlerMixin, Post
 
   /* WATCH */
 
-  // @Watch("internalValue.ospiti")
-  // async watchInternalValueOspiti() {
-  //   if (this.internalValue.ospiti) {
-  //     this.ospitiPostiLetto = await Promise.all(
-  //       this.internalValue.ospiti.map(async (el) => {
-  //         const ospite = await this.getOspite(el.idOspite, { persona: true }, AlertType.ERRORS_QUEUE);
-  //         // TODO: add api to postoLetto hat fetches it without knowing id stanza and fabbricato
-  //         const postiLetto = el.postiLetto;
-  //         return {
-  //           ospite,
-  //           postiLetto: postiLetto.map((pl) => ({
-  //             idPostoLetto: pl,
-  //             postoLetto: "",
-  //             idStanza: 0,
-  //             unitaImmobiliare: "",
-  //             numeroStanza: "",
-  //             idFabbricato: 0,
-  //             codiceFabbricato: "",
-  //             nomeFabbricato: "",
-  //           })),
-  //         };
-  //       })
-  //     );
-  //   } else {
-  //     this.ospitiPostiLetto = [];
-  //   }
-  // }
-
   @Watch("ospitiPostiLetto")
   async watchOspitiPostiLetto() {
     this.internalValue.ospiti = this.ospitiPostiLetto.map((el) => ({
@@ -216,6 +189,32 @@ export default class OperatnOspitiStanze extends Mixins(OspiteHandlerMixin, Post
     }));
 
     this.$emit("update:formValid", !!this.internalValue.ospiti.length);
+  }
+
+  /* LIFE CYCLE */
+
+  async mounted() {
+    if (this.internalValue.ospiti?.length) {
+      this.ospitiPostiLetto = await Promise.all(
+        this.internalValue.ospiti.map(async (el) => {
+          const ospite = await this.getOspite(el.idOspite, { persona: true }, AlertType.ERRORS_QUEUE);
+          const postiLetto = await Promise.all(el.postiLetto.map(async (pl) => this.getPostoLettoGeneral(pl, { stanza: { fabbricato: true } }, AlertType.ERRORS_QUEUE)));
+          return {
+            ospite,
+            postiLetto: postiLetto.map((pl) => ({
+              idPostoLetto: pl.id,
+              postoLetto: pl.postoLetto,
+              idStanza: pl.idStanza,
+              unitaImmobiliare: pl.stanza?.unitaImmobiliare ?? '',
+              numeroStanza:  pl.stanza?.numeroStanza ?? '',
+              idFabbricato:  pl.stanza?.idFabbricato ?? -1,
+              codiceFabbricato:  pl.stanza?.fabbricato?.codice ?? '',
+              nomeFabbricato: pl.stanza?.fabbricato?.nome ?? '',
+            })),
+          };
+        })
+      );
+    }
   }
 }
 </script>
