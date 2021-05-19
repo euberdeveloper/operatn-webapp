@@ -344,7 +344,10 @@ const routes: Array<RouteConfig> = [
       {
         path: 'utenti',
         name: 'admin-utenti',
-        component: AdminUtenti
+        component: AdminUtenti,
+        meta: {
+          infoText: infos.utenti
+        }
       },
       {
         path: 'tipi-stanza',
