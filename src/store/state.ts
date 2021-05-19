@@ -9,6 +9,8 @@ export interface State {
     errorsQueue: string[];
     errorDialogText: string | null;
     successDialogText: string | null;
+    infoDialogText: string | null;
+    showInfo: boolean;
     confirmDialog: { text: string; callback: (answer: boolean) => void | Promise<void> } | null;
     darkTheme: boolean;
     primaryColour: string | null;
@@ -26,6 +28,8 @@ export const state: State = {
     errorsQueue: [],
     errorDialogText: null,
     successDialogText: null,
+    infoDialogText: null,
+    showInfo: false,
     confirmDialog: null,
     darkTheme: false,
     primaryColour: null,

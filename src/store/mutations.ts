@@ -9,6 +9,8 @@ export enum MutationTypes {
     SET_ERRORS_QUEUE = 'SET_ERRORS_QUEUE',
     SET_ERROR_DIALOG_TEXT = 'SET_ERROR_DIALOG_TEXT',
     SET_SUCCESS_DIALOG_TEXT = 'SET_SUCCESS_DIALOG_TEXT',
+    SET_INFO_DIALOG_TEXT = 'SET_INFO_DIALOG_TEXT',
+    SET_SHOW_INFO = 'SET_SHOW_INFO',
     SET_CONFIRM_DIALOG = 'SET_CONFIRM_DIALOG',
     SET_USER = 'SET_USER',
     SET_TOKEN = 'SET_TOKEN',
@@ -23,6 +25,8 @@ export interface Mutations<S = State> {
     [MutationTypes.SET_ERRORS_QUEUE](state: S, queue: string[]): void;
     [MutationTypes.SET_ERROR_DIALOG_TEXT](state: S, text: string | null): void;
     [MutationTypes.SET_SUCCESS_DIALOG_TEXT](state: S, text: string | null): void;
+    [MutationTypes.SET_INFO_DIALOG_TEXT](state: S, text: string | null): void;
+    [MutationTypes.SET_SHOW_INFO](state: S, show: boolean): void;
     [MutationTypes.SET_CONFIRM_DIALOG](state: S, value: { text: string; callback: (answer: boolean) => void | Promise<void> } | null): void;
     [MutationTypes.SET_USER](state: S, user: UtentiReturned | null): void;
     [MutationTypes.SET_TOKEN](state: S, token: string | null): void;
@@ -46,6 +50,12 @@ export const mutations: MutationTree<State> & Mutations = {
     },
     [MutationTypes.SET_SUCCESS_DIALOG_TEXT](state, text) {
         state.successDialogText = text;
+    },
+    [MutationTypes.SET_INFO_DIALOG_TEXT](state, text) {
+        state.infoDialogText = text;
+    },
+    [MutationTypes.SET_SHOW_INFO](state, show) {
+        state.showInfo = show;
     },
     [MutationTypes.SET_CONFIRM_DIALOG](state, value) {
         state.confirmDialog = value;

@@ -8,6 +8,9 @@ const beforeEach: NavigationGuard = function (to, _from, next) {
         ? [...prev, ...curr.meta.authentication]
         : prev, []);
 
+    const infoText: string | null = to.meta.infoText || null;
+    store.dispatch(ActionTypes.SET_INFO_TEXT, infoText);
+
     if (!allowed.length || allowed.includes(ruolo as string)) {
         next();
     }
