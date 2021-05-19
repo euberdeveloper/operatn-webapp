@@ -1,7 +1,7 @@
 <template>
   <operatn-base-resource-manager
     title="Contratti terminati"
-    description="Visualizzazione dei contratti terminati."
+    description="Visualizzazione dei contratti attualmente terminati."
     :isCard="false"
     tableTitle="Contratti"
     :tableSelectedValues.sync="selectedValues"

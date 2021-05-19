@@ -2,7 +2,7 @@
   <div>
     <operatn-base-resource-manager
       title="Contratti attivi"
-      description="Visualizzazione dei contratti attivi."
+      description="Visualizzazione dei contratti attualmente attivi."
       :isCard="false"
       tableTitle="Contratti"
       :tableSelectedValues.sync="selectedValues"
