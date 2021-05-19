@@ -94,6 +94,7 @@ import TipoOspiteHandlerMixin from "@/mixins/handlers/TipoOspiteHandlerMixin";
 import TipoTariffaHandlerMixin from "@/mixins/handlers/TipoTariffaHandlerMixin";
 import TipoStanzaHandlerMixin from "@/mixins/handlers/TipoStanzaHandlerMixin";
 import TariffaHandlerMixin from "@/mixins/handlers/TariffaHandlerMixin";
+import { AlertType } from "@/store";
 
 @Component({
   model: {
@@ -125,6 +126,7 @@ export default class OperatnTariffa extends Mixins(
   private tipiTariffa: TipoTariffa[] = [];
   private tariffe: Tariffa[] = [];
 
+  private tipoTariffaDefault: TipoTariffa | null = null;
   private body = this.getEmptyBody();
 
   /* GETTERS AND SETTERS */
@@ -174,6 +176,13 @@ export default class OperatnTariffa extends Mixins(
     }) : this.getEmptyBody();
   }
 
+  @Watch("tipoTariffaDefault")
+  watchSelectedTipoTariffaDefault() {
+    if (typeof this.body.idTipoTariffa !== 'number') {
+      this.body.idTipoTariffa = this.tipoTariffaDefault?.id ?? null;
+    }
+  }
+
   /* METHODS */
 
   getEmptyBody() {
@@ -181,18 +190,20 @@ export default class OperatnTariffa extends Mixins(
       idTipoOspite: null as number | null,
       idUtilizzoStanza: null as number | null,
       idTipoFabbricato: null as number | null,
-      idTipoTariffa: null as number | null,
+      idTipoTariffa: this.tipoTariffaDefault?.id as number | null,
     };
   }
 
   /* LIFE CYCLE */
 
   async mounted() {
-    this.tipiFabbricato = await this.getTipiFabbricato();
-    this.tipiStanza = await this.getTipiStanza();
-    this.tipiTariffa = await this.getTipiTariffa();
-    this.tipiOspite = await this.getTipiOspite();
-    this.tariffe = await this.getTariffe();
+    this.tipiFabbricato = await this.getTipiFabbricato(AlertType.ERRORS_QUEUE);
+    this.tipiStanza = await this.getTipiStanza(AlertType.ERRORS_QUEUE);
+    this.tipiTariffa = await this.getTipiTariffa(AlertType.ERRORS_QUEUE);
+    this.tipiOspite = await this.getTipiOspite({}, AlertType.ERRORS_QUEUE);
+    this.tariffe = await this.getTariffe({}, AlertType.ERRORS_QUEUE);
+
+    this.tipoTariffaDefault = await this.getTipoTariffaByValue('MENSILE', AlertType.ERRORS_QUEUE);
   }
 }
 </script>

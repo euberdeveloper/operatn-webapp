@@ -45,8 +45,8 @@ import RootContratti from '@/views/root/contratti/RootContrattiView.vue';
 import RootContrattiProvvisori from '@/views/root/contratti/provvisori/RootContrattiProvvisoriView.vue';
 import RootContrattiDaFirmare from '@/views/root/contratti/da-firmare/RootContrattiDaFirmareView.vue';
 import RootContrattiDaVisionare from '@/views/root/contratti/da-visionare/RootContrattiDaVisionareView.vue';
-import RootContrattiFirmati from '@/views/root/contratti/firmati/RootContrattiFirmatiView.vue';
-
+import RootContrattiAttivi from '@/views/root/contratti/attivi/RootContrattiAttiviView.vue';
+import RootContrattiTerminati from '@/views/root/contratti/terminati/RootContrattiTerminatiView.vue';
 
 /* ADMIN */
 import Admin from '@/views/admin/AdminView.vue';
@@ -78,7 +78,8 @@ import AdminContratti from '@/views/admin/contratti/AdminContrattiView.vue';
 import AdminContrattiProvvisori from '@/views/admin/contratti/provvisori/AdminContrattiProvvisoriView.vue';
 import AdminContrattiDaFirmare from '@/views/admin/contratti/da-firmare/AdminContrattiDaFirmareView.vue';
 import AdminContrattiDaVisionare from '@/views/admin/contratti/da-visionare/AdminContrattiDaVisionareView.vue';
-import AdminContrattiFirmati from '@/views/admin/contratti/firmati/AdminContrattiFirmatiView.vue';
+import AdminContrattiAttivi from '@/views/admin/contratti/attivi/AdminContrattiAttiviView.vue';
+import AdminContrattiTerminati from '@/views/admin/contratti/terminati/AdminContrattiTerminatiView.vue';
 
 /* RAGIONERIA */
 import Ragioneria from '@/views/ragioneria/RagioneriaView.vue';
@@ -112,6 +113,8 @@ import SportelloContrattiProvvisori from '@/views/sportello/contratti/provvisori
 import SportelloContrattiDaFirmare from '@/views/sportello/contratti/da-firmare/SportelloContrattiDaFirmareView.vue';
 import SportelloContrattiDaVisionare from '@/views/sportello/contratti/da-visionare/SportelloContrattiDaVisionareView.vue';
 import SportelloContrattiFirmati from '@/views/sportello/contratti/firmati/SportelloContrattiFirmatiView.vue';
+import SportelloContrattiAttivi from '@/views/sportello/contratti/attivi/SportelloContrattiAttiviView.vue';
+import SportelloContrattiTerminati from '@/views/sportello/contratti/terminati/SportelloContrattiTerminatiView.vue';
 
 
 Vue.use(VueRouter);
@@ -301,10 +304,16 @@ const routes: Array<RouteConfig> = [
             path: 'da-visionare',
             name: 'root-contratti-da-visionare',
             component: RootContrattiDaVisionare
-          }, {
-            path: 'firmati',
-            name: 'root-contratti-firmati',
-            component: RootContrattiFirmati
+          }, 
+          {
+            path: 'attivi',
+            name: 'root-contratti-attivi',
+            component: RootContrattiAttivi
+          },
+          {
+            path: 'terminati',
+            name: 'root-contratti-terminati',
+            component: RootContrattiTerminati
           },
         ]
       },
@@ -467,10 +476,16 @@ const routes: Array<RouteConfig> = [
             path: 'da-visionare',
             name: 'admin-contratti-da-visionare',
             component: AdminContrattiDaVisionare
-          }, {
-            path: 'firmati',
-            name: 'admin-contratti-firmati',
-            component: AdminContrattiFirmati
+          },
+          {
+            path: 'attivi',
+            name: 'admin-contratti-attivi',
+            component: AdminContrattiAttivi
+          },
+          {
+            path: 'terminati',
+            name: 'admin-contratti-terminati',
+            component: AdminContrattiTerminati
           },
         ]
       },
@@ -628,10 +643,16 @@ const routes: Array<RouteConfig> = [
             path: 'da-visionare',
             name: 'sportello-contratti-da-visionare',
             component: SportelloContrattiDaVisionare
-          }, {
-            path: 'firmati',
-            name: 'sportello-contratti-firmati',
-            component: SportelloContrattiFirmati
+          },
+          {
+            path: 'attivi',
+            name: 'sportello-contratti-attivi',
+            component: SportelloContrattiAttivi
+          },
+          {
+            path: 'terminati',
+            name: 'sportello-contratti-terminati',
+            component: SportelloContrattiTerminati
           },
         ]
       },

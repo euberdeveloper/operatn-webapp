@@ -1,7 +1,7 @@
 <template>
   <operatn-base-resource-manager
-    title="Contratti firmati"
-    description="Visualizzazione dei contratti da firmare."
+    title="Contratti terminati"
+    description="Visualizzazione dei contratti attualmente terminati."
     :isCard="false"
     tableTitle="Contratti"
     :tableSelectedValues.sync="selectedValues"
@@ -11,6 +11,7 @@
     tableItemKey="id"
     :tableLoading="tableLoading"
     :tableUpdateBody.sync="updateBody"
+    :tableShowTitle="false"
     createDialogTitle="Nuovo contratto"
     :createDialogShow.sync="showCreateDialog"
     :createDialogDisabled="!createBodyValid"
@@ -26,9 +27,11 @@
   >
     <template v-slot:tableHeader>
       <span class="mx-4" />
-      <operatn-date-input placeholder="Data inizio" style="flex: 1" name="dataInizio" dense hideDetails clearable v-model="dateQueryParams.dataInizio" />
+      <operatn-date-input placeholder="Inizia dopo il" style="flex: 1" name="dataInizio" dense hideDetails clearable v-model="dateQueryParams.dataInizio" />
       <span class="mx-4" />
-      <operatn-date-input placeholder="Data fine" style="flex: 1" name="dataFine" dense hideDetails clearable v-model="dateQueryParams.dataFine" />
+      <operatn-date-input placeholder="Finisce prima del" style="flex: 1" name="dataFine" dense hideDetails clearable v-model="dateQueryParams.dataFine" />
+      <span class="mx-4" />
+      <operatn-ospite-input placeholder="Ospite" name="idOspite" dense hideDetails clearable v-model="dateQueryParams.idOspite" />
       <span class="mx-4" />
     </template>
     <template v-slot:createDialog>
@@ -54,16 +57,19 @@ import { ActionTypes, AlertType } from "@/store";
 import ResourceManagerMixin from "@/mixins/ResourceManagerMixin";
 import ContrattoHandlerMixin from "@/mixins/handlers/ContrattoHandlerMixin";
 
+import { downloadBlob } from "@/utils";
+
 import OperatnActionDialog from "@/components/gears/dialogs/OperatnActionDialog.vue";
 import OperatnBaseResourceManager, { Column, Actions } from "@/components/gears/bases/OperatnBaseResourceManager.vue";
 import OperatnContrattoForm from "@/components/gears/forms/contratto/OperatnContrattoForm.vue";
 import OperatnDateInput from "@/components/gears/inputs/OperatnDateInput.vue";
-import { downloadBlob } from "@/utils";
+import OperatnOspiteInput from "@/components/gears/inputs/OperatnOspiteInput.vue";
 
 interface Tuple {
   id: number;
   dataInizio: Date;
   dataFine: Date;
+  dataChiusuraAnticipata: Date | null;
   nome: string;
   cognome: string;
   codiceFabbricato: string;
@@ -80,9 +86,10 @@ interface Tuple {
     OperatnBaseResourceManager,
     OperatnContrattoForm,
     OperatnDateInput,
+    OperatnOspiteInput,
   },
 })
-export default class ContrattiFirmati extends Mixins<ResourceManagerMixin<Tuple, ContrattiCreateBody, ContrattiReplaceBody, number> & ContrattoHandlerMixin>(
+export default class ContrattiTerminati extends Mixins<ResourceManagerMixin<Tuple, ContrattiCreateBody, ContrattiReplaceBody, number> & ContrattoHandlerMixin>(
   ResourceManagerMixin,
   ContrattoHandlerMixin
 ) {
@@ -92,6 +99,7 @@ export default class ContrattiFirmati extends Mixins<ResourceManagerMixin<Tuple,
   private dateQueryParams: ContrattiFilterParams = {
     dataInizio: undefined,
     dataFine: undefined,
+    idOspite: undefined,
   };
   private tableLoading = false;
 
@@ -120,6 +128,14 @@ export default class ContrattiFirmati extends Mixins<ResourceManagerMixin<Tuple,
 
         editable: false,
         itemTextHandler: (value) => value.toLocaleDateString(),
+      },
+      {
+        text: "C. anticipata",
+        value: "dataChiusuraAnticipata",
+        groupable: false,
+
+        editable: false,
+        itemTextHandler: (value) => (value ? value.toLocaleDateString() : "NO"),
       },
       {
         text: "Nome",
@@ -166,9 +182,9 @@ export default class ContrattiFirmati extends Mixins<ResourceManagerMixin<Tuple,
       others: [
         {
           icon: "mdi-download",
-          color: "primary",
+          color: "indigo",
           action: (item) => this.downloadContratto(item),
-        }
+        },
       ],
     };
   }
@@ -180,6 +196,7 @@ export default class ContrattiFirmati extends Mixins<ResourceManagerMixin<Tuple,
       id: contratto.id,
       dataInizio: contratto.dataInizio,
       dataFine: contratto.dataFine,
+      dataChiusuraAnticipata: contratto.dataChiusuraAnticipata,
       nome: contratto.contrattiSuOspite?.[0].ospite?.persona?.nome ?? "",
       cognome: contratto.contrattiSuOspite?.[0].ospite?.persona?.cognome ?? "",
       codiceFabbricato: contratto.contrattiSuOspite?.[0].contrattiSuOspiteSuPostoLetto?.[0].postoLetto?.stanza?.fabbricato?.codice ?? "",
@@ -266,7 +283,7 @@ export default class ContrattiFirmati extends Mixins<ResourceManagerMixin<Tuple,
   async fetchContratti(): Promise<void> {
     try {
       this.tableLoading = true;
-      this.contratti = await this.getContrattiFirmati({
+      this.contratti = await this.getContrattiTerminati({
         contrattiSuOspite: {
           ospite: { persona: true },
           contrattiSuOspiteSuPostoLetto: {

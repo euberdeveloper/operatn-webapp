@@ -12,6 +12,7 @@
         :dense="dense"
         :hide-details="hideDetails"
         :rules="rules"
+        :required="required"
         @blur="internalValue = parseDate(dateFormatted)"
         @keypress.enter="enterClicked"
         v-on="on"
@@ -38,10 +39,10 @@ export default class OperatnDateInput extends Vue {
   @Prop({ validator: (v) => typeof v === "object" || v === null || v === undefined, required: true })
   value!: Date | null;
 
-  @Prop({ type: String, default: '' })
+  @Prop({ type: String, default: "" })
   label!: string;
 
-  @Prop({ type: String, default: '' })
+  @Prop({ type: String, default: "" })
   placeholder!: string;
 
   @Prop({ type: String, required: false })
@@ -59,6 +60,8 @@ export default class OperatnDateInput extends Vue {
   @Prop({ type: Boolean, default: false })
   dense?: boolean;
 
+  @Prop({ type: Boolean, default: false })
+  required?: boolean;
 
   /* DATA */
 
