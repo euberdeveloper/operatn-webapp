@@ -20,6 +20,17 @@ export default class QuietanzianteHandlerMixin extends Vue {
     }
   }
 
+  async getQuietanzianteByValue(value: string, alertType = AlertType.ERROR_ALERT): Promise<Quietanziante> {
+    try {
+      return await this.$api.quietanzianti.getByValue(value, { alertType });
+    } catch (error) {
+      if (error) {
+        this.$store.dispatch(ActionTypes.ALERT, { message: `Quietanziante ${value} non trovato`, alertType });
+      }
+      throw error;
+    }
+  }
+
   async createQuietanziante(body: QuietanziantiCreateBody, alertType = AlertType.ERROR_ALERT): Promise<number> {
     try {
       const id = await this.$api.quietanzianti.create(body, { alertType });

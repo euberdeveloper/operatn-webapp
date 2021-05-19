@@ -13,26 +13,14 @@
     </v-expansion-panel>
 
     <v-expansion-panel>
-      <v-expansion-panel-header :disable-icon-rotate="quietanzianteValid">
-        <span class="text-h6">Quietanziante</span>
-        <template v-slot:actions v-if="quietanzianteValid">
+      <v-expansion-panel-header :disable-icon-rotate="ospitiPostiLettoValid">
+        <span class="text-h6">Ospiti / Posti letto</span>
+        <template v-slot:actions v-if="ospitiPostiLettoValid">
           <v-icon color="teal">mdi-check</v-icon>
         </template>
       </v-expansion-panel-header>
       <v-expansion-panel-content>
-        <operatn-quietanziante v-model="internalValue" :formValid.sync="quietanzianteValid" />
-      </v-expansion-panel-content>
-    </v-expansion-panel>
-
-    <v-expansion-panel>
-      <v-expansion-panel-header :disable-icon-rotate="tipoContrattoValid">
-        <span class="text-h6">Tipo contratto</span>
-        <template v-slot:actions v-if="tipoContrattoValid">
-          <v-icon color="teal">mdi-check</v-icon>
-        </template>
-      </v-expansion-panel-header>
-      <v-expansion-panel-content>
-        <operatn-tipo-contratto v-model="internalValue" :formValid.sync="tipoContrattoValid" />
+        <operatn-ospiti-stanze v-model="internalValue" :formValid.sync="ospitiPostiLettoValid" />
       </v-expansion-panel-content>
     </v-expansion-panel>
 
@@ -49,14 +37,26 @@
     </v-expansion-panel>
 
     <v-expansion-panel>
-      <v-expansion-panel-header :disable-icon-rotate="ospitiPostiLettoValid">
-        <span class="text-h6">Ospiti / Posti letto</span>
-        <template v-slot:actions v-if="ospitiPostiLettoValid">
+      <v-expansion-panel-header :disable-icon-rotate="tipoContrattoValid">
+        <span class="text-h6">Tipo contratto</span>
+        <template v-slot:actions v-if="tipoContrattoValid">
           <v-icon color="teal">mdi-check</v-icon>
         </template>
       </v-expansion-panel-header>
       <v-expansion-panel-content>
-        <operatn-ospiti-stanze v-model="internalValue" :formValid.sync="ospitiPostiLettoValid" />
+        <operatn-tipo-contratto v-model="internalValue" :formValid.sync="tipoContrattoValid" />
+      </v-expansion-panel-content>
+    </v-expansion-panel>
+
+    <v-expansion-panel>
+      <v-expansion-panel-header :disable-icon-rotate="quietanzianteValid">
+        <span class="text-h6">Quietanziante</span>
+        <template v-slot:actions v-if="quietanzianteValid">
+          <v-icon color="teal">mdi-check</v-icon>
+        </template>
+      </v-expansion-panel-header>
+      <v-expansion-panel-content>
+        <operatn-quietanziante v-model="internalValue" :formValid.sync="quietanzianteValid" />
       </v-expansion-panel-content>
     </v-expansion-panel>
 
@@ -75,9 +75,10 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop, Watch } from "vue-property-decorator";
-import { ContrattiCreateBody, ContrattiReplaceBody } from "operatn-api-client";
+import { Component, Prop, Watch, Mixins } from "vue-property-decorator";
+import { ContrattiCreateBody, ContrattiReplaceBody, Quietanziante } from "operatn-api-client";
+
+import QuietanzianteHandlerMixin from "@/mixins/handlers/QuietanzianteHandlerMixin";
 
 import OperatnDateInput from "@/components/gears/inputs/OperatnDateInput.vue";
 import OperatnDatiContratto from "./gears/OperatnDatiContratto.vue";
@@ -86,6 +87,7 @@ import OperatnTipoContratto from "./gears/OperatnTipoContratto.vue";
 import OperatnTariffa from "./gears/OperatnTariffa.vue";
 import OperatnOspitiStanze from "./gears/OperatnOspitiStanze.vue";
 import OperatnNote from "./gears/OperatnNote.vue";
+import { AlertType } from "@/store";
 
 @Component({
   model: {
@@ -99,10 +101,10 @@ import OperatnNote from "./gears/OperatnNote.vue";
     OperatnTipoContratto,
     OperatnTariffa,
     OperatnOspitiStanze,
-    OperatnNote
+    OperatnNote,
   },
 })
-export default class OperatnContrattoForm extends Vue {
+export default class OperatnContrattoForm extends Mixins(QuietanzianteHandlerMixin) {
   /* PROPS */
 
   @Prop({ type: Object, default: null })
@@ -119,6 +121,8 @@ export default class OperatnContrattoForm extends Vue {
   private tipoContrattoValid = false;
   private tariffaValid = false;
   private ospitiPostiLettoValid = false;
+
+  private quietanzianteDefault: Quietanziante | null = null;
 
   /* GETTERS AND SETTERS */
 
@@ -147,7 +151,7 @@ export default class OperatnContrattoForm extends Vue {
       tipoRata: undefined,
       idTariffa: undefined,
       idTipoContratto: undefined,
-      idQuietanziante: undefined,
+      idQuietanziante: this.quietanzianteDefault?.id ?? undefined,
       ospiti: [],
       note: null,
     };
@@ -189,8 +193,9 @@ export default class OperatnContrattoForm extends Vue {
 
   /* LIFE CYCLE */
 
-  mounted() {
+  async mounted() {
     if (this.internalValue === null) {
+      this.quietanzianteDefault = await this.getQuietanzianteByValue("Beneficiario", AlertType.ERRORS_QUEUE);
       this.internalValue = this.getEmptyValue();
     }
   }
