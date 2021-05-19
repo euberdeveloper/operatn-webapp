@@ -301,7 +301,8 @@ const routes: Array<RouteConfig> = [
           {
             path: 'da-firmare',
             name: 'root-contratti-da-firmare',
-            component: RootContrattiDaFirmare
+            component: RootContrattiDaFirmare,
+            meta: { infoText: infos.contrattiDaFirmare }
           },
           {
             path: 'da-visionare',
@@ -473,7 +474,8 @@ const routes: Array<RouteConfig> = [
           {
             path: 'da-firmare',
             name: 'admin-contratti-da-firmare',
-            component: AdminContrattiDaFirmare
+            component: AdminContrattiDaFirmare,
+            meta: { infoText: infos.contrattiDaFirmare }
           },
           {
             path: 'da-visionare',
@@ -640,7 +642,8 @@ const routes: Array<RouteConfig> = [
           {
             path: 'da-firmare',
             name: 'sportello-contratti-da-firmare',
-            component: SportelloContrattiDaFirmare
+            component: SportelloContrattiDaFirmare,
+            meta: { infoText: infos.contrattiDaFirmare }
           },
           {
             path: 'da-visionare',

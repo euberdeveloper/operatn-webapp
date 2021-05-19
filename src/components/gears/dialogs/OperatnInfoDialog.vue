@@ -57,7 +57,7 @@ export default class OperatnInfoDialog extends Vue {
   @Prop({ type: String })
   text!: string;
 
-  @Prop({ type: String, default: "600" })
+  @Prop({ type: String, default: "45vw" })
   width!: string;
 
 
