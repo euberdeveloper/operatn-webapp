@@ -12,6 +12,9 @@ export enum ActionTypes {
     SET_TOAST = 'SET_TOAST',
     ADD_ERROR_TO_QUEUE = 'ADD_ERROR_TO_QUEUE',
     SET_ERRORS_QUEUE = 'SET_ERRORS_QUEUE',
+    HIDE_INFO = 'HIDE_INFO',
+    SHOW_INFO = 'SHOW_INFO',
+    SET_INFO_TEXT = 'SET_INFO_TEXT',
     HIDE_ERROR_DIALOG = 'HIDE_ERROR_DIALOG',
     SHOW_ERROR_DIALOG = 'SHOW_ERROR_DIALOG',
     HIDE_SUCCESS_DIALOG = 'HIDE_SUCCESS_DIALOG',
@@ -43,6 +46,9 @@ export interface Actions {
     [ActionTypes.ALERT]({ dispatch }: AugmentedActionContext, payload: { message: string, alertType?: AlertType }): void;
     [ActionTypes.ADD_ERROR_TO_QUEUE]({ commit }: AugmentedActionContext, text: string): void;
     [ActionTypes.SET_ERRORS_QUEUE]({ commit }: AugmentedActionContext, queue: string[]): void;
+    [ActionTypes.HIDE_INFO]({ commit }: AugmentedActionContext): void;
+    [ActionTypes.SHOW_INFO]({ commit }: AugmentedActionContext): void;
+    [ActionTypes.SET_INFO_TEXT]({ commit }: AugmentedActionContext, text: string | null): void;
     [ActionTypes.HIDE_ERROR_DIALOG]({ commit }: AugmentedActionContext): void;
     [ActionTypes.SHOW_ERROR_DIALOG]({ commit }: AugmentedActionContext, text: string): void;
     [ActionTypes.HIDE_SUCCESS_DIALOG]({ commit }: AugmentedActionContext): void;
@@ -89,6 +95,15 @@ export const actions: ActionTree<State, State> & Actions = {
     },
     [ActionTypes.SET_ERRORS_QUEUE]({ commit }, queue) {
         commit(MutationTypes.SET_ERRORS_QUEUE, queue);
+    },
+    [ActionTypes.HIDE_INFO]({ commit }) {
+        commit(MutationTypes.SET_SHOW_INFO, false);
+    },
+    [ActionTypes.SHOW_INFO]({ commit }) {
+        commit(MutationTypes.SET_SHOW_INFO, true);
+    },
+    [ActionTypes.SET_INFO_TEXT]({ commit }, text) {
+        commit(MutationTypes.SET_INFO_DIALOG_TEXT, text);
     },
     [ActionTypes.HIDE_ERROR_DIALOG]({ commit }) {
         commit(MutationTypes.SET_ERROR_DIALOG_TEXT, null);

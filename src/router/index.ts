@@ -4,6 +4,7 @@ import { RuoloUtente } from 'operatn-api-client';
 
 import rootRedirect from './utils/rootRedirect';
 import beforeEach from './utils/beforeEach';
+import infos from './utils/infos';
 
 /* LOGIN */
 import Login from '@/views/login/LoginView.vue';
@@ -112,7 +113,6 @@ import SportelloContratti from '@/views/sportello/contratti/SportelloContrattiVi
 import SportelloContrattiProvvisori from '@/views/sportello/contratti/provvisori/SportelloContrattiProvvisoriView.vue';
 import SportelloContrattiDaFirmare from '@/views/sportello/contratti/da-firmare/SportelloContrattiDaFirmareView.vue';
 import SportelloContrattiDaVisionare from '@/views/sportello/contratti/da-visionare/SportelloContrattiDaVisionareView.vue';
-import SportelloContrattiFirmati from '@/views/sportello/contratti/firmati/SportelloContrattiFirmatiView.vue';
 import SportelloContrattiAttivi from '@/views/sportello/contratti/attivi/SportelloContrattiAttiviView.vue';
 import SportelloContrattiTerminati from '@/views/sportello/contratti/terminati/SportelloContrattiTerminatiView.vue';
 
@@ -168,7 +168,10 @@ const routes: Array<RouteConfig> = [
       {
         path: 'utenti',
         name: 'root-utenti',
-        component: RootUtenti
+        component: RootUtenti,
+        meta: {
+          infoText: infos.utenti
+        }
       },
       {
         path: 'tipi-stanza',
@@ -298,13 +301,14 @@ const routes: Array<RouteConfig> = [
           {
             path: 'da-firmare',
             name: 'root-contratti-da-firmare',
-            component: RootContrattiDaFirmare
+            component: RootContrattiDaFirmare,
+            meta: { infoText: infos.contrattiDaFirmare }
           },
           {
             path: 'da-visionare',
             name: 'root-contratti-da-visionare',
             component: RootContrattiDaVisionare
-          }, 
+          },
           {
             path: 'attivi',
             name: 'root-contratti-attivi',
@@ -340,7 +344,10 @@ const routes: Array<RouteConfig> = [
       {
         path: 'utenti',
         name: 'admin-utenti',
-        component: AdminUtenti
+        component: AdminUtenti,
+        meta: {
+          infoText: infos.utenti
+        }
       },
       {
         path: 'tipi-stanza',
@@ -470,7 +477,8 @@ const routes: Array<RouteConfig> = [
           {
             path: 'da-firmare',
             name: 'admin-contratti-da-firmare',
-            component: AdminContrattiDaFirmare
+            component: AdminContrattiDaFirmare,
+            meta: { infoText: infos.contrattiDaFirmare }
           },
           {
             path: 'da-visionare',
@@ -637,7 +645,8 @@ const routes: Array<RouteConfig> = [
           {
             path: 'da-firmare',
             name: 'sportello-contratti-da-firmare',
-            component: SportelloContrattiDaFirmare
+            component: SportelloContrattiDaFirmare,
+            meta: { infoText: infos.contrattiDaFirmare }
           },
           {
             path: 'da-visionare',
