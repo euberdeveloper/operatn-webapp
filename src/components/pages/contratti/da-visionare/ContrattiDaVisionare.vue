@@ -4,6 +4,7 @@
     description="Gestione dei contratti da visionare. Si può scaricare il documento che è stato inviato via email, controllarlo e confermarlo."
     :isCard="false"
     tableTitle="Contratti"
+    :tableShowTitle="false"
     :tableSelectedValues.sync="selectedValues"
     :tableColumns="columns"
     :tableActions="actions"
@@ -17,6 +18,7 @@
     editDialogTitle="Modifica contratto"
     :editDialogShow.sync="showEditDialog"
     :editDialogDisabled="!updateBodyValid"
+    dialogWidth="80vw"
     @fabCreateClick="openCreate"
     @fabDeleteClick="askDeleteMultiple"
     @createDialogConfirm="closeCreate(true)"
@@ -26,9 +28,9 @@
   >
     <template v-slot:tableHeader>
       <span class="mx-4" />
-      <operatn-date-input placeholder="Data inizio" style="flex: 1" name="dataInizio" dense hideDetails clearable v-model="dateQueryParams.dataInizio" />
+      <operatn-date-input placeholder="Inizia dopo il" style="flex: 1" name="dataInizio" dense hideDetails clearable v-model="dateQueryParams.dataInizio" />
       <span class="mx-4" />
-      <operatn-date-input placeholder="Data fine" style="flex: 1" name="dataFine" dense hideDetails clearable v-model="dateQueryParams.dataFine" />
+      <operatn-date-input placeholder="Finisce prima del" style="flex: 1" name="dataFine" dense hideDetails clearable v-model="dateQueryParams.dataFine" />
       <span class="mx-4" />
     </template>
     <template v-slot:createDialog>
@@ -223,8 +225,8 @@ export default class ContrattiDaVisionare extends Mixins<ResourceManagerMixin<Tu
     return {
       dataInizio: value.reference.dataInizio,
       dataFine: value.reference.dataFine,
-      checkout: value.reference.checkout,
-      cauzione: value.reference.cauzione,
+      checkout: !!value.reference.checkout,
+      cauzione: !!value.reference.cauzione,
       tipoRata: value.reference.tipoRata,
       idTariffa: value.reference.idTariffa,
       idTipoContratto: value.reference.idTipoContratto,

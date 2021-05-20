@@ -21,7 +21,7 @@
           <v-select type="text" label="Sesso" name="sesso" :items="['M', 'F']" clearable v-model="internalValue.sesso" />
         </v-col>
         <v-col cols="6">
-          <operatn-date-input label="Data nascita" name="dataNascita" v-model="internalValue.dataNascita" />
+          <operatn-date-input label="Data nascita" name="dataNascita" clearable v-model="internalValue.dataNascita" />
         </v-col>
       </v-row>
       <v-row align="center" justify="center">

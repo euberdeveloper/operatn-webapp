@@ -3,11 +3,12 @@
     <router-view name="bar" />
     <router-view name="menu" />
     <router-view />
-    <v-snackbar v-if="toast" v-model="toast"  :color="toast.color">{{toast.message}}</v-snackbar>
+    <v-snackbar v-if="toast" v-model="toast" :color="toast.color">{{ toast.message }}</v-snackbar>
     <operatn-error-dialog v-model="showErrorDialog" :text="errorDialogText" />
     <operatn-errors-queue v-model="errorsQueue" />
     <operatn-success-dialog v-model="showSuccessDialog" :text="successDialogText" />
     <operatn-confirm-dialog v-if="showConfirmDialog" v-model="showConfirmDialog" :text="confirmDialog.text" :callback="confirmDialog.callback" />
+    <operatn-info-dialog v-model="infoDialogShow" v-if="infoDialogText" :text="infoDialogText" />
   </v-app>
 </template>
 
@@ -17,6 +18,7 @@ import OperatnErrorDialog from "@/components/gears/dialogs/OperatnErrorDialog.vu
 import OperatnErrorsQueue from "@/components/gears/dialogs/OperatnErrorsQueue.vue";
 import OperatnSuccessDialog from "@/components/gears/dialogs/OperatnSuccessDialog.vue";
 import OperatnConfirmDialog from "@/components/gears/dialogs/OperatnConfirmDialog.vue";
+import OperatnInfoDialog from "@/components/gears/dialogs/OperatnInfoDialog.vue";
 
 import { ActionTypes } from "@/store";
 
@@ -26,15 +28,16 @@ import { ActionTypes } from "@/store";
     OperatnErrorsQueue,
     OperatnSuccessDialog,
     OperatnConfirmDialog,
+    OperatnInfoDialog,
   },
 })
 export default class App extends Vue {
   /* COMPUTED */
 
-  get toast(): { message: string, color: string } | null {
+  get toast(): { message: string; color: string } | null {
     return this.$store.state.toast;
   }
-  set toast(value: { message: string, color: string } | null) {
+  set toast(value: { message: string; color: string } | null) {
     this.$store.dispatch(ActionTypes.SET_TOAST, value);
   }
 
@@ -73,6 +76,16 @@ export default class App extends Vue {
     if (!value) {
       this.$store.dispatch(ActionTypes.HIDE_CONFIRM_DIALOG);
     }
+  }
+
+  get infoDialogText(): string | null {
+    return this.$store.state.infoDialogText;
+  }
+  get infoDialogShow(): boolean {
+    return this.$store.state.showInfo;
+  }
+  set infoDialogShow(value: boolean) {
+    this.$store.dispatch(value ? ActionTypes.SHOW_INFO : ActionTypes.HIDE_INFO);
   }
 
   get errorsQueue(): string[] {
@@ -116,6 +129,8 @@ export default class App extends Vue {
       this.$vuetify.theme.themes.light.primary = this.primaryColour;
       this.$vuetify.theme.themes.dark.primary = this.primaryColour;
     }
+
+    // this.$store.dispatch(ActionTypes.SHOW_INFO);
   }
 }
 </script>

@@ -1,6 +1,6 @@
 <template>
   <v-form @submit.prevent v-if="internalValue">
-    <v-container fluid>
+    <v-container fluid v-if="body">
       <v-row align="center" justify="center">
         <v-col cols="6">
           <v-select
@@ -55,22 +55,10 @@
       </v-row>
       <v-row align="center" justify="center" v-if="selectedTariffa">
         <v-col cols="6">
-          <v-text-field
-            type="text"
-            label="Prezzo canoni"
-            name="prezzoCanoni"
-            readonly
-            :value="`€ ${selectedTariffa.prezzoCanoni}`"
-          />
+          <v-text-field type="text" label="Prezzo canoni" name="prezzoCanoni" readonly :value="`€ ${selectedTariffa.prezzoCanoni}`" />
         </v-col>
         <v-col cols="6">
-          <v-text-field
-            type="text"
-            label="Prezzo consumi"
-            name="prezzoConsumi"
-            readonly
-            :value="`€ ${selectedTariffa.prezzoConsumi}`"
-          />
+          <v-text-field type="text" label="Prezzo consumi" name="prezzoConsumi" readonly :value="`€ ${selectedTariffa.prezzoConsumi}`" />
         </v-col>
       </v-row>
     </v-container>
@@ -79,21 +67,21 @@
 
 <script lang="ts">
 import { Component, Mixins, Prop, Watch } from "vue-property-decorator";
-import {
-  ContrattiCreateBody,
-  ContrattiReplaceBody,
-  Tariffa,
-  TipiOspiteReturned,
-  TipoFabbricato,
-  TipoStanza,
-  TipoTariffa,
-} from "operatn-api-client";
+import { ContrattiCreateBody, ContrattiReplaceBody, Tariffa, TipiOspiteReturned, TipoFabbricato, TipoStanza, TipoTariffa } from "operatn-api-client";
 
 import TipoFabbricatoHandlerMixin from "@/mixins/handlers/TipoFabbricatoHandlerMixin";
 import TipoOspiteHandlerMixin from "@/mixins/handlers/TipoOspiteHandlerMixin";
 import TipoTariffaHandlerMixin from "@/mixins/handlers/TipoTariffaHandlerMixin";
 import TipoStanzaHandlerMixin from "@/mixins/handlers/TipoStanzaHandlerMixin";
 import TariffaHandlerMixin from "@/mixins/handlers/TariffaHandlerMixin";
+import { AlertType } from "@/store";
+
+interface Body {
+  idTipoOspite: null | number;
+  idUtilizzoStanza: null | number;
+  idTipoFabbricato: null | number;
+  idTipoTariffa: null | number;
+}
 
 @Component({
   model: {
@@ -125,7 +113,9 @@ export default class OperatnTariffa extends Mixins(
   private tipiTariffa: TipoTariffa[] = [];
   private tariffe: Tariffa[] = [];
 
-  private body = this.getEmptyBody();
+  private tipoTariffaDefault: TipoTariffa | null = null;
+  private body: Body | null = null;
+  private selectedTariffa: null | Tariffa = null;
 
   /* GETTERS AND SETTERS */
 
@@ -136,42 +126,55 @@ export default class OperatnTariffa extends Mixins(
     this.$emit("save", value);
   }
 
-  get selectedTariffa(): null | Tariffa {
-    return (
-      this.tariffe.find(
-        (t) =>
-          t.idTipoOspite === this.body.idTipoOspite &&
-          t.idUtilizzoStanza === this.body.idUtilizzoStanza &&
-          t.idTipoFabbricato === this.body.idTipoFabbricato &&
-          t.idTipoTariffa === this.body.idTipoTariffa
-      ) ?? null
-    );
-  }
-
   get tipiOspiteItems() {
-    return this.tipiOspite.map(to => ({
+    return this.tipiOspite.map((to) => ({
       label: `${to.sigla} - ${to.tipoOspite}`,
-      value: to.id
-    }))
+      value: to.id,
+    }));
   }
 
   /* WATCH */
 
+  @Watch("body", { deep: true })
+  watchBody() {
+    if (this.body && this.tariffe.length) {
+      this.selectedTariffa =
+        this.tariffe.find(
+          (t) =>
+            t.idTipoOspite === (this.body as any).idTipoOspite &&
+            t.idUtilizzoStanza === (this.body as any).idUtilizzoStanza &&
+            t.idTipoFabbricato === (this.body as any).idTipoFabbricato &&
+            t.idTipoTariffa === (this.body as any).idTipoTariffa
+        ) ?? null;
+    }
+  }
+
   @Watch("selectedTariffa", { deep: true })
   watchSelectedTariffa() {
-    this.internalValue.idTariffa = this.selectedTariffa ? this.selectedTariffa.id : undefined;
-    this.$emit('update:formValid', !!this.selectedTariffa);
+    if (this.tariffe.length) {
+      this.internalValue.idTariffa = this.selectedTariffa ? this.selectedTariffa.id : undefined;
+      this.$emit("update:formValid", !!this.selectedTariffa);
+    }
   }
 
   @Watch("internalValue", { deep: true })
   watchValue() {
-    const tariffa = this.tariffe.find(t => t.id === this.internalValue.idTariffa);
-    this.body =  tariffa ? ({
-      idTipoOspite: tariffa.idTipoOspite,
-      idUtilizzoStanza: tariffa.idUtilizzoStanza,
-      idTipoFabbricato: tariffa.idTipoFabbricato,
-      idTipoTariffa: tariffa.idTipoTariffa
-    }) : this.getEmptyBody();
+    const tariffa = this.tariffe.find((t) => t.id === this.internalValue.idTariffa);
+    this.body = tariffa
+      ? {
+          idTipoOspite: tariffa.idTipoOspite,
+          idUtilizzoStanza: tariffa.idUtilizzoStanza,
+          idTipoFabbricato: tariffa.idTipoFabbricato,
+          idTipoTariffa: tariffa.idTipoTariffa,
+        }
+      : this.getEmptyBody();
+  }
+
+  @Watch("tipoTariffaDefault")
+  watchSelectedTipoTariffaDefault() {
+    if (this.body && typeof this.body.idTipoTariffa !== "number") {
+      this.body.idTipoTariffa = this.tipoTariffaDefault?.id ?? null;
+    }
   }
 
   /* METHODS */
@@ -181,18 +184,22 @@ export default class OperatnTariffa extends Mixins(
       idTipoOspite: null as number | null,
       idUtilizzoStanza: null as number | null,
       idTipoFabbricato: null as number | null,
-      idTipoTariffa: null as number | null,
+      idTipoTariffa: this.tipoTariffaDefault?.id as number | null,
     };
   }
 
   /* LIFE CYCLE */
 
   async mounted() {
-    this.tipiFabbricato = await this.getTipiFabbricato();
-    this.tipiStanza = await this.getTipiStanza();
-    this.tipiTariffa = await this.getTipiTariffa();
-    this.tipiOspite = await this.getTipiOspite();
-    this.tariffe = await this.getTariffe();
+    this.tipiFabbricato = await this.getTipiFabbricato(AlertType.ERRORS_QUEUE);
+    this.tipiStanza = await this.getTipiStanza(AlertType.ERRORS_QUEUE);
+    this.tipiTariffa = await this.getTipiTariffa(AlertType.ERRORS_QUEUE);
+    this.tipiOspite = await this.getTipiOspite({}, AlertType.ERRORS_QUEUE);
+    this.tariffe = await this.getTariffe({}, AlertType.ERRORS_QUEUE);
+
+    this.tipoTariffaDefault = await this.getTipoTariffaByValue("MENSILE", AlertType.ERRORS_QUEUE);
+
+    this.body = typeof this.internalValue.idTariffa !== "number" ? this.getEmptyBody() : (this.tariffe.find((t) => t.id === this.internalValue.idTariffa) ?? null);
   }
 }
 </script>

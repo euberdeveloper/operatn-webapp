@@ -5,6 +5,7 @@
       description="Gestione dei contratti da firmare. Si può scaricare, firmare e caricare un contratto se l'ospite viene allo sportello, oppure inviare una email con il contratto allegato ed un link per caricarlo una volta firmato. In questo secondo caso lo sportello dovrà comunque controllare il documento e confermarlo."
       :isCard="false"
       tableTitle="Contratti"
+      :tableShowTitle="false"
       :tableSelectedValues.sync="selectedValues"
       :tableColumns="columns"
       :tableActions="actions"
@@ -19,6 +20,7 @@
       editDialogTitle="Modifica contratto"
       :editDialogShow.sync="showEditDialog"
       :editDialogDisabled="!updateBodyValid"
+    dialogWidth="80vw"
       @fabCreateClick="openCreate"
       @fabDeleteClick="askDeleteMultiple"
       @createDialogConfirm="closeCreate(true)"
@@ -28,11 +30,13 @@
     >
       <template v-slot:tableHeader>
         <span class="mx-4" />
-        <operatn-date-input placeholder="Data inizio" style="flex: 1" name="dataInizio" dense hideDetails clearable v-model="dateQueryParams.dataInizio" />
+        <operatn-date-input placeholder="Inizia dopo il" style="flex: 1" name="dataInizio" dense hideDetails clearable v-model="dateQueryParams.dataInizio" />
         <span class="mx-4" />
-        <operatn-date-input placeholder="Data fine" style="flex: 1" name="dataFine" dense hideDetails clearable v-model="dateQueryParams.dataFine" />
+        <operatn-date-input placeholder="Finisce prima del" style="flex: 1" name="dataFine" dense hideDetails clearable v-model="dateQueryParams.dataFine" />
         <span class="mx-4" />
-        <v-radio-group v-model="selectAction" row dense hide-details>
+        <operatn-ospite-input v-show="!selectedValues.length" placeholder="Ospite" name="idOspite" dense hideDetails clearable v-model="dateQueryParams.idOspite" />
+        <span class="mx-4" />
+        <v-radio-group v-show="selectedValues.length" v-model="selectAction" row dense hide-details>
           <v-radio label="Scarica pdf" value="pdf" />
           <v-radio label="Invia email" value="email" />
         </v-radio-group>
@@ -60,6 +64,9 @@
 import { Component, Mixins, Watch } from "vue-property-decorator";
 import { ContrattiCreateBody, ContrattiFilterParams, ContrattiReplaceBody, ContrattiReturned } from "operatn-api-client";
 
+import { pdfContratto, pdfGetBlob } from "@/utils/pdf";
+import { downloadBlob } from "@/utils";
+
 import { ActionTypes, AlertType } from "@/store";
 import ResourceManagerMixin from "@/mixins/ResourceManagerMixin";
 import ContrattoHandlerMixin from "@/mixins/handlers/ContrattoHandlerMixin";
@@ -69,8 +76,7 @@ import OperatnBaseResourceManager, { Column, Actions } from "@/components/gears/
 import OperatnContrattoForm from "@/components/gears/forms/contratto/OperatnContrattoForm.vue";
 import OperatnContrattoFirmaForm from "@/components/gears/forms/contratto/OperatnContrattoFirmaForm.vue";
 import OperatnDateInput from "@/components/gears/inputs/OperatnDateInput.vue";
-import { pdfContratto, pdfGetBlob } from "@/utils/pdf";
-import { downloadBlob } from "@/utils";
+import OperatnOspiteInput from "@/components/gears/inputs/OperatnOspiteInput.vue";
 
 interface Tuple {
   id: number;
@@ -93,6 +99,7 @@ interface Tuple {
     OperatnContrattoForm,
     OperatnContrattoFirmaForm,
     OperatnDateInput,
+    OperatnOspiteInput,
   },
 })
 export default class ContrattiDaFirmare extends Mixins<ResourceManagerMixin<Tuple, ContrattiCreateBody, ContrattiReplaceBody, number> & ContrattoHandlerMixin>(
@@ -108,6 +115,7 @@ export default class ContrattiDaFirmare extends Mixins<ResourceManagerMixin<Tupl
   private dateQueryParams: ContrattiFilterParams = {
     dataInizio: undefined,
     dataFine: undefined,
+    idOspite: undefined
   };
   private selectAction: "pdf" | "email" = "pdf";
   private tableLoading = false;
@@ -188,12 +196,12 @@ export default class ContrattiDaFirmare extends Mixins<ResourceManagerMixin<Tupl
       others: [
         {
           icon: "mdi-file-pdf",
-          color: "error",
+          color: "red",
           action: (item) => this.downloadContratto(item),
         },
         {
           icon: "mdi-email-send",
-          color: "primary",
+          color: "indigo",
           showAction: (item) => {
             return item.reference.dataRispostaEmail === null;
           },
@@ -201,7 +209,7 @@ export default class ContrattiDaFirmare extends Mixins<ResourceManagerMixin<Tupl
         },
         {
           icon: "mdi-upload",
-          color: "success",
+          color: "green",
           action: (item) => this.openFirmaContratto(item),
         },
       ],
@@ -248,8 +256,8 @@ export default class ContrattiDaFirmare extends Mixins<ResourceManagerMixin<Tupl
     return {
       dataInizio: value.reference.dataInizio,
       dataFine: value.reference.dataFine,
-      checkout: value.reference.checkout,
-      cauzione: value.reference.cauzione,
+      checkout: !!value.reference.checkout,
+      cauzione: !!value.reference.cauzione,
       tipoRata: value.reference.tipoRata,
       idTariffa: value.reference.idTariffa,
       idTipoContratto: value.reference.idTipoContratto,
@@ -334,8 +342,7 @@ export default class ContrattiDaFirmare extends Mixins<ResourceManagerMixin<Tupl
       } finally {
         this.firmaDialogCancel();
       }
-    }
-    else {
+    } else {
       this.firmaDialogCancel();
     }
   }

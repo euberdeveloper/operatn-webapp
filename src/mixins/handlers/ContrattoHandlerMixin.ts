@@ -52,6 +52,28 @@ export default class ContrattoHandlerMixin extends Vue {
     }
   }
 
+  async getContrattiAttivi(params: ContrattiIncludeParams & ContrattiFilterParams = {}, alertType = AlertType.ERROR_ALERT): Promise<ContrattiReturned[]> {
+    try {
+      return await this.$api.contratti.getAttivi(params, { alertType });
+    } catch (error) {
+      if (error) {
+        this.$store.dispatch(ActionTypes.ALERT, { message: `Impossibile caricare i contratti`, alertType });
+      }
+      throw error;
+    }
+  }
+
+  async getContrattiTerminati(params: ContrattiIncludeParams & ContrattiFilterParams = {}, alertType = AlertType.ERROR_ALERT): Promise<ContrattiReturned[]> {
+    try {
+      return await this.$api.contratti.getTerminati(params, { alertType });
+    } catch (error) {
+      if (error) {
+        this.$store.dispatch(ActionTypes.ALERT, { message: `Impossibile caricare i contratti`, alertType });
+      }
+      throw error;
+    }
+  }
+
   async getContratto(id: number, params: ContrattiIncludeParams & ContrattiFilterParams = {}, alertType = AlertType.ERROR_ALERT): Promise<ContrattiReturned> {
     try {
       return await this.$api.contratti.get(id, params, { alertType });

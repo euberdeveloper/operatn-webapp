@@ -30,6 +30,16 @@
       <v-color-picker v-model="primaryColour" elevation="15" />
     </v-menu>
 
+    <!-- INFO BUTTON -->
+    <v-tooltip bottom="bottom" v-if="showInfoButton">
+      <template v-slot:activator="{ on }">
+        <v-btn v-on="on" icon="icon" @click="showInfo">
+          <v-icon>mdi-information-outline</v-icon>
+        </v-btn>
+      </template>
+      <span>Informazioni</span>
+    </v-tooltip>
+
     <!-- SETTINGS MENU -->
     <v-menu ref="userMenu" v-model="userMenu" transition="scale-transition" offset-y>
       <template v-slot:activator="{ on, attrs }">
@@ -93,15 +103,18 @@ export default class Bar extends Vue {
   /* COMPUTED */
 
   get primaryColour(): any {
-    return this.$store.state.primaryColour ? this.$store.state.primaryColour : '#1976D2';
+    return this.$store.state.primaryColour ? this.$store.state.primaryColour : "#1976D2";
   }
   set primaryColour(colour: any) {
-    if (colour === null || typeof colour === 'string') {
+    if (colour === null || typeof colour === "string") {
       this.$store.dispatch(ActionTypes.CHANGE_PRIMARY_COLOUR, colour);
-    }
-    else {
+    } else {
       this.$store.dispatch(ActionTypes.CHANGE_PRIMARY_COLOUR, colour.hex);
     }
+  }
+
+  get showInfoButton(): boolean {
+    return !!this.$store.state.infoDialogText;
   }
 
   /* METHODS */
@@ -112,6 +125,10 @@ export default class Bar extends Vue {
 
   changeTheme(): void {
     this.$store.dispatch(ActionTypes.TOGGLE_DARK_THEME);
+  }
+
+  showInfo(): void {
+    this.$store.dispatch(ActionTypes.SHOW_INFO);
   }
 
   getRandomColor(): string {

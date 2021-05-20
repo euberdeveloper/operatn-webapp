@@ -20,6 +20,7 @@
       :showSelect="tableShowSelect"
       :multiSort="tableMultiSort"
       :loading="tableLoading"
+      :showTitle="tableShowTitle"
       :updateBody.sync="internalTableUpdateBody"
       v-if="showTable"
     >
@@ -132,6 +133,9 @@ export default class OperatnBaseResourceManager extends Vue {
 
   @Prop({ type: Boolean, default: false })
   private tableLoading!: boolean;
+
+  @Prop({ type: Boolean, default: true })
+  private tableShowTitle!: boolean;
 
   @Prop({ validator: (v) => typeof v === "object" || v === null, required: true })
   private tableUpdateBody!: any;

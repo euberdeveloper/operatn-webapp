@@ -8,6 +8,7 @@
     :tableColumns="columns"
     :tableActions="actions"
     :tableValues="values"
+    :tableShowTitle="false"
     tableItemKey="id"
     tableShowSelect
     :tableLoading="tableLoading"
@@ -18,6 +19,7 @@
     editDialogTitle="Modifica contratto"
     :editDialogShow.sync="showEditDialog"
     :editDialogDisabled="!updateBodyValid"
+    dialogWidth="80vw"
     @fabCreateClick="openCreate"
     @fabDeleteClick="askDeleteMultiple"
     @createDialogConfirm="closeCreate(true)"
@@ -27,9 +29,11 @@
   >
     <template v-slot:tableHeader>
       <span class="mx-4" />
-      <operatn-date-input placeholder="Data inizio" style="flex: 1" name="dataInizio" dense hideDetails clearable v-model="dateQueryParams.dataInizio" />
+      <operatn-date-input placeholder="Inizia dopo il" name="dataInizio" dense hideDetails clearable v-model="dateQueryParams.dataInizio" />
       <span class="mx-4" />
-      <operatn-date-input placeholder="Data fine" style="flex: 1" name="dataFine" dense hideDetails clearable v-model="dateQueryParams.dataFine" />
+      <operatn-date-input placeholder="Finisce prima del" name="dataFine" dense hideDetails clearable v-model="dateQueryParams.dataFine" />
+      <span class="mx-4" />
+      <operatn-ospite-input placeholder="Ospite" name="idOspite" dense hideDetails clearable v-model="dateQueryParams.idOspite" />
       <span class="mx-4" />
     </template>
     <template v-slot:createDialog>
@@ -53,6 +57,7 @@ import OperatnActionDialog from "@/components/gears/dialogs/OperatnActionDialog.
 import OperatnBaseResourceManager, { Column, Actions } from "@/components/gears/bases/OperatnBaseResourceManager.vue";
 import OperatnContrattoForm from "@/components/gears/forms/contratto/OperatnContrattoForm.vue";
 import OperatnDateInput from "@/components/gears/inputs/OperatnDateInput.vue";
+import OperatnOspiteInput from "@/components/gears/inputs/OperatnOspiteInput.vue";
 
 interface Tuple {
   id: number;
@@ -64,6 +69,7 @@ interface Tuple {
   unitaImmobiliare: string;
   numeroStanza: string;
   postiLetto: string;
+  nOspiti: number;
   dataInserimento: Date;
   reference: ContrattiReturned;
 }
@@ -74,6 +80,7 @@ interface Tuple {
     OperatnBaseResourceManager,
     OperatnContrattoForm,
     OperatnDateInput,
+    OperatnOspiteInput,
   },
 })
 export default class Contratti extends Mixins<ResourceManagerMixin<Tuple, ContrattiCreateBody, ContrattiReplaceBody, number> & ContrattoHandlerMixin>(
@@ -89,6 +96,7 @@ export default class Contratti extends Mixins<ResourceManagerMixin<Tuple, Contra
   private dateQueryParams: ContrattiFilterParams = {
     dataInizio: undefined,
     dataFine: undefined,
+    idOspite: undefined,
   };
   private tableLoading = false;
 
@@ -149,6 +157,12 @@ export default class Contratti extends Mixins<ResourceManagerMixin<Tuple, Contra
         editable: false,
       },
       {
+        text: "N. ospiti",
+        value: "nOspiti",
+        groupable: false,
+        editable: false,
+      },
+      {
         text: "Data inserimento",
         value: "dataInserimento",
         groupable: false,
@@ -180,6 +194,7 @@ export default class Contratti extends Mixins<ResourceManagerMixin<Tuple, Contra
       postiLetto: contratto.contrattiSuOspite?.[0].contrattiSuOspiteSuPostoLetto
         ? contratto.contrattiSuOspite[0].contrattiSuOspiteSuPostoLetto.map((pl) => pl.postoLetto).join(", ")
         : "",
+      nOspiti: contratto.contrattiSuOspite?.length ?? 0,
       dataInserimento: contratto.dataInserimento,
       reference: contratto,
     };
@@ -205,8 +220,8 @@ export default class Contratti extends Mixins<ResourceManagerMixin<Tuple, Contra
     return {
       dataInizio: value.reference.dataInizio,
       dataFine: value.reference.dataFine,
-      checkout: value.reference.checkout,
-      cauzione: value.reference.cauzione,
+      checkout: !!value.reference.checkout,
+      cauzione: !!value.reference.cauzione,
       tipoRata: value.reference.tipoRata,
       idTariffa: value.reference.idTariffa,
       idTipoContratto: value.reference.idTipoContratto,

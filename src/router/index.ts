@@ -4,6 +4,7 @@ import { RuoloUtente } from 'operatn-api-client';
 
 import rootRedirect from './utils/rootRedirect';
 import beforeEach from './utils/beforeEach';
+import infos from './utils/infos';
 
 /* LOGIN */
 import Login from '@/views/login/LoginView.vue';
@@ -45,8 +46,8 @@ import RootContratti from '@/views/root/contratti/RootContrattiView.vue';
 import RootContrattiProvvisori from '@/views/root/contratti/provvisori/RootContrattiProvvisoriView.vue';
 import RootContrattiDaFirmare from '@/views/root/contratti/da-firmare/RootContrattiDaFirmareView.vue';
 import RootContrattiDaVisionare from '@/views/root/contratti/da-visionare/RootContrattiDaVisionareView.vue';
-import RootContrattiFirmati from '@/views/root/contratti/firmati/RootContrattiFirmatiView.vue';
-
+import RootContrattiAttivi from '@/views/root/contratti/attivi/RootContrattiAttiviView.vue';
+import RootContrattiTerminati from '@/views/root/contratti/terminati/RootContrattiTerminatiView.vue';
 
 /* ADMIN */
 import Admin from '@/views/admin/AdminView.vue';
@@ -78,7 +79,8 @@ import AdminContratti from '@/views/admin/contratti/AdminContrattiView.vue';
 import AdminContrattiProvvisori from '@/views/admin/contratti/provvisori/AdminContrattiProvvisoriView.vue';
 import AdminContrattiDaFirmare from '@/views/admin/contratti/da-firmare/AdminContrattiDaFirmareView.vue';
 import AdminContrattiDaVisionare from '@/views/admin/contratti/da-visionare/AdminContrattiDaVisionareView.vue';
-import AdminContrattiFirmati from '@/views/admin/contratti/firmati/AdminContrattiFirmatiView.vue';
+import AdminContrattiAttivi from '@/views/admin/contratti/attivi/AdminContrattiAttiviView.vue';
+import AdminContrattiTerminati from '@/views/admin/contratti/terminati/AdminContrattiTerminatiView.vue';
 
 /* RAGIONERIA */
 import Ragioneria from '@/views/ragioneria/RagioneriaView.vue';
@@ -92,6 +94,28 @@ import RagioneriaTariffe from '@/views/ragioneria/tariffe/RagioneriaTariffeView.
 import RagioneriaContabilita from '@/views/ragioneria/contabilita/RagioneriaContabilitaView.vue';
 import RagioneriaContabilitaInvia from '@/views/ragioneria/contabilita/invia/RagioneriaContabilitaInviaView.vue';
 import RagioneriaContabilitaCronologia from '@/views/ragioneria/contabilita/cronologia/RagioneriaContabilitaCronologiaView.vue';
+
+/* SPORTELLO */
+import Sportello from '@/views/sportello/SportelloView.vue';
+import SportelloBar from '@/views/sportello/SportelloBarView.vue';
+import SportelloMenu from '@/views/sportello/SportelloMenuView.vue';
+import SportelloUserInfo from '@/views/sportello/user-info/SportelloUserInfoView.vue';
+import SportelloTipiStudente from '@/views/sportello/tipi-studente/SportelloTipiStudenteView.vue';
+import SportelloTipiContratto from '@/views/sportello/tipi-contratto/SportelloTipiContrattoView.vue';
+import SportelloFabbricati from '@/views/sportello/fabbricati/SportelloFabbricatiView.vue';
+import SportelloFabbricatiId from '@/views/sportello/fabbricati/id/SportelloFabbricatiIdView.vue';
+import SportelloFabbricatiIdStanzeId from '@/views/sportello/fabbricati/id/stanze/id/SportelloFabbricatiIdStanzeIdView.vue';
+import SportelloDipartimentiUnitn from '@/views/sportello/dipartimenti-unitn/SportelloDipartimentiUnitnView.vue';
+import SportelloTabellone from '@/views/sportello/tabellone/SportelloTabelloneView.vue';
+import SportelloTabelloneEsporta from '@/views/sportello/tabellone/esporta/SportelloTabelloneEsportaView.vue';
+import SportelloTabelloneCronologia from '@/views/sportello/tabellone/cronologia/SportelloTabelloneCronologiaView.vue';
+import SportelloContratti from '@/views/sportello/contratti/SportelloContrattiView.vue';
+import SportelloContrattiProvvisori from '@/views/sportello/contratti/provvisori/SportelloContrattiProvvisoriView.vue';
+import SportelloContrattiDaFirmare from '@/views/sportello/contratti/da-firmare/SportelloContrattiDaFirmareView.vue';
+import SportelloContrattiDaVisionare from '@/views/sportello/contratti/da-visionare/SportelloContrattiDaVisionareView.vue';
+import SportelloContrattiAttivi from '@/views/sportello/contratti/attivi/SportelloContrattiAttiviView.vue';
+import SportelloContrattiTerminati from '@/views/sportello/contratti/terminati/SportelloContrattiTerminatiView.vue';
+
 
 Vue.use(VueRouter);
 
@@ -144,7 +168,10 @@ const routes: Array<RouteConfig> = [
       {
         path: 'utenti',
         name: 'root-utenti',
-        component: RootUtenti
+        component: RootUtenti,
+        meta: {
+          infoText: infos.utenti
+        }
       },
       {
         path: 'tipi-stanza',
@@ -274,16 +301,23 @@ const routes: Array<RouteConfig> = [
           {
             path: 'da-firmare',
             name: 'root-contratti-da-firmare',
-            component: RootContrattiDaFirmare
+            component: RootContrattiDaFirmare,
+            meta: { infoText: infos.contrattiDaFirmare }
           },
           {
             path: 'da-visionare',
             name: 'root-contratti-da-visionare',
             component: RootContrattiDaVisionare
-          }, {
-            path: 'firmati',
-            name: 'root-contratti-firmati',
-            component: RootContrattiFirmati
+          },
+          {
+            path: 'attivi',
+            name: 'root-contratti-attivi',
+            component: RootContrattiAttivi
+          },
+          {
+            path: 'terminati',
+            name: 'root-contratti-terminati',
+            component: RootContrattiTerminati
           },
         ]
       },
@@ -310,7 +344,10 @@ const routes: Array<RouteConfig> = [
       {
         path: 'utenti',
         name: 'admin-utenti',
-        component: AdminUtenti
+        component: AdminUtenti,
+        meta: {
+          infoText: infos.utenti
+        }
       },
       {
         path: 'tipi-stanza',
@@ -440,16 +477,23 @@ const routes: Array<RouteConfig> = [
           {
             path: 'da-firmare',
             name: 'admin-contratti-da-firmare',
-            component: AdminContrattiDaFirmare
+            component: AdminContrattiDaFirmare,
+            meta: { infoText: infos.contrattiDaFirmare }
           },
           {
             path: 'da-visionare',
             name: 'admin-contratti-da-visionare',
             component: AdminContrattiDaVisionare
-          }, {
-            path: 'firmati',
-            name: 'admin-contratti-firmati',
-            component: AdminContrattiFirmati
+          },
+          {
+            path: 'attivi',
+            name: 'admin-contratti-attivi',
+            component: AdminContrattiAttivi
+          },
+          {
+            path: 'terminati',
+            name: 'admin-contratti-terminati',
+            component: AdminContrattiTerminati
           },
         ]
       },
@@ -511,6 +555,114 @@ const routes: Array<RouteConfig> = [
             name: 'ragioneria-contabilita-cronologia',
             component: RagioneriaContabilitaCronologia
           }
+        ]
+      },
+    ]
+  },
+  {
+    path: '/sportello',
+    components: {
+      default: Sportello,
+      bar: SportelloBar,
+      menu: SportelloMenu
+    },
+    meta: { authentication: [RuoloUtente.SPORTELLO] },
+    children: [
+      {
+        path: '',
+        redirect: 'tabellone'
+      },
+      {
+        path: 'user-info',
+        name: 'sportello-user-info',
+        component: SportelloUserInfo
+      },
+      {
+        path: 'tipi-studente',
+        name: 'sportello-tipi-studente',
+        component: SportelloTipiStudente
+      },
+      {
+        path: 'tipi-contratto',
+        name: 'sportello-tipi-contratto',
+        component: SportelloTipiContratto
+      },
+      {
+        path: 'dipartimenti-unitn',
+        name: 'sportello-dipartimenti-unitn',
+        component: SportelloDipartimentiUnitn
+      },
+      {
+        path: 'fabbricati',
+        name: 'sportello-fabbricati',
+        component: SportelloFabbricati
+      },
+      {
+        path: 'fabbricati/:fid',
+        name: 'sportello-fabbricati-id',
+        component: SportelloFabbricatiId,
+        props: true
+      },
+      {
+        path: 'fabbricati/:fid/stanze/:sid',
+        name: 'sportello-fabbricati-id-stanze-id',
+        component: SportelloFabbricatiIdStanzeId,
+        props: true
+      },
+      {
+        path: 'tabellone',
+        component: SportelloTabellone,
+        children: [
+          {
+            path: '',
+            redirect: 'esporta'
+          },
+          {
+            path: 'esporta',
+            name: 'sportello-tabellone-esporta',
+            component: SportelloTabelloneEsporta
+          },
+          {
+            path: 'cronologia',
+            name: 'sportello-tabellone-cronologia',
+            component: SportelloTabelloneCronologia
+          }
+        ]
+      },
+      {
+        path: 'contratti',
+        component: SportelloContratti,
+        children: [
+          {
+            path: '',
+            redirect: 'provvisori'
+          },
+          {
+            path: 'provvisori',
+            name: 'sportello-contratti-provvisori',
+            component: SportelloContrattiProvvisori
+          },
+          {
+            path: 'da-firmare',
+            name: 'sportello-contratti-da-firmare',
+            component: SportelloContrattiDaFirmare,
+            meta: { infoText: infos.contrattiDaFirmare }
+          },
+          {
+            path: 'da-visionare',
+            name: 'sportello-contratti-da-visionare',
+            component: SportelloContrattiDaVisionare
+          },
+          {
+            path: 'attivi',
+            name: 'sportello-contratti-attivi',
+            component: SportelloContrattiAttivi
+          },
+          {
+            path: 'terminati',
+            name: 'sportello-contratti-terminati',
+            component: SportelloContrattiTerminati
+          },
         ]
       },
     ]
