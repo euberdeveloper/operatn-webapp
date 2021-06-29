@@ -8,4 +8,4 @@ ENV VUE_APP_STORED_URL=/stored
 RUN npm run build && \
     rm -r node_modules src public
 RUN npm install -D http-server
-CMD [ "sh", "\" cd site ; rm -r *; cd ..; npx http-server site \"" ]
+CMD [ "sh", "deploy.sh" ]
