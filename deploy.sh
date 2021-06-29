@@ -1,5 +1,9 @@
 #!/bin/bash
 
+echo "Build site"
+npm run build
+rm -r node_modules src public
+
 echo "Removing any pre-existing static file"
 cd site
 rm -r *
