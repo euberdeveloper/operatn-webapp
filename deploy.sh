@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 echo "Removing any pre-existing static file"
 cd site
