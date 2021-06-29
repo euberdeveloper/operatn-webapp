@@ -8,5 +8,5 @@ cd ..
 echo "Passing all the new static files from dist to site"
 cp dist/* site -r
 
-echo "Building frontend"
+echo "Serving debug frontend"
 npx http-server site

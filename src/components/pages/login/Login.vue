@@ -12,7 +12,7 @@
             <v-card class="elevation-12" v-show="showCard">
               <!-- TITLE -->
               <v-toolbar color="primary" class="d-flex justify-center" dark flat>
-                <v-toolbar-title>Login OperaTN PROVA</v-toolbar-title>
+                <v-toolbar-title>Login OperaTN</v-toolbar-title>
               </v-toolbar>
               <!-- FORM -->
               <v-card-text>
