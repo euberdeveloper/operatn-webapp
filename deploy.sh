@@ -1,16 +1,9 @@
-#!/bin/bash
+#!/bin/sh
 
-echo "Removing any pre-existing dist"
-rm -rf dist
+echo "Removing any pre-existing static file"
+cd site
+rm -r *
+cd ..
 
 echo "Building frontend"
-npm run build
-
-echo "Removing node modules and source code"
-rm -r node_modules src
-
-echo "Installing dep for http static debug server"
-npm install -D http-server
-
-echo "Running debug server"
-npx http-server dist
+npx http-server site
