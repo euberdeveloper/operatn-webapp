@@ -1,3 +1,7 @@
+# 301 - Project moved to the [official github organization](https://github.com/operatn)
+
+Note that the project is heavily changed since is was moved to the official organization and there is no risk in the disclosure of this code
+
 # operatn-webapp
 This is the repo for the webapp of OperaTN.
 
